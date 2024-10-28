@@ -1,13 +1,16 @@
 export interface OrgUnitDetails {
-  id: string;
-  code: string;
-  name: string;
-  groupType: string;
-  subGroup: string;
-  activity: string;
-  description: string;
-  dateOfActivity: string;
+  // subGroup: any;
+  // dateOfActivity: any;
+  id: number;
+  recordDate: string;
+  track: string;
+  topicTrainedOn: string;
+  beneficiaryName: string;
+  nonBeneficiaryName: string;
+  sex: string;
+  age: number;
   venue: string;
+  // Add any additional fields if necessary
 }
 
 export interface GetOrgUnitDetailsResponse {

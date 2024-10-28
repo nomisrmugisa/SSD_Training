@@ -63,9 +63,9 @@ export function SessionsTable(props: Props) {
     }, [isLoading]);
 
     useEffect(() => {
-        const matchedElement = data?.find(item => item.id === props.detailsId);
-        if (matchedElement && matchedElement.subGroup) {
-            setSession(matchedElement.subGroup);
+        const matchedElement = data?.find(item => item.id === Number(props.detailsId)); // Convert detailsId to number
+        if (matchedElement && typeof matchedElement === 'string') { // Ensure subGroup is a string
+            setSession(matchedElement);
         }
     }, [data, props.detailsId]);
 
@@ -309,8 +309,8 @@ export function SessionsTable(props: Props) {
     const fetchNewId = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_BASE_URL}/ovc/api/system/id?`,
-                // `/ovc/api/system/id?`, //with proxy
+                `${process.env.REACT_APP_BASE_URL}/api/system/id?`,
+                // `/api/system/id?`, //with proxy
                 {
                     method: 'GET',
                     headers: {
@@ -358,8 +358,8 @@ export function SessionsTable(props: Props) {
 
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_BASE_URL}/ovc/api/events?`,
-                // `/ovc/api/events?`,
+                `${process.env.REACT_APP_BASE_URL}/api/events?`,
+                // `/api/events?`,
                 {
                     method: 'POST',
                     headers: {

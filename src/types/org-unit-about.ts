@@ -30,3 +30,10 @@ export interface Session {
   name: string;
 
 }
+
+// Assuming this is where OrgUnitDetails is defined
+export interface OrgUnitDetails {
+    id: number;
+    subGroup?: string; // Add subGroup if it should exist
+    // ... other properties ...
+}

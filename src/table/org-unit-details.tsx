@@ -3,6 +3,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { OrgUnitDetails } from '../types/org-unit-details';
 import React, {useState} from 'react';
 import {handleDelete} from "../components/org-unit-details/deleteRecord";
+import './table-styles.css'; // Ensure this path is correct
 
 
 const columnHelper = createColumnHelper<OrgUnitDetails>();
@@ -11,34 +12,27 @@ export const orgUnitDetailsColumns =  (credentials: string, setMessage: any, set
   columnHelper.accessor('id', {
     id: 'id',
   }),
-  columnHelper.accessor('code', {
+  columnHelper.accessor('recordDate', {
     cell: (info) => info.getValue(),
-    header: () => 'Code',
+    header: () => 'Record Date',
   }),
-  columnHelper.accessor('name', {
+  columnHelper.accessor('beneficiaryName', {
     cell: (info) => info.getValue(),
     header: () => 'Name of CSO/Partner',
   }),
-  columnHelper.accessor('groupType', {
+  columnHelper.accessor('topicTrainedOn', {
     cell: (info) => info.getValue(),
     header: () => 'Group Type',
   }),
-  columnHelper.accessor('subGroup', {
-    cell: (info) => info.getValue(),
-    header: () => 'Sub Group',
-  }),
-  columnHelper.accessor('activity', {
+  columnHelper.accessor('track', {
     cell: (info) => info.getValue(),
     header: () => 'Activity',
   }),
-  columnHelper.accessor('description', {
+  columnHelper.accessor('sex', {
     cell: (info) => info.getValue(),
     header: () => 'Description',
   }),
-  columnHelper.accessor('dateOfActivity', {
-    cell: (info) => info.getValue(),
-    header: () => 'Date of Activity',
-  }),
+  
   columnHelper.accessor('venue', {
     cell: (info) => info.getValue(),
     header: () => 'Venue',
@@ -51,7 +45,7 @@ export const orgUnitDetailsColumns =  (credentials: string, setMessage: any, set
         <button
             onClick={(event) => {
               event.stopPropagation();  // Prevent row click event
-              const rowId = info.row.original.id;
+              const rowId = String(info.row.original.id); // Convert to string if necessary
               handleDelete(rowId, credentials, setMessage, setIsError)
             }}
             className="delete-button"

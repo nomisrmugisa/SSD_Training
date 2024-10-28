@@ -3,6 +3,7 @@ import { OrgUnitSearch } from './org-unit-search';
 import { OrgUnitTable } from './org-unit-table';
 import { useOrgUnitDetails } from '../../hooks/use-org-unit-details';
 import React from 'react';
+import './table-styles.css'; 
 
 // Define the expected parameters as a type
 type Params = {
@@ -28,7 +29,19 @@ export function OrgUnitDetails() {
 function Table(props: { orgUnitId: string }) {
   const { data } = useOrgUnitDetails(props.orgUnitId);
 
-  // if (data === undefined) return null;
+  // Check if data is defined and is an array
+  const formattedData = data ? data.map(item => ({
+    id: item.id,
+    recordDate: item.recordDate, // Adjust field names as necessary
+    track: item.track,
+    topicTrainedOn: item.topicTrainedOn,
+    beneficiaryName: item.beneficiaryName,
+    nonBeneficiaryName: item.nonBeneficiaryName,
+    sex: item.sex,
+    age: item.age,
+    venue: item.venue,
+  })) : [];
 
-  return <OrgUnitTable orgUnitDetails={data || []} orgUnitId={props.orgUnitId} />;
+  // orgUnitDetails={formattedData}
+  return <OrgUnitTable  orgUnitId={props.orgUnitId} />;
 }

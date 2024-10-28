@@ -4,8 +4,8 @@ export const deleteGroup = async (id: string, credentials: string, setMessage: a
 
     try {
         const response = await fetch(
-            `${process.env.REACT_APP_BASE_URL}ovc/api/events/${id}`,
-            // `/ovc/api/events/${id}`,
+            `${process.env.REACT_APP_BASE_URL}api/events/${id}`,
+            // `/api/events/${id}`,
             {
                 method: 'DELETE',
                 headers: {

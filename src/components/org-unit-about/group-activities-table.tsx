@@ -68,8 +68,8 @@ export function GroupActivitiesTable(props: Props) {
             try {
                 // First request: Fetch the organization unit code
                 const orgUnitCodeResponse = await fetch(
-                    `${process.env.REACT_APP_BASE_URL}/ovc/api/organisationUnits/${props.orgUnitId}`,
-                    // `/ovc/api/organisationUnits/${props.orgUnitId}`,
+                    `${process.env.REACT_APP_BASE_URL}/api/organisationUnits/${props.orgUnitId}`,
+                    // `/api/organisationUnits/${props.orgUnitId}`,
                     {
                         method: 'GET',
                         headers: {
@@ -86,8 +86,8 @@ export function GroupActivitiesTable(props: Props) {
                 if (orgUnitCode) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
-                        `${process.env.REACT_APP_BASE_URL}/ovc/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
-                        // `/ovc/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        `${process.env.REACT_APP_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        // `/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
                             headers: {
@@ -131,8 +131,8 @@ export function GroupActivitiesTable(props: Props) {
     const fetchNewId = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_BASE_URL}/ovc/api/system/id?`,
-                // `/ovc/api/system/id?`, //with proxy
+                `${process.env.REACT_APP_BASE_URL}/api/system/id?`,
+                // `/api/system/id?`, //with proxy
                 {
                     method: 'GET',
                     headers: {
@@ -186,8 +186,8 @@ export function GroupActivitiesTable(props: Props) {
 
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_BASE_URL}/ovc/api/events?`,
-                // `/ovc/api/events?`, //wth proxy
+                `${process.env.REACT_APP_BASE_URL}/api/events?`,
+                // `/api/events?`, //wth proxy
                 {
                     method: 'POST',
                     headers: {
@@ -228,8 +228,8 @@ export function GroupActivitiesTable(props: Props) {
         try {
 
             const response = await fetch(
-                `${process.env.REACT_APP_BASE_URL}/ovc/api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`,
-                // `/ovc/api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`, //with proxy
+                `${process.env.REACT_APP_BASE_URL}/api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`,
+                // `/api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`, //with proxy
                 {
                     method: 'GET',
                     headers: {
