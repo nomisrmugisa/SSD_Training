@@ -1,0 +1,12 @@
+.sticky-col-left {
+    position: sticky;
+    left: 0;
+    background-color: red; /* Avoid overlap issues */
+    z-index: 2; /* Ensure it is on top of scrollable columns */
+    box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1); /* Optional shadow for better visibility */
+}
+
+/* Adjust the left property for each sticky column based on the width of the previous column */
+.sticky-col-left + .sticky-col-left {
+    left: 100px; /* Adjust this based on the width of the first column */
+}

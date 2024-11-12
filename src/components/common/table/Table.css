@@ -1,0 +1,9 @@
+/* Table.css */
+.table-dark-header thead {
+    background-color: #343a40; /* Dark background */
+    color: #ffffff; /* White text color */
+}
+
+.table-dark-header th {
+    border-color: #454d55; /* Darker border color if needed */
+}

@@ -1,0 +1,36 @@
+/* OrgUnitSearch.css */
+
+.org-unit-search-header {
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+}
+
+.search-input {
+    width: 20%;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.org-unit-list {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    max-height: 25rem;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.org-unit-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.org-unit-item:hover {
+    background-color: #ebf8ff;
+}
