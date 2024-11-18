@@ -3,7 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 82vh; /* Full viewport height */
+    min-height: 58vh; /* Full viewport height */
     background-color: #f9fafb;
 }
 .form {
@@ -15,10 +15,17 @@
     width: 100%;
 }
 
+.form div {
+    margin-left: 250px;
+    max-width: 300px;
+    width: 100%;
+}
+
 /* Form input fields */
 form input[type="text"],
 form input[type="number"] {
-    width: 100%;
+    pointer-events: auto;
+    width: 60%;
     padding: 0.5rem;
     margin-top: 0.25rem;
     border: 1px solid #d1d5db;
@@ -36,18 +43,26 @@ form input[type="number"]:focus {
 }
 
 /* Labels for form fields */
-form label {
+.form label {
     display: block;
     font-size: 0.875rem;
     font-weight: 500;
     color: #4b5563;
     margin-bottom: 0.25rem;
+    
+    max-width: 100px;
+    width: 50%;
+}
+
+form select, 
+form input {
+    max-width: 300px;
 }
 
 /* Buttons in the form */
-form button {
-    padding: 0.5rem 1rem;
-    margin-right: 0.5rem;
+.form button {
+    /* padding: 0.5rem 1rem; */
+    margin-right: 5rem;
     background-color: #10b981;
     color: white;
     border: none;

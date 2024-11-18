@@ -8,9 +8,12 @@ import { orgUnitDetailsColumns } from '../../table/org-unit-details';
 import { OrgUnitDetails } from '../../types/org-unit-details';
 import { useTable } from '../../hooks/use-table';
 import { useHistory } from 'react-router-dom';
+import Modal from '../common/modal/modal';
 import React from 'react';
 
-import  Modal  from '../common/modal/modal';
+import LivelihoodForm from '../training-forms/livelihood';
+import WaterSanitationForm from '../training-forms/waterSanitation';
+import NutritionForm from '../training-forms/nutrition';
 
 import '../org-unit-about/form-styles.css';
 
@@ -67,14 +70,18 @@ export function OrgUnitTable(props: Props) {
     // New state variables for filters
     const [trainingFilter, setTrainingFilter] = useState('');
 
+    const [selectedRecord, setSelectedRecord] = useState(null); // State to hold the selected record
+    const [showFilterForm, setShowFilterForm] = useState(false); // State to control filter form visibility
+
     // Function to handle beneficiary search
     const handleBeneficiarySearch = async (event) => {
         if (event.key === 'Enter') {
             try {
-                const response = await fetch(`http://localhost:5001/api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&trackedEntityType=b8gedH8Po5d&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&pageSize=50&page=1&totalPages=false`);
+                const response = await fetch(`http://localhost:5001/api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=kmfLZO8ckxY&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
                 const data = await response.json();
                 setSearchResults(data.rows); // Set the search results
                 setIsModalVisible(true); // Show the modal
+                console.log(trackFilter)
             } catch (error) {
                 console.error('Error fetching search results:', error);
             }
@@ -84,31 +91,40 @@ export function OrgUnitTable(props: Props) {
     // Function to close the modal
     const closeModal = () => {
         setIsModalVisible(false);
+
         setBeneficiarySearch(''); // Reset search input
+        setSelectedRecord(null); // Reset selected record
+        setShowFilterForm(false); // Hide filter form
+    };
+
+    const handleRecordClick = (record) => {
+        setSelectedRecord(record); // Set the selected record
+        setShowFilterForm(true); // Show the filter form
+        console.log({ record });
     };
 
     // Function to handle training filter change
-    const handleTrainingChange = (event) => {
-        setTrainingFilter(event.target.value);
+    const handleTrainingChange = async (event) => {
+        await setTrainingFilter(event.target.value);
         // Fetch data based on the selected training type
         // Implement your data fetching logic here
     };
 
     // Function to handle place filter change
-    const handlePlaceChange = (event) => {
-        setPlaceFilter(event.target.value);
+    const handlePlaceChange = async (event) => {
+        await setPlaceFilter(event.target.value);
         // Implement your data fetching logic here
     };
 
     // Function to handle date filter change
-    const handleDateChange = (event) => {
-        setDateFilter(event.target.value);
+    const handleDateChange = async (event) => {
+        await setDateFilter(event.target.value);
         // Implement your data fetching logic here
     };
 
     // Function to handle track filter change
-    const handleTrackChange = (event) => {
-        setTrackFilter(event.target.value);
+    const handleTrackChange = async (event) => {
+        await setTrackFilter(event.target.value);
         // Implement your data fetching logic here
     };
 
@@ -167,17 +183,10 @@ export function OrgUnitTable(props: Props) {
         fetchData();
     }, [trigger]);
 
-    function onAdd() {
+    const onAdd = () => {
         setFormVisible(true);
         setTrigger(prevTrigger => prevTrigger + 1);
     }
-
-    // const [selectedDate, setSelectedDate] = useState('');
-    // const handleDateChange = (event) => {
-    //     const date = new Date(event.target.value);
-    //     const formattedDate = date.toISOString().split('T')[0]; // Format to YYYY-MM-DD
-    //     setSelectedDate(formattedDate);
-    // };
 
     // Function to fetch a new ID
     const fetchNewId = async () => {
@@ -230,7 +239,7 @@ export function OrgUnitTable(props: Props) {
         }
     };
 
-    async function handleFormSubmit(event: React.FormEvent) {
+    const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         // console.log("formData", formData)
         setLoading(true);
@@ -285,14 +294,14 @@ export function OrgUnitTable(props: Props) {
             relationships: [],
 
             attributes: [
-                { "attribute": "FwEpAEagGeK", "value": "Fisher"},
-                { "attribute": "IVvy19BmIOw", "value": "Male" },
+                { "attribute": "FwEpAEagGeK", "value": formData.track },
+                { "attribute": "IVvy19BmIOw", "value": formData.sex },
                 { "attribute": "OWR8KrtfN3n", "value": "0777129065" },
-                { "attribute": "lvpNOLmDEEG", "value": "24" },
-                { "attribute": "m35qF41KIdK","value":"jdlklk878777832"},
-                { "attribute": "r0AIdmEpPN9", "value": "2024-10-27" },
-                { "attribute": "tUjM7KxKvCO", "value": "Alphonse" }, // Replace with actual value
-                { "attribute": "xts0QtWHpnK", "value": "Capone" } // Replace with actual value
+                { "attribute": "lvpNOLmDEEG", "value": formData.age },
+                { "attribute": "m35qF41KIdK", "value": "jdlklk878777832" },
+                { "attribute": "r0AIdmEpPN9", "value": formData.recordDate },
+                { "attribute": "tUjM7KxKvCO", "value": formData.beneficiaryName }, // Replace with actual value
+                { "attribute": "xts0QtWHpnK", "value": formData.nonBeneficiaryName } // Replace with actual value
             ],
             enrollments: [
                 {
@@ -346,7 +355,7 @@ export function OrgUnitTable(props: Props) {
         setLoading(false);
     }
 
-    async function handleInputChange(event) {
+    const handleInputChange = async (event) => {
         const { name, value } = event.target;
         setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
@@ -408,7 +417,7 @@ export function OrgUnitTable(props: Props) {
     };
 
 
-   
+
     return (
         <main className="space-y-4">
             <Header
@@ -417,10 +426,12 @@ export function OrgUnitTable(props: Props) {
             />
 
             {/* Training Filters */}
-            <h5 style={{ padding: '10px'}}>Training</h5>
-            <div className="flex space-x-4" style={{ padding: '10px',
-                display: 'flex', gap: '15px' }}>                
-                <label style={{ display: 'flex', gap: '3px'}}>
+            <h5 style={{ padding: '10px' }}>Training</h5>
+            <div className="flex space-x-4" style={{
+                padding: '0px 10px 10px 10px',
+                display: 'flex', gap: '15px'
+            }}>
+                <label style={{ display: 'flex', gap: '3px' }}>
                     <input
                         type="radio"
                         value="Livelihood"
@@ -429,7 +440,7 @@ export function OrgUnitTable(props: Props) {
                     />
                     Livelihood
                 </label>
-                <label style={{ display: 'flex', gap: '3px'}}>
+                <label style={{ display: 'flex', gap: '3px' }}>
                     <input
                         type="radio"
                         value="Water Sanitation & Hygiene"
@@ -438,7 +449,7 @@ export function OrgUnitTable(props: Props) {
                     />
                     Water Sanitation & Hygiene
                 </label>
-                <label style={{ display: 'flex', gap: '3px'}}>
+                <label style={{ display: 'flex', gap: '3px' }}>
                     <input
                         type="radio"
                         value="Nutrition"
@@ -450,8 +461,10 @@ export function OrgUnitTable(props: Props) {
             </div>
 
             {/* Search Input for Beneficiary and other Filters */}
-            <div className="flex space-x-4" style= {{ padding: '10px', 
-                display: 'flex', gap: '15px' }}>
+            <div className="flex space-x-4" style={{
+                padding: '10px',
+                display: 'flex', gap: '15px'
+            }}>
                 <input
                     type="text"
                     placeholder="Search Beneficiary"
@@ -459,39 +472,56 @@ export function OrgUnitTable(props: Props) {
                     onChange={(e) => setBeneficiarySearch(e.target.value)}
                     onKeyDown={handleBeneficiarySearch}
                     className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px'}}
+                    style={{ borderRadius: '5px' }}
                 />
-            
+
                 <input
                     type="text"
                     placeholder="Place"
                     value={placeFilter}
                     onChange={handlePlaceChange}
                     className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px'}}
+                    style={{ borderRadius: '5px' }}
                 />
                 <input
                     type="date"
                     value={dateFilter}
                     onChange={handleDateChange}
                     className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px'}}
+                    style={{ borderRadius: '5px' }}
                 />
                 <select
                     value={trackFilter}
-                    onChange={handleTrackChange}
+                    onChange={(e) => setTrackFilter(e.target.value)}
+                    // onKeyDown={handleBeneficiarySearch}
                     className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px'}}
+                    style={{ borderRadius: '5px' }}
                 >
                     <option value="Select Tracker">Select Tracker</option>
                     <option value="Fisher">Fisher</option>
                     <option value="Farmer">Farmer</option>
                 </select>
+
+                <input
+                    type="text"
+                    placeholder="New Beneficiary"
+                    value={placeFilter}
+                    // onChange={handlePlaceChange}
+                    className="border border-gray-300 rounded-md p-2"
+                    style={{ borderRadius: '5px' }}
+                />
             </div>
 
             {/* Modal for Search Results */}
             {isModalVisible && (
-                <Modal onClose={closeModal} >
+                <Modal
+                    // onClose={closeModal}
+                    trainingFilter={trainingFilter}
+                    LivelihoodForm={LivelihoodForm}
+                    WaterSanitationForm={WaterSanitationForm}
+                    NutritionForm={NutritionForm}
+
+                >
                     <h2>Person Search Results</h2>
                     <table className="min-w-full border-collapse border border-gray-300">
                         <thead>
@@ -504,28 +534,54 @@ export function OrgUnitTable(props: Props) {
                                 <th className="border border-gray-300">Surname</th>
                                 <th className="border border-gray-300">Age</th>
                                 <th className="border border-gray-300">Date of Birth</th>
+                                <th className="border border-gray-300">Sex</th>
+                                <th className="border border-gray-300">Beneficiary Track</th>
+
+
                             </tr>
                         </thead>
                         <tbody>
                             {searchResults.map((row, index) => (
-                                <tr key={index}>
+                                <tr key={index} onClick={() => handleRecordClick(row)}>
                                     <td className="border border-gray-300">{row[4]}</td>
                                     <td className="border border-gray-300">{row[1]}</td>
-                                    <td className="border border-gray-300">{row[9]}</td>
+                                    <td className="border border-gray-300">{"No"}</td>
                                     <td className="border border-gray-300">{row[8]}</td>
                                     <td className="border border-gray-300">{row[12]}</td>
-                                    <td className="border border-gray-300">{row[10]}</td>
-                                    <td className="border border-gray-300">{row[11]}</td>
                                     <td className="border border-gray-300">{row[13]}</td>
+                                    <td className="border border-gray-300">{row[14]}</td>
+                                    <td className="border border-gray-300">{row[15]}</td>
+                                    <td className="border border-gray-300">{row[16]}</td>
+                                    <td className="border border-gray-300">{row[18]}</td>
+
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                    {/* Pagination Controls */}
-                    <div className="flex justify-between mt-4">
-                        <button className="btn">Back</button>
-                        <button className="btn">Go to registration</button>
-                    </div>
+                    {showFilterForm && selectedRecord && (
+                        <div>
+                            {/* Render the specific filter form based on the selected record */}
+                            
+                            {trainingFilter === 'Livelihood' && (
+                                <LivelihoodForm
+                                    place={selectedRecord[4]}
+                                    track={selectedRecord[18]}
+                                />
+                            )}
+                            {trainingFilter === 'Water Sanitation & Hygiene' && (
+                                <WaterSanitationForm
+                                    place={selectedRecord[4]}
+                                    track={selectedRecord[18]}
+                                />
+                            )}
+                            {trainingFilter === 'Nutrition' && (
+                                <NutritionForm
+                                    place={selectedRecord[4]}
+                                    track={selectedRecord[18]}
+                                />
+                            )}
+                        </div>
+                    )}
                 </Modal>
             )}
 
@@ -542,7 +598,173 @@ export function OrgUnitTable(props: Props) {
                 </div>
             )}
 
+            {/* Conditionally render the Livelihood form */}
+            {/* {trainingFilter === 'Livelihood' && (
+                <LivelihoodForm onClose={() => setTrainingFilter('')} />
+            )} */}
+
+            {/* Conditionally render the Water Sanitation form */}
+            {/* {trainingFilter === 'Water Sanitation & Hygiene' && (
+                <WaterSanitationForm onClose={() => setTrainingFilter('')} />
+            )} */}
+
+            {/* Conditionally render the Nutrition form */}
+            {/* {trainingFilter === 'Nutrition' && (
+                <NutritionForm onClose={() => setTrainingFilter('')} />
+            )} */}
+
             {/* Table Section */}
+
+            {formVisible && (
+                <div className="form-container">
+                    <form onSubmit={handleFormSubmit} className="form">
+                        {/*loader for getting code*/}
+                        {isLoading ? (
+                            <div className="mt-4">
+                                <div className="loader-container">
+                                    {/* <div className="spinner"></div> */}
+                                    <p>Loading code, please wait...</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Record Date</label>
+                                <input
+                                    type="date"
+                                    name="recordDate"
+                                    value={formData.recordDate}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    required
+                                />
+                            </div>
+                        )}
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Track</label>
+                            <select
+                                name="track"
+                                value={formData.track}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                required
+                            >
+                                <option value="">Select Tracker</option>
+                                <option value="1. Farmer">Farmer</option>
+                                <option value="2. Fisher">Fisher</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Topic Trained On</label>
+                            <input
+                                type="text"
+                                name="topicTrainedOn"
+                                value={formData.topicTrainedOn}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Name (Beneficiary)</label>
+                            <input
+                                type="text"
+                                name="beneficiaryName"
+                                value={formData.beneficiaryName}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Name (Non Beneficiary)</label>
+                            <input
+                                type="text"
+                                name="nonBeneficiaryName"
+                                value={formData.nonBeneficiaryName}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Sex</label>
+                            <select
+                                name="sex"
+                                value={formData.sex}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                required
+                            >
+                                <option value="">Sex</option>
+                                <option value="1. Male">Male</option>
+                                <option value="2. Female">Female</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Age</label>
+                            <input
+                                type="number"
+                                name="age"
+                                value={formData.age}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Venue</label>
+                            <input
+                                type="text"
+                                name="venue"
+                                value={formData.venue}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Action</label>
+                            <input
+                                type="text"
+                                name="action"
+                                value={formData.action}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                required
+                            />
+                        </div>
+
+
+                        <div className="button-container">
+                            <button type="submit" className="submit-button"
+                                style={{ marginLeft: '-250px' }}
+                            >
+                                Save & Continue
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setFormVisible(false);
+                                    setFormData({
+                                        recordDate: '',
+                                        track: '',
+                                        topicTrainedOn: '',
+                                        beneficiaryName: '',
+                                        nonBeneficiaryName: '',
+                                        sex: '',
+                                        age: '',
+                                        venue: '',
+                                        action: ''
+                                    });
+                                    setSelectedFilter('');
+                                }}
+                                className="cancel-button"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
+
             {!formVisible && <Table
                 table={table}
                 className="border border-gray-300 rounded-md shadow-md"
@@ -556,6 +778,6 @@ export function OrgUnitTable(props: Props) {
 
     );
 
-    
+
 
 }
