@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
+
 import './modal.css';
 
 type ModalProps = {
     // onClose: () => void;
+    orgUnitId: string;
+    trackInstanceId: string;
     children: React.ReactNode;
     trainingFilter: string; // Add trainingFilter as a prop
-    LivelihoodForm: React.FC<{ place: string; track: string }>;
-    WaterSanitationForm: React.FC<{ place: string; track: string }>;
-    NutritionForm: React.FC<{ place: string; track: string }>;
+    LivelihoodForm: React.FC<{ place: string; track: string; orgUnit: string, trackInstance: string }>;
+    WaterSanitationForm: React.FC<{ place: string; track: string; orgUnit: string, trackInstance: string }>;
+    NutritionForm: React.FC<{ place: string; track: string; orgUnit: string, trackInstance: string }>;
 };
 
-const Modal: React.FC<ModalProps> = ({ children, trainingFilter, LivelihoodForm, WaterSanitationForm, NutritionForm }) => {
+const Modal: React.FC<ModalProps> = ({ orgUnitId, trackInstanceId, children, trainingFilter, LivelihoodForm, WaterSanitationForm, NutritionForm}) => {
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [showFilterForm, setShowFilterForm] = useState(false);
 
@@ -30,9 +33,9 @@ const Modal: React.FC<ModalProps> = ({ children, trainingFilter, LivelihoodForm,
                 {children}
                 {showFilterForm && selectedRecord && (
                     <div>
-                        {trainingFilter === 'Livelihood' && (<LivelihoodForm place={selectedRecord.registeringUnit} track={selectedRecord.beneficiaryTrack} />)}
-                        {trainingFilter === 'Water Sanitation & Hygiene' && (<WaterSanitationForm place={selectedRecord.registeringUnit} track={selectedRecord.beneficiaryTrack} />)}
-                        {trainingFilter === 'Nutrition' && (<NutritionForm place={selectedRecord.registeringUnit} track={selectedRecord.beneficiaryTrack} />)}
+                        {trainingFilter === 'Livelihood' && (<LivelihoodForm place={selectedRecord.registeringUnit} track={selectedRecord.beneficiaryTrack} orgUnit={orgUnitId} trackInstance={trackInstanceId}  />)}
+                        {trainingFilter === 'Water Sanitation & Hygiene' && (<WaterSanitationForm place={selectedRecord.registeringUnit} track={selectedRecord.beneficiaryTrack} orgUnit={orgUnitId} trackInstance={trackInstanceId} />)}
+                        {trainingFilter === 'Nutrition' && (<NutritionForm place={selectedRecord.registeringUnit} track={selectedRecord.beneficiaryTrack} orgUnit={orgUnitId} trackInstance={trackInstanceId} />)}
                     </div>
                 )}
             </div>

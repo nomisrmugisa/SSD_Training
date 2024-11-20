@@ -81,7 +81,8 @@ export function OrgUnitTable(props: Props) {
                 const data = await response.json();
                 setSearchResults(data.rows); // Set the search results
                 setIsModalVisible(true); // Show the modal
-                console.log(trackFilter)
+                console.log(trackFilter);
+                // console.log({searchResults})
             } catch (error) {
                 console.error('Error fetching search results:', error);
             }
@@ -239,19 +240,34 @@ export function OrgUnitTable(props: Props) {
         }
     };
 
+
+    const generateTrackInstId = async (length = 11): Promise<string> => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        return new Promise((resolve) => {
+            let result = '';
+            setTimeout(() => {
+                for (let i = 0; i < length; i++) {
+                    const randomIndex = Math.floor(Math.random() * characters.length);
+                    result += characters[randomIndex];
+                }
+                resolve(result);
+            }, 100);
+        });
+    };
+
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         // console.log("formData", formData)
         setLoading(true);
 
         // Fetch new ID for the event
-        const newId = await fetchNewId();
-        if (!newId) {
-            console.error('Failed to generate a new trackedEntityInstance ID.');
-            setLoading(false);
-            setMessage('Failed to generate a new trackedEntityInstance ID.');
-            return;
-        }
+        const newId = await generateTrackInstId();
+        // if (!newId) {
+        //     console.error('Failed to generate a new trackedEntityInstance ID.');
+        //     setLoading(false);
+        //     setMessage('Failed to generate a new trackedEntityInstance ID.');
+        //     return;
+        // }
         // console.log("id", newId)
 
         // Fetch new ID for the event
@@ -477,6 +493,15 @@ export function OrgUnitTable(props: Props) {
 
                 <input
                     type="text"
+                    placeholder="New Beneficiary"
+                    value={placeFilter}
+                    // onChange={handlePlaceChange}
+                    className="border border-gray-300 rounded-md p-2"
+                    style={{ borderRadius: '5px' }}
+                />
+
+                <input
+                    type="text"
                     placeholder="Place"
                     value={placeFilter}
                     onChange={handlePlaceChange}
@@ -502,20 +527,16 @@ export function OrgUnitTable(props: Props) {
                     <option value="Farmer">Farmer</option>
                 </select>
 
-                <input
-                    type="text"
-                    placeholder="New Beneficiary"
-                    value={placeFilter}
-                    // onChange={handlePlaceChange}
-                    className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px' }}
-                />
+
             </div>
 
             {/* Modal for Search Results */}
             {isModalVisible && (
                 <Modal
                     // onClose={closeModal}
+
+                    orgUnitId={props.orgUnitId}
+                    trackInstanceId={''}
                     trainingFilter={trainingFilter}
                     LivelihoodForm={LivelihoodForm}
                     WaterSanitationForm={WaterSanitationForm}
@@ -561,23 +582,29 @@ export function OrgUnitTable(props: Props) {
                     {showFilterForm && selectedRecord && (
                         <div>
                             {/* Render the specific filter form based on the selected record */}
-                            
+
                             {trainingFilter === 'Livelihood' && (
                                 <LivelihoodForm
                                     place={selectedRecord[4]}
                                     track={selectedRecord[18]}
+                                    orgUnit={props.orgUnitId}
+                                    trackInstance = {selectedRecord[0]}
                                 />
                             )}
                             {trainingFilter === 'Water Sanitation & Hygiene' && (
                                 <WaterSanitationForm
                                     place={selectedRecord[4]}
                                     track={selectedRecord[18]}
+                                    orgUnit={props.orgUnitId}
+                                    trackInstance = {selectedRecord[0]}
                                 />
                             )}
                             {trainingFilter === 'Nutrition' && (
                                 <NutritionForm
                                     place={selectedRecord[4]}
                                     track={selectedRecord[18]}
+                                    orgUnit={props.orgUnitId}
+                                    trackInstance = {selectedRecord[0]}
                                 />
                             )}
                         </div>
@@ -598,22 +625,7 @@ export function OrgUnitTable(props: Props) {
                 </div>
             )}
 
-            {/* Conditionally render the Livelihood form */}
-            {/* {trainingFilter === 'Livelihood' && (
-                <LivelihoodForm onClose={() => setTrainingFilter('')} />
-            )} */}
-
-            {/* Conditionally render the Water Sanitation form */}
-            {/* {trainingFilter === 'Water Sanitation & Hygiene' && (
-                <WaterSanitationForm onClose={() => setTrainingFilter('')} />
-            )} */}
-
-            {/* Conditionally render the Nutrition form */}
-            {/* {trainingFilter === 'Nutrition' && (
-                <NutritionForm onClose={() => setTrainingFilter('')} />
-            )} */}
-
-            {/* Table Section */}
+            {/* Add record Section */}
 
             {formVisible && (
                 <div className="form-container">
@@ -650,8 +662,8 @@ export function OrgUnitTable(props: Props) {
                                 required
                             >
                                 <option value="">Select Tracker</option>
-                                <option value="1. Farmer">Farmer</option>
-                                <option value="2. Fisher">Fisher</option>
+                                <option value="Farmer">Farmer</option>
+                                <option value="Fisher">Fisher</option>
                             </select>
                         </div>
                         <div>
@@ -694,8 +706,8 @@ export function OrgUnitTable(props: Props) {
                                 required
                             >
                                 <option value="">Sex</option>
-                                <option value="1. Male">Male</option>
-                                <option value="2. Female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
                             </select>
                         </div>
                         <div>

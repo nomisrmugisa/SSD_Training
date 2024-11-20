@@ -60,3 +60,15 @@
     display: flex;
     justify-content: space-between;
 }
+
+.trackFarmer, .trackFisher, .track{
+    margin-right: 120px;
+}
+
+
+.form-rowTrack {
+    margin-right: 60px;
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}

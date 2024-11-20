@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './formStyles.css';
 
-const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, track }) => {
+const NutritionForm: React.FC<{ place: string; track: string; orgUnit: string; trackInstance: string }> = ({ place, track, orgUnit, trackInstance}) => {
     const [formData, setFormData] = useState({
         reportDate: '',
         dueDate: '',
@@ -20,18 +20,113 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
         other: '',
     });
 
-    const handleInputChange = (event) => {
-        const { name, type, checked, value } = event.target;
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleInputChange = async (event) => {
+        const { name, type, checked, value } = await event.target;
         setFormData((prevData) => ({
             ...prevData,
             [name]: type === 'checkbox' ? checked : value,
         }));
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const generateEvent = async (length = 11) => {
+        return new Promise((resolve) => {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+
+            // Simulate async task (e.g., a delay)
+            setTimeout(() => {
+                for (let i = 0; i < length; i++) {
+                    const randomIndex = Math.floor(Math.random() * characters.length);
+                    result += characters[randomIndex];
+                }
+
+                // Create the event object with the generated random code
+                resolve(result);  // Resolve the Promise with the generated code
+            }, 100);  // Adding a small delay of 100ms
+        });
+    };
+
+    const handleComplete = async () => {
+        try {
+            const event = generateEvent();
+            const payload = {
+                "dataValues": [
+                    { "value": formData.nutritionPregnancy, "dataElement": "FVIkGrGWz1s" },
+                    { "value": formData.earlyInitiation, "dataElement": "URD2xr6Enhc" },
+                    { "value": formData.breastfeedingFirst6Months, "dataElement": "LzFFXJl5Iqu" },
+                    { "value": formData.exclusiveBreastfeeding, "dataElement": "ecFLn0i8QrL" },
+                    { "value": formData.goodHygienePractices, "dataElement": "ijTViGLk6hP" },
+                    { "value": formData.complementaryFeeding, "dataElement": "LzGN50sTSh3" },
+                    { "value": formData.healthSeekingBehavior, "dataElement": "C2GoFXyTUj2" },
+                    { "value": formData.growthMonitoring, "dataElement": "DK06Y2Viejs" },
+                    { "value": formData.kitchenGardens, "dataElement": "NOIbysghola" },
+                    { "value": formData.cookingDemonstration, "dataElement": "LhcJpqUzqcp" },
+                    { "value": formData.pregnant, "dataElement": "stU3OZCy64s" },
+                    { "value": formData.lactating, "dataElement": "NA1ZhjvX47L" },
+                    { "value": formData.other, "dataElement": "TQLLkvvbCD2" }
+                ],
+                "event": event,
+                "program": "kmfLZO8ckxY",
+                "programStage": "DSFjQPPKuyM",
+                "orgUnit": orgUnit, // "DGY1RFEb7sO",
+                "trackedEntityInstance": trackInstance, //"kfJ7DFRjnuA",
+                "status": "COMPLETED",
+                "dueDate": formData.dueDate,
+                "eventDate": formData.reportDate,
+                "completedDate": new Date().toISOString().split('T')[0] // Today's date
+            };
+
+            const response = await fetch(process.env.REACT_APP_DHIS2_BASE_URL + '/api/events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic ' + btoa('admin:Precommunicate30-#Helle17') // Replace with your authentication
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Data submitted successfully:', data);
+            alert('Form submitted successfully!');
+
+        } catch (error) {
+            console.error('Error submitting data:', error);
+            alert('Error submitting form. Please try again later.');
+        }
+    };
+
+    const handleSubmit = async (event) => {
+        await event.preventDefault();
         console.log('Nutrition Form submitted:', formData);
         // onClose();
+        await handleComplete();
+    };
+
+    const resetForm = () => {
+        setFormData({
+            reportDate: '',
+            dueDate: '',
+            nutritionPregnancy: false,
+            earlyInitiation: false,
+            breastfeedingFirst6Months: false,
+            exclusiveBreastfeeding: false,
+            goodHygienePractices: false,
+            complementaryFeeding: false,
+            healthSeekingBehavior: false,
+            growthMonitoring: false,
+            kitchenGardens: false,
+            cookingDemonstration: false,
+            pregnant: false,
+            lactating: false,
+            other: '',
+        });
     };
 
     return (
@@ -70,7 +165,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                     required
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Nutrition during pregnancy and lactation                    
                 </label>
@@ -82,7 +177,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Importance of early initiation of breastfeeding                    
                 </label>
@@ -94,7 +189,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Breastfeeding in the first 6 months                    
                 </label>
@@ -106,7 +201,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row  track">
                 <label className='form-label'>
                     Exclusive breastfeeding during the first 6 months                    
                 </label>
@@ -118,7 +213,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Good hygiene practices                    
                 </label>
@@ -130,7 +225,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Complementary feeding                    
                 </label>
@@ -142,7 +237,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Health seeking behavior                    
                 </label>
@@ -154,7 +249,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Growth monitoring
                 </label>
@@ -166,7 +261,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Kitchen gardens and fruit trees
                 </label>
@@ -178,7 +273,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Cooking Demonstration                    
                 </label>
@@ -190,7 +285,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'>
                     Pregnant                    
                 </label>
@@ -202,7 +297,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row track">
                 <label className='form-label'> 
                     Lactating                    
                 </label>
@@ -214,7 +309,7 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                         onChange={handleInputChange}
                 />
             </div>
-            <div className="form-row">
+            <div className="form-row ">
                 <label className='form-label'>Other</label>
                 <input
                     className='form-input'
@@ -225,8 +320,10 @@ const NutritionForm: React.FC<{ place: string; track: string }> = ({ place, trac
                 />
             </div>
             <div className="button-container">
-                <button type="submit">Complete</button>
-                <button type="button" onClick={()=>{}}>Cancel</button>
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Submitting...' : 'Complete'}
+                </button>
+                <button type="button" onClick={resetForm}>Cancel</button>
             </div>
         </form>
     );
