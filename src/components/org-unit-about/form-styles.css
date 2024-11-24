@@ -3,21 +3,21 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 58vh; /* Full viewport height */
+    min-height: 64vh; /* Full viewport height */
     background-color: #f9fafb;
 }
 .form {
     background-color: #f3f4f6;
-    padding: 1rem;
+    padding: 0.2rem;
     border-radius: 0.5rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+    max-width: 800px;
     width: 100%;
 }
 
 .form div {
     margin-left: 250px;
-    max-width: 300px;
+    max-width: 500px;
     width: 100%;
 }
 
@@ -50,8 +50,8 @@ form input[type="number"]:focus {
     color: #4b5563;
     margin-bottom: 0.25rem;
     
-    max-width: 100px;
-    width: 50%;
+    max-width: 300px;
+    width: 70%;
 }
 
 form select, 

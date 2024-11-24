@@ -31,12 +31,12 @@ export const App = observer(() => {
                   <Route exact path="/:orgUnitId">
                       <OrgUnitDetails />
                   </Route>
-                  <Route exact path="/:orgUnitId/:detailsId/about">
+                  {/* <Route exact path="/:orgUnitId/:detailsId/about">
                       <OrgUnitAbout />
                   </Route>
                   <Route exact path="/:orgUnitId/:detailsId/sessions">
                       <SessionsPage />
-                  </Route>
+                  </Route> */}
               </Switch>
           </Router>
 

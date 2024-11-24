@@ -5,7 +5,7 @@ type Props = {
 //   search: string;
 //   onSearch: (value: string) => void;
   onAdd: () => void;
-  onDownloadCSV: () => void;  // New prop for the CSV button
+//  onDownloadCSV: () => void;  
   back?: ReactNode;
   front?: ReactNode;
 };
@@ -27,7 +27,7 @@ export function Header(props: Props) {
 
             <div style={{ display: 'flex', gap: '16px', marginLeft: 'auto', alignItems: 'center' }}>
                 {/* New Download CSV Button */}
-                <button
+                {/* <button
                     style={{
                         padding: '0.25rem 1rem',
                         backgroundColor: '#2563eb', // Tailwind blue-600 color
@@ -37,10 +37,10 @@ export function Header(props: Props) {
                         cursor: 'pointer',
                         transition: 'background-color 0.3s ease',
                     }}
-                    onClick={props.onDownloadCSV}
+                    onClick={}
                 >
                     Download CSV
-                </button>
+                </button> */}
 
                 {/* Existing Add + Button */}
                 <button

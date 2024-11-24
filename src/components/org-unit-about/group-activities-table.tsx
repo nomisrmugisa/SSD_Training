@@ -326,7 +326,7 @@ export function GroupActivitiesTable(props: Props) {
                         </button>
                     </Link>
                 }
-                onDownloadCSV={handleDownloadCSV}
+                // onDownloadCSV={handleDownloadCSV}
             />
 
             {/*looader for saving entry*/}

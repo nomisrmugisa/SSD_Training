@@ -38,13 +38,19 @@ export function OrgUnitTable(props: Props) {
     const [formData, setFormData] = useState({
         recordDate: '',
         track: '',
+        inactive: '',
+        beneficiaryStage: '',
+        careGiver: '',
+        careGiverAge: '',
+        patientID: '',
+        firstMiddleName: '',
+        surname: '',
         topicTrainedOn: '',
         beneficiaryName: '',
         nonBeneficiaryName: '',
         sex: '',
         age: '',
-        venue: '',
-        action: ''
+
     }); // Add initial form data
     // console.log("orgUnitDetails", props.orgUnitDetails);
     const [message, setMessage] = useState(null); // State for success or error message
@@ -310,14 +316,22 @@ export function OrgUnitTable(props: Props) {
             relationships: [],
 
             attributes: [
-                { "attribute": "FwEpAEagGeK", "value": formData.track },
+                { "attribute": "FwEpAEagGeK", "value": formData.track }, //hcyi8QjEwyW
                 { "attribute": "IVvy19BmIOw", "value": formData.sex },
-                { "attribute": "OWR8KrtfN3n", "value": "0777129065" },
-                { "attribute": "lvpNOLmDEEG", "value": formData.age },
-                { "attribute": "m35qF41KIdK", "value": "jdlklk878777832" },
+
+                { "attribute": "lvpNOLmDEEG", "value": formData.age },                
                 { "attribute": "r0AIdmEpPN9", "value": formData.recordDate },
-                { "attribute": "tUjM7KxKvCO", "value": formData.beneficiaryName }, // Replace with actual value
-                { "attribute": "xts0QtWHpnK", "value": formData.nonBeneficiaryName } // Replace with actual value
+                // { "attribute": "tUjM7KxKvCO", "value": formData.beneficiaryName },
+                // { "attribute": "lvpNOLmDEEG", "value": formData.nonBeneficiaryName },
+                // { "attribute": "xts0QtWHpnK", "value": formData.inactive },
+                { "attribute": "OWR8KrtfN3n", "value": formData.topicTrainedOn},
+
+                { "attribute": "m35qF41KIdK", "value": formData.patientID},
+                { "attribute": "PQEHpxr8tzp", "value": formData.careGiver },
+                { "attribute": "kfyR35y3k3E", "value": formData.careGiverAge },
+                { "attribute": "KmxskLLhS0k", "value": formData.beneficiaryStage },                
+                { "attribute": "tUjM7KxKvCO", "value": formData.firstMiddleName },
+                { "attribute": "xts0QtWHpnK", "value": formData.surname },
             ],
             enrollments: [
                 {
@@ -352,13 +366,19 @@ export function OrgUnitTable(props: Props) {
             setFormData({
                 recordDate: '',
                 track: '',
+                inactive: '',
+                beneficiaryStage: '',
+                careGiver: '',
+                careGiverAge: '',
+                patientID: '',
+                firstMiddleName: '',
+                surname: '',
                 topicTrainedOn: '',
                 beneficiaryName: '',
                 nonBeneficiaryName: '',
                 sex: '',
                 age: '',
-                venue: '',
-                action: ''
+        
             }); // Reset form data
             setDateFilter('');
             setMessage('Data successfully saved!');
@@ -432,14 +452,34 @@ export function OrgUnitTable(props: Props) {
         }
     };
 
-
+    const resetForm = () => {
+        setFormVisible(false);
+        setFormData({
+            recordDate: '',
+            track: '',
+            inactive: '',
+            beneficiaryStage: '',
+            careGiver: '',
+            careGiverAge: '',
+            patientID: '',
+            firstMiddleName: '',
+            surname: '',
+            topicTrainedOn: '',
+            beneficiaryName: '',
+            nonBeneficiaryName: '',
+            sex: '',
+            age: '',
+    
+        });
+        setSelectedFilter('');
+    }
 
     return (
         <main className="space-y-4">
-            <Header
+            {/* <Header
                 onAdd={onAdd}
-                onDownloadCSV={() => handleDownloadCSV('')}
-            />
+            // onDownloadCSV={() => handleDownloadCSV('')}
+            /> */}
 
             {/* Training Filters */}
             <h5 style={{ padding: '10px' }}>Training</h5>
@@ -491,31 +531,32 @@ export function OrgUnitTable(props: Props) {
                     style={{ borderRadius: '5px' }}
                 />
 
-                <input
-                    type="text"
-                    placeholder="New Beneficiary"
-                    value={placeFilter}
+                <button
+                    type="button"
                     // onChange={handlePlaceChange}
+                    onClick={onAdd}
                     className="border border-gray-300 rounded-md p-2"
                     style={{ borderRadius: '5px' }}
-                />
+                >
+                    Non Beneficiary
+                </button>    
 
-                <input
+                {/* <input
                     type="text"
                     placeholder="Place"
                     value={placeFilter}
                     onChange={handlePlaceChange}
                     className="border border-gray-300 rounded-md p-2"
                     style={{ borderRadius: '5px' }}
-                />
-                <input
+                /> */}
+                {/* <input
                     type="date"
                     value={dateFilter}
                     onChange={handleDateChange}
                     className="border border-gray-300 rounded-md p-2"
                     style={{ borderRadius: '5px' }}
-                />
-                <select
+                /> */}
+                {/* <select
                     value={trackFilter}
                     onChange={(e) => setTrackFilter(e.target.value)}
                     // onKeyDown={handleBeneficiarySearch}
@@ -525,7 +566,7 @@ export function OrgUnitTable(props: Props) {
                     <option value="Select Tracker">Select Tracker</option>
                     <option value="Fisher">Fisher</option>
                     <option value="Farmer">Farmer</option>
-                </select>
+                </select> */}
 
 
             </div>
@@ -588,7 +629,7 @@ export function OrgUnitTable(props: Props) {
                                     place={selectedRecord[4]}
                                     track={selectedRecord[18]}
                                     orgUnit={props.orgUnitId}
-                                    trackInstance = {selectedRecord[0]}
+                                    trackInstance={selectedRecord[0]}
                                 />
                             )}
                             {trainingFilter === 'Water Sanitation & Hygiene' && (
@@ -596,7 +637,7 @@ export function OrgUnitTable(props: Props) {
                                     place={selectedRecord[4]}
                                     track={selectedRecord[18]}
                                     orgUnit={props.orgUnitId}
-                                    trackInstance = {selectedRecord[0]}
+                                    trackInstance={selectedRecord[0]}
                                 />
                             )}
                             {trainingFilter === 'Nutrition' && (
@@ -604,7 +645,7 @@ export function OrgUnitTable(props: Props) {
                                     place={selectedRecord[4]}
                                     track={selectedRecord[18]}
                                     orgUnit={props.orgUnitId}
-                                    trackInstance = {selectedRecord[0]}
+                                    trackInstance={selectedRecord[0]}
                                 />
                             )}
                         </div>
@@ -631,43 +672,28 @@ export function OrgUnitTable(props: Props) {
                 <div className="form-container">
                     <form onSubmit={handleFormSubmit} className="form">
                         {/*loader for getting code*/}
-                        {isLoading ? (
+                        {/* {isLoading ? (
                             <div className="mt-4">
-                                <div className="loader-container">
-                                    {/* <div className="spinner"></div> */}
-                                    <p>Loading code, please wait...</p>
+                                <div className="loader-container"> */}
+                        {/* <div className="spinner"></div> */}
+                        {/* <p>Loading code, please wait...</p>
                                 </div>
                             </div>
-                        ) : (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Record Date</label>
-                                <input
-                                    type="date"
-                                    name="recordDate"
-                                    value={formData.recordDate}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                    required
-                                />
-                            </div>
-                        )}
-
+                        ) : ( */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Track</label>
-                            <select
-                                name="track"
-                                value={formData.track}
+                            <label className="block text-sm font-medium text-gray-700">Registration Date</label>
+                            <input
+                                type="date"
+                                name="recordDate"
+                                value={formData.recordDate}
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                 required
-                            >
-                                <option value="">Select Tracker</option>
-                                <option value="Farmer">Farmer</option>
-                                <option value="Fisher">Fisher</option>
-                            </select>
+                            />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Topic Trained On</label>
+                        {/*  )} */}
+                        {/* <div>
+                            <label className="block text-sm font-medium text-gray-700">Registering Unit</label>
                             <input
                                 type="text"
                                 name="topicTrainedOn"
@@ -675,7 +701,114 @@ export function OrgUnitTable(props: Props) {
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                             />
+                        </div> */}
+                        {/* <div>
+                            <label className="block text-sm font-medium text-gray-700">Inactive</label>
+                            <input
+                                type="text"
+                                name="inactive"
+                                value={formData.inactive}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                required
+                            />
+                        </div> */}
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Is Beneficiary an Adult or Child</label>
+                            <select
+                                name="beneficiaryStage"
+                                value={formData.beneficiaryStage}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                required
+                            >
+                                <option value=""></option>
+                                <option value="Adult">Adult</option>
+                                <option value="Child">Child</option>
+                            </select>
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Name of Care Giver</label>
+                            <input
+                                type="text"
+                                name="careGiver"
+                                value={formData.careGiver}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Age of Care Giver</label>
+                            <input
+                                type="text"
+                                name="careGiverAge"
+                                value={formData.careGiverAge}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            />
+                        </div>
+                        {/* <div>
+                            <label className="block text-sm font-medium text-gray-700">Gender of Care Giver</label>
+                            <select
+                                name="sex"
+                                value={formData.sex}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                required
+                            >
+                                <option value="">Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div> */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Patient ID</label>
+                            <input
+                                type="text"
+                                name="patientID"
+                                value={formData.patientID}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            />
+                        </div>    
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">First Name and Middle Name</label>
+                            <input
+                                type="text"
+                                name="firstMiddleName"
+                                value={formData.firstMiddleName}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            />
+                        </div> 
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Surname</label>
+                            <input
+                                type="text"
+                                name="surname"
+                                value={formData.surname}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">SSD_Select Training</label>
+                            <select
+                                name="topicTrainedOn"
+                                value={formData.topicTrainedOn}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                required
+                            >
+                                <option value=""></option>
+                                <option value="Livelihood">Livelihood</option>
+                                <option value="Water Sanitation and Hygiene Promotion ">Water Sanitation and Hygiene Promotion</option>
+                                <option value="Nutrition Centric Training">Nutrition Centric Training</option>
+                            </select>
+                        </div>
+                        
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Name (Beneficiary)</label>
                             <input
@@ -686,7 +819,7 @@ export function OrgUnitTable(props: Props) {
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                             />
                         </div>
-                        <div>
+                        {/* <div>
                             <label className="block text-sm font-medium text-gray-700">Name (Non Beneficiary)</label>
                             <input
                                 type="text"
@@ -695,7 +828,7 @@ export function OrgUnitTable(props: Props) {
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                             />
-                        </div>
+                        </div> */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Sex</label>
                             <select
@@ -705,7 +838,7 @@ export function OrgUnitTable(props: Props) {
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                 required
                             >
-                                <option value="">Sex</option>
+                                <option value=""></option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                             </select>
@@ -722,57 +855,37 @@ export function OrgUnitTable(props: Props) {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Venue</label>
-                            <input
-                                type="text"
-                                name="venue"
-                                value={formData.venue}
+                            <label className="block text-sm font-medium text-gray-700">Track</label>
+                            <select
+                                name="track"
+                                value={formData.track}
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                 required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Action</label>
-                            <input
-                                type="text"
-                                name="action"
-                                value={formData.action}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                required
-                            />
-                        </div>
-
-
+                            >
+                                <option value=""></option>
+                                <option value="Farmer">Farmer</option>
+                                <option value="Fisher">Fisher</option>
+                            </select>
+                        </div><br></br>                        
+                        
                         <div className="button-container">
-                            <button type="submit" className="submit-button"
-                                style={{ marginLeft: '-250px' }}
+                            <button 
+                                type="submit" 
+                                className="submit-button"
+                                style={{ marginLeft: '5px' }}
                             >
                                 Save & Continue
                             </button>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setFormVisible(false);
-                                    setFormData({
-                                        recordDate: '',
-                                        track: '',
-                                        topicTrainedOn: '',
-                                        beneficiaryName: '',
-                                        nonBeneficiaryName: '',
-                                        sex: '',
-                                        age: '',
-                                        venue: '',
-                                        action: ''
-                                    });
-                                    setSelectedFilter('');
-                                }}
+                                onClick={resetForm}
                                 className="cancel-button"
+                                style={{ marginRight: '200px' }}
                             >
                                 Close
                             </button>
-                        </div>
+                        </div><br></br>
                     </form>
                 </div>
             )}

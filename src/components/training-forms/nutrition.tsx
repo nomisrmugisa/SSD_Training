@@ -22,8 +22,8 @@ const NutritionForm: React.FC<{ place: string; track: string; orgUnit: string; t
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleInputChange = async (event) => {
-        const { name, type, checked, value } = await event.target;
+    const handleInputChange =  (event) => {
+        const { name, type, checked, value } =  event.target;
         setFormData((prevData) => ({
             ...prevData,
             [name]: type === 'checkbox' ? checked : value,
@@ -50,7 +50,7 @@ const NutritionForm: React.FC<{ place: string; track: string; orgUnit: string; t
 
     const handleComplete = async () => {
         try {
-            const event = generateEvent();
+            const event = await generateEvent();
             const payload = {
                 "dataValues": [
                     { "value": formData.nutritionPregnancy, "dataElement": "FVIkGrGWz1s" },

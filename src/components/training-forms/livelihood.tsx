@@ -85,6 +85,7 @@ const LivelihoodForm: React.FC<{ place: string; track: string; orgUnit: string; 
         setIsLoading(true);
         try {
             const eventGenerated = await generateEvent();
+            console.log({"event": eventGenerated})
             const trackInstGenerated = await generateEvent();
             console.log({ event: eventGenerated });
             const payload = {

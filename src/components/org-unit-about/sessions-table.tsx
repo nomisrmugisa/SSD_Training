@@ -167,7 +167,7 @@ export function SessionsTable(props: Props) {
                         </button>
                     </Link>
                 }
-                onDownloadCSV={handleDownloadCSV}
+                // onDownloadCSV={handleDownloadCSV}
             />
             <br></br>
             {loading && <div className="mt-4">

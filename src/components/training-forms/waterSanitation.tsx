@@ -23,27 +23,25 @@ const WaterSanitationForm: React.FC<{ place: string; track: string; orgUnit: str
         }));
     };
 
-    const generateEvent = async (length = 11) => {
+    const generateEvent = async (length = 11): Promise<string> => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         return new Promise((resolve) => {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let result = '';
-
-            // Simulate async task (e.g., a delay)
             setTimeout(() => {
                 for (let i = 0; i < length; i++) {
                     const randomIndex = Math.floor(Math.random() * characters.length);
                     result += characters[randomIndex];
                 }
-
-                // Create the event object with the generated random code
-                resolve(result);  // Resolve the Promise with the generated code
-            }, 100);  // Adding a small delay of 100ms
+                resolve(result);
+            }, 100);
         });
     };
 
     const handleComplete = async () => {
         try {
-            const event = generateEvent();
+            const event = await generateEvent();
+            console.log({"event": event})
+
             const payload = {
                 "dataValues": [
                     { "value": formData.foodSafety, "dataElement": "Q4dJyNwdyyJ" },
