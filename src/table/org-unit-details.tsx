@@ -13,60 +13,70 @@ export const orgUnitDetailsColumns = (credentials: any, setMessage: any, setIsEr
     header: 'Row ID',
     cell: (info) => info.row.index + 1,  // Add 1 to make it 1-based instead of 0-based
   }),
-  columnHelper.accessor('id', {
-    id: 'Record ID',
-  }),
+  // columnHelper.accessor('id', {
+  //   id: 'Record ID',
+  // }),
   columnHelper.accessor('recordDate', {
     cell: (info) => info.getValue(),
-    header: () => 'Record Date',
+    header: () => 'Registration Date',
   }),
-  columnHelper.accessor('track', {
+  columnHelper.accessor('patientID', {
     cell: (info) => info.getValue(),
-    header: () => 'Track',
+    header: () => 'Patient ID',
   }),
-  columnHelper.accessor('topicTrainedOn', {
+  columnHelper.accessor('first_middleName', {
     cell: (info) => info.getValue(),
-    header: () => 'Topic Trained On',
+    header: () => 'First Name & Middle Name',
   }),
-  columnHelper.accessor('beneficiaryName', {
+  columnHelper.accessor('surname', {
     cell: (info) => info.getValue(),
-    header: () => 'Beneficiary Name',
-  }),
-  columnHelper.accessor('nonBeneficiaryName', {
-    cell: (info) => info.getValue(),
-    header: () => 'Name (Non Beneficiary)',
-  }),
-  columnHelper.accessor('sex', {
-    cell: (info) => info.getValue(),
-    header: () => 'Sex',
+    header: () => 'Surname',
   }),
   columnHelper.accessor('age', {
     cell: (info) => info.getValue(),
     header: () => 'Age',
   }),
-  columnHelper.accessor('venue', {
+  columnHelper.accessor('dob', {
     cell: (info) => info.getValue(),
-    header: () => 'Venue',
+    header: () => 'Date of Birth',
   }),
-  columnHelper.accessor('action', {
+  columnHelper.accessor('sex', {
     cell: (info) => info.getValue(),
-    header: () => 'Action',
+    header: () => 'Sex',
   }),
+  columnHelper.accessor('track', {
+    cell: (info) => info.getValue(),
+    header: () => 'Beneficiary Track',
+  }), 
+  columnHelper.accessor('beneficiaryStage', {
+    cell: (info) => info.getValue(),
+    header: () => 'Is Beneficiary Child / Adult',
+  }),
+ 
+  
+  // columnHelper.accessor('venue', {
+  //   cell: (info) => info.getValue(),
+  //   header: () => 'Venue',
+  // }),
+  // columnHelper.accessor('action', {
+  //   cell: (info) => info.getValue(),
+  //   header: () => 'Action',
+  // }),
   // Custom delete column
-  columnHelper.display({
-    id: 'delete',
-    header: 'Delete',
-    cell: (info) => (
-      <button
-        onClick={(event) => {
-          event.stopPropagation();
-          const rowId = info.row.original.id;
-          handleDelete(rowId, credentials, setMessage, setIsError);
-        }}
-        className="delete-button"
-      >
-        x
-      </button>
-    ),
-  }),
+  // columnHelper.display({
+  //   id: 'delete',
+  //   header: 'Delete',
+  //   cell: (info) => (
+  //     <button
+  //       onClick={(event) => {
+  //         event.stopPropagation();
+  //         const rowId = info.row.original.id;
+  //         handleDelete(rowId, credentials, setMessage, setIsError);
+  //       }}
+  //       className="delete-button"
+  //     >
+  //       x
+  //     </button>
+  //   ),
+  // }),
 ];

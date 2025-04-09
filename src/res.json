@@ -1,0 +1,3011 @@
+{
+    "enrollments": [
+        {
+            "events": [
+                {
+                    "storedBy": "Losih",
+                    "dueDate": "2024-11-14T09:18:09.119",
+                    "program": "kmfLZO8ckxY",
+                    "event": "O63MkxI7xtb",
+                    "programStage": "adGXaBx7b0Y",
+                    "orgUnit": "XJRKJzZke87",
+                    "enrollment": "vWKaBSrIvAv",
+                    "trackedEntityInstance": "iBFytGk6KDX",
+                    "enrollmentStatus": "ACTIVE",
+                    "eventDate": "2024-11-14T00:00:00.000",
+                    "orgUnitName": "Ayod Boma",
+                    "status": "ACTIVE",
+                    "attributeCategoryOptions": "xYerKDKCefk",
+                    "lastUpdated": "2024-11-14T09:18:26.417",
+                    "created": "2024-11-14T09:18:09.119",
+                    "deleted": false,
+                    "attributeOptionCombo": "HllvX50cXC0",
+                    "lastUpdatedByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "createdByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "dataValues": [
+                        {
+                            "lastUpdated": "2024-11-14T09:18:26.416",
+                            "created": "2024-11-14T09:18:26.416",
+                            "dataElement": "zDIgqaXsxjg",
+                            "value": "Moderate 115-124mm (Yellow)",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:18:25.815",
+                            "created": "2024-11-14T09:18:25.815",
+                            "dataElement": "LQNXHgUuLbD",
+                            "value": "12.4",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:18:26.128",
+                            "created": "2024-11-14T09:18:26.128",
+                            "dataElement": "uOJmECsPp5M",
+                            "value": "false",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        }
+                    ],
+                    "notes": [],
+                    "relationships": []
+                },
+                {
+                    "storedBy": "Losih",
+                    "dueDate": "2024-11-14T09:18:38.784",
+                    "program": "kmfLZO8ckxY",
+                    "event": "KjxCuWavTbP",
+                    "programStage": "j3I4HeeEL0K",
+                    "orgUnit": "XJRKJzZke87",
+                    "enrollment": "vWKaBSrIvAv",
+                    "trackedEntityInstance": "iBFytGk6KDX",
+                    "enrollmentStatus": "ACTIVE",
+                    "eventDate": "2024-11-14T00:00:00.000",
+                    "orgUnitName": "Ayod Boma",
+                    "status": "ACTIVE",
+                    "attributeCategoryOptions": "xYerKDKCefk",
+                    "lastUpdated": "2024-11-14T09:20:12.364",
+                    "created": "2024-11-14T09:18:38.784",
+                    "deleted": false,
+                    "attributeOptionCombo": "HllvX50cXC0",
+                    "lastUpdatedByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "createdByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "dataValues": [
+                        {
+                            "lastUpdated": "2024-11-14T09:19:33.206",
+                            "created": "2024-11-14T09:19:33.206",
+                            "dataElement": "TCSKxlymcyD",
+                            "value": "3",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:20:12.364",
+                            "created": "2024-11-14T09:20:12.364",
+                            "dataElement": "ZVUa1jsNqNc",
+                            "value": "0,25",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:18:47.187",
+                            "created": "2024-11-14T09:18:47.187",
+                            "dataElement": "Nmh0TPGuXWS",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:19:17.031",
+                            "created": "2024-11-14T09:19:17.031",
+                            "dataElement": "td3WOxoQ4wN",
+                            "value": "15000",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:19:39.632",
+                            "created": "2024-11-14T09:19:39.632",
+                            "dataElement": "sQShE9oP513",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:18:48.471",
+                            "created": "2024-11-14T09:18:48.471",
+                            "dataElement": "VyqyQ0BZISo",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:19:00.920",
+                            "created": "2024-11-14T09:19:00.920",
+                            "dataElement": "YzlNvVyLIkn",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:18:58.103",
+                            "created": "2024-11-14T09:18:58.103",
+                            "dataElement": "vVKfsZ8VgiG",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        }
+                    ],
+                    "notes": [],
+                    "relationships": []
+                },
+                {
+                    "storedBy": "Losih",
+                    "dueDate": "2024-11-14T09:20:18.211",
+                    "program": "kmfLZO8ckxY",
+                    "event": "jR2aMk0jr6C",
+                    "programStage": "s8sy2zvEinI",
+                    "orgUnit": "XJRKJzZke87",
+                    "enrollment": "vWKaBSrIvAv",
+                    "trackedEntityInstance": "iBFytGk6KDX",
+                    "enrollmentStatus": "ACTIVE",
+                    "eventDate": "2024-11-14T00:00:00.000",
+                    "orgUnitName": "Ayod Boma",
+                    "status": "ACTIVE",
+                    "attributeCategoryOptions": "xYerKDKCefk",
+                    "lastUpdated": "2024-11-14T09:21:10.088",
+                    "created": "2024-11-14T09:20:18.211",
+                    "deleted": false,
+                    "attributeOptionCombo": "HllvX50cXC0",
+                    "lastUpdatedByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "createdByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "dataValues": [
+                        {
+                            "lastUpdated": "2024-11-14T09:20:57.635",
+                            "created": "2024-11-14T09:20:57.635",
+                            "dataElement": "o7jWNMhcqWw",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:10.088",
+                            "created": "2024-11-14T09:21:10.088",
+                            "dataElement": "VIVie5zl81Q",
+                            "value": "1000",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:20:51.813",
+                            "created": "2024-11-14T09:20:51.813",
+                            "dataElement": "gdtjNx0o30V",
+                            "value": "3",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:20:35.486",
+                            "created": "2024-11-14T09:20:35.486",
+                            "dataElement": "q2iF3q9hSYJ",
+                            "value": "A",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:20:46.852",
+                            "created": "2024-11-14T09:20:46.852",
+                            "dataElement": "c4Y5yTWAgDj",
+                            "value": "3",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:20:31.415",
+                            "created": "2024-11-14T09:20:31.415",
+                            "dataElement": "Y3owuJaQQZg",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        }
+                    ],
+                    "notes": [],
+                    "relationships": []
+                },
+                {
+                    "storedBy": "Losih",
+                    "dueDate": "2024-11-14T09:21:13.759",
+                    "program": "kmfLZO8ckxY",
+                    "event": "uBHVgeDgOSW",
+                    "programStage": "QAEEGAsJ5H7",
+                    "orgUnit": "XJRKJzZke87",
+                    "enrollment": "vWKaBSrIvAv",
+                    "trackedEntityInstance": "iBFytGk6KDX",
+                    "enrollmentStatus": "ACTIVE",
+                    "eventDate": "2024-11-14T00:00:00.000",
+                    "orgUnitName": "Ayod Boma",
+                    "status": "ACTIVE",
+                    "attributeCategoryOptions": "xYerKDKCefk",
+                    "lastUpdated": "2024-11-14T09:21:21.366",
+                    "created": "2024-11-14T09:21:13.759",
+                    "deleted": false,
+                    "attributeOptionCombo": "HllvX50cXC0",
+                    "lastUpdatedByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "createdByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "dataValues": [
+                        {
+                            "lastUpdated": "2024-11-14T09:21:16.130",
+                            "created": "2024-11-14T09:21:16.130",
+                            "dataElement": "zwumtCV5d8h",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:17.172",
+                            "created": "2024-11-14T09:21:17.172",
+                            "dataElement": "POMbjIgo3EF",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:18.469",
+                            "created": "2024-11-14T09:21:18.469",
+                            "dataElement": "Q4dJyNwdyyJ",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:21.366",
+                            "created": "2024-11-14T09:21:21.366",
+                            "dataElement": "xyaOOPDyjoN",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        }
+                    ],
+                    "notes": [],
+                    "relationships": []
+                },
+                {
+                    "storedBy": "Losih",
+                    "dueDate": "2024-11-14T09:21:31.107",
+                    "program": "kmfLZO8ckxY",
+                    "event": "moXfMUiVqCu",
+                    "programStage": "DSFjQPPKuyM",
+                    "orgUnit": "XJRKJzZke87",
+                    "enrollment": "vWKaBSrIvAv",
+                    "trackedEntityInstance": "iBFytGk6KDX",
+                    "enrollmentStatus": "ACTIVE",
+                    "eventDate": "2024-11-14T00:00:00.000",
+                    "orgUnitName": "Ayod Boma",
+                    "status": "ACTIVE",
+                    "attributeCategoryOptions": "xYerKDKCefk",
+                    "lastUpdated": "2024-11-14T09:22:04.195",
+                    "created": "2024-11-14T09:21:31.107",
+                    "deleted": false,
+                    "attributeOptionCombo": "HllvX50cXC0",
+                    "lastUpdatedByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "createdByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "dataValues": [
+                        {
+                            "lastUpdated": "2024-11-14T09:21:38.330",
+                            "created": "2024-11-14T09:21:38.330",
+                            "dataElement": "LzFFXJl5Iqu",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:46.199",
+                            "created": "2024-11-14T09:21:46.199",
+                            "dataElement": "NOIbysghola",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:35.440",
+                            "created": "2024-11-14T09:21:35.440",
+                            "dataElement": "FVIkGrGWz1s",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:41.886",
+                            "created": "2024-11-14T09:21:41.886",
+                            "dataElement": "LzGN50sTSh3",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:04.195",
+                            "created": "2024-11-14T09:22:04.195",
+                            "dataElement": "TQLLkvvbCD2",
+                            "value": "Caregiver",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:36.679",
+                            "created": "2024-11-14T09:21:36.679",
+                            "dataElement": "URD2xr6Enhc",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:47.266",
+                            "created": "2024-11-14T09:21:47.266",
+                            "dataElement": "LhcJpqUzqcp",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:40.570",
+                            "created": "2024-11-14T09:21:40.570",
+                            "dataElement": "ijTViGLk6hP",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:21:39.021",
+                            "created": "2024-11-14T09:21:39.021",
+                            "dataElement": "ecFLn0i8QrL",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        }
+                    ],
+                    "notes": [],
+                    "relationships": []
+                },
+                {
+                    "storedBy": "Losih",
+                    "dueDate": "2024-11-14T09:22:11.847",
+                    "program": "kmfLZO8ckxY",
+                    "event": "wNIqOOJrkc4",
+                    "programStage": "tGdhYIlNU8r",
+                    "orgUnit": "XJRKJzZke87",
+                    "enrollment": "vWKaBSrIvAv",
+                    "trackedEntityInstance": "iBFytGk6KDX",
+                    "enrollmentStatus": "ACTIVE",
+                    "eventDate": "2024-11-14T00:00:00.000",
+                    "orgUnitName": "Ayod Boma",
+                    "status": "ACTIVE",
+                    "attributeCategoryOptions": "xYerKDKCefk",
+                    "lastUpdated": "2024-11-14T09:41:17.086",
+                    "created": "2024-11-14T09:22:11.847",
+                    "deleted": false,
+                    "attributeOptionCombo": "HllvX50cXC0",
+                    "lastUpdatedByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "createdByUserInfo": {
+                        "uid": "oGejPTTTS6y",
+                        "firstName": "Losih",
+                        "surname": "Losih",
+                        "username": "Losih"
+                    },
+                    "dataValues": [
+                        {
+                            "lastUpdated": "2024-11-14T09:29:19.721",
+                            "created": "2024-11-14T09:29:19.721",
+                            "dataElement": "gdPnO5UlCMx",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:33:44.938",
+                            "created": "2024-11-14T09:33:44.938",
+                            "dataElement": "NotXXLsgUhk",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:26:26.405",
+                            "created": "2024-11-14T09:26:26.405",
+                            "dataElement": "vfRJriO8jxv",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:24:27.608",
+                            "created": "2024-11-14T09:24:27.608",
+                            "dataElement": "WzZUusCTzxb",
+                            "value": "000",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:31:18.993",
+                            "created": "2024-11-14T09:31:18.993",
+                            "dataElement": "WhfiCkBDjVR",
+                            "value": "4",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:43.546",
+                            "created": "2024-11-14T09:22:43.546",
+                            "dataElement": "LiQhy6lf5o4",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:36:58.243",
+                            "created": "2024-11-14T09:36:58.243",
+                            "dataElement": "C4UHggbDYFc",
+                            "value": "4",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:34:35.297",
+                            "created": "2024-11-14T09:34:35.297",
+                            "dataElement": "HuAqMK01bGO",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:27:22.589",
+                            "created": "2024-11-14T09:27:22.589",
+                            "dataElement": "uHhcfLk0B7v",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:24:05.281",
+                            "created": "2024-11-14T09:24:05.281",
+                            "dataElement": "XWToQhhKSnr",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:34:08.353",
+                            "created": "2024-11-14T09:34:08.353",
+                            "dataElement": "PnoCpvh1PdF",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:30:37.236",
+                            "created": "2024-11-14T09:30:37.236",
+                            "dataElement": "ldTDhvxqLV6",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:38:25.196",
+                            "created": "2024-11-14T09:38:25.196",
+                            "dataElement": "PSmteKu6Ptd",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:35:50.761",
+                            "created": "2024-11-14T09:35:50.761",
+                            "dataElement": "uAPsHQQlvZj",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:34:00.321",
+                            "created": "2024-11-14T09:34:00.321",
+                            "dataElement": "DDUh3EiUJE5",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:41:17.086",
+                            "created": "2024-11-14T09:41:17.086",
+                            "dataElement": "pbqSevICRI4",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:32:02.562",
+                            "created": "2024-11-14T09:32:02.562",
+                            "dataElement": "I7wOSaWSJSp",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:26:17.734",
+                            "created": "2024-11-14T09:26:17.734",
+                            "dataElement": "ke477Ynz3vp",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:35.923",
+                            "created": "2024-11-14T09:22:35.923",
+                            "dataElement": "OjQvmBlGdEM",
+                            "value": "1",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:40:01.932",
+                            "created": "2024-11-14T09:40:01.932",
+                            "dataElement": "kaWIth5VH8Z",
+                            "value": "1",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:29:03.684",
+                            "created": "2024-11-14T09:29:03.684",
+                            "dataElement": "cbNOgH0zWWE",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:40:13.068",
+                            "created": "2024-11-14T09:40:13.068",
+                            "dataElement": "i6Rh3mIUA6B",
+                            "value": "1",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:28:08.150",
+                            "created": "2024-11-14T09:28:08.150",
+                            "dataElement": "dIOCVlXHXTD",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:33:13.739",
+                            "created": "2024-11-14T09:33:13.739",
+                            "dataElement": "tjDbnMmAO2r",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:39:15.647",
+                            "created": "2024-11-14T09:39:15.647",
+                            "dataElement": "AegMmlk9RjR",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:34:13.469",
+                            "created": "2024-11-14T09:34:13.469",
+                            "dataElement": "Y7c30L4ZnUZ",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:37:31.436",
+                            "created": "2024-11-14T09:37:31.436",
+                            "dataElement": "AkxZugsxK8G",
+                            "value": "3",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:06.002",
+                            "created": "2024-11-14T09:23:06.002",
+                            "dataElement": "DcW1XQKSKHx",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:35:31.252",
+                            "created": "2024-11-14T09:35:31.252",
+                            "dataElement": "gdtjNx0o30V",
+                            "value": "4",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:38:02.206",
+                            "created": "2024-11-14T09:38:02.206",
+                            "dataElement": "h4ZTHqT6f1V",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:29:37.346",
+                            "created": "2024-11-14T09:29:37.346",
+                            "dataElement": "eYElb77LlIu",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:24:51.935",
+                            "created": "2024-11-14T09:24:51.935",
+                            "dataElement": "K5opTFVEKA3",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:37:36.764",
+                            "created": "2024-11-14T09:37:36.764",
+                            "dataElement": "rOklyFBeoMO",
+                            "value": "1",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:39:46.473",
+                            "created": "2024-11-14T09:39:46.473",
+                            "dataElement": "lKDo9xtA7Jw",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:38:22.419",
+                            "created": "2024-11-14T09:38:22.419",
+                            "dataElement": "saEUVjzfavr",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:24:19.846",
+                            "created": "2024-11-14T09:24:19.846",
+                            "dataElement": "pDklSvJbuDt",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:31:23.845",
+                            "created": "2024-11-14T09:31:23.845",
+                            "dataElement": "mdj82B2glix",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:35:48.845",
+                            "created": "2024-11-14T09:35:48.845",
+                            "dataElement": "VIVie5zl81Q",
+                            "value": "1000",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:28:28.614",
+                            "created": "2024-11-14T09:28:28.614",
+                            "dataElement": "wWaVbpt8SHQ",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:27:55.409",
+                            "created": "2024-11-14T09:27:55.409",
+                            "dataElement": "lu5qatHa8Gn",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:39:02.808",
+                            "created": "2024-11-14T09:39:02.808",
+                            "dataElement": "fgU825F9MF5",
+                            "value": "3",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:25:13.375",
+                            "created": "2024-11-14T09:25:13.375",
+                            "dataElement": "meHfIaZDAXD",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:39.505",
+                            "created": "2024-11-14T09:23:39.505",
+                            "dataElement": "kmKarGwtbQF",
+                            "value": "6",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:34:53.530",
+                            "created": "2024-11-14T09:34:53.530",
+                            "dataElement": "MrDFQo3oi0T",
+                            "value": "A",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:34:23.183",
+                            "created": "2024-11-14T09:34:23.183",
+                            "dataElement": "n03xQAJPZY6",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:35:25.156",
+                            "created": "2024-11-14T09:35:25.156",
+                            "dataElement": "c4Y5yTWAgDj",
+                            "value": "4",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:27.440",
+                            "created": "2024-11-14T09:23:27.440",
+                            "dataElement": "bTQ5rXyFyvO",
+                            "value": "2",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:27:41.130",
+                            "created": "2024-11-14T09:27:41.130",
+                            "dataElement": "m42iUumUJKR",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:30:01.880",
+                            "created": "2024-11-14T09:30:01.880",
+                            "dataElement": "z9s6xTz5cFc",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:30:16.444",
+                            "created": "2024-11-14T09:30:16.444",
+                            "dataElement": "WGmKAvHDvqd",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:47.510",
+                            "created": "2024-11-14T09:22:47.510",
+                            "dataElement": "DTS1in4ZKn5",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:32.583",
+                            "created": "2024-11-14T09:22:32.583",
+                            "dataElement": "NNHVXVesxUB",
+                            "value": "3",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:24:08.690",
+                            "created": "2024-11-14T09:24:08.690",
+                            "dataElement": "a95JkHswMUr",
+                            "value": "1",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:52.429",
+                            "created": "2024-11-14T09:23:52.429",
+                            "dataElement": "ewrO9sdsZzo",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:27:42.558",
+                            "created": "2024-11-14T09:27:42.558",
+                            "dataElement": "xu7LGPYBChs",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:40:42.402",
+                            "created": "2024-11-14T09:40:42.402",
+                            "dataElement": "ohbtWMnStqP",
+                            "value": "Dyke construction",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:28:34.372",
+                            "created": "2024-11-14T09:28:34.372",
+                            "dataElement": "tFSIxwFwbDp",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:29:13.772",
+                            "created": "2024-11-14T09:29:13.772",
+                            "dataElement": "i5OW5L9f8UL",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:33:50.965",
+                            "created": "2024-11-14T09:33:50.965",
+                            "dataElement": "NKMLlAFUsL7",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:33:17.301",
+                            "created": "2024-11-14T09:33:17.301",
+                            "dataElement": "syP5cdsiFjr",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:33:31.639",
+                            "created": "2024-11-14T09:33:31.639",
+                            "dataElement": "mLDDqa7QDGW",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:33:26.456",
+                            "created": "2024-11-14T09:33:26.456",
+                            "dataElement": "R5vEyLdBWH8",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:31:32.956",
+                            "created": "2024-11-14T09:31:32.956",
+                            "dataElement": "BdXkn1Nrfcf",
+                            "value": "1",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:25:50.594",
+                            "created": "2024-11-14T09:25:50.594",
+                            "dataElement": "CQuUenHQUxx",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:25:05.787",
+                            "created": "2024-11-14T09:25:05.787",
+                            "dataElement": "k3QloVAbZEa",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:26:04.648",
+                            "created": "2024-11-14T09:26:04.648",
+                            "dataElement": "GmIW6mgzMaC",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:34:30.161",
+                            "created": "2024-11-14T09:34:30.161",
+                            "dataElement": "iqSF8fUT3tH",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:37:21.624",
+                            "created": "2024-11-14T09:37:21.624",
+                            "dataElement": "s2fbZkhiwjy",
+                            "value": "2",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:37:09.453",
+                            "created": "2024-11-14T09:37:09.453",
+                            "dataElement": "FiqWp3dDx2H",
+                            "value": "4",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:26:14.307",
+                            "created": "2024-11-14T09:26:14.307",
+                            "dataElement": "ReKQU3bTErz",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:37:56.685",
+                            "created": "2024-11-14T09:37:56.685",
+                            "dataElement": "uFtwWPHHD3e",
+                            "value": "2",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:40.285",
+                            "created": "2024-11-14T09:22:40.285",
+                            "dataElement": "z8UfDLp6vQj",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:39:40.348",
+                            "created": "2024-11-14T09:39:40.348",
+                            "dataElement": "ShAqjjJH2A3",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:34:44.781",
+                            "created": "2024-11-14T09:34:44.781",
+                            "dataElement": "NLBCC4xki8I",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:38:50.285",
+                            "created": "2024-11-14T09:38:50.285",
+                            "dataElement": "kJWGyBwRlKu",
+                            "value": "3",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:55.167",
+                            "created": "2024-11-14T09:22:55.167",
+                            "dataElement": "HjYSIX37YMX",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:26:58.683",
+                            "created": "2024-11-14T09:26:58.683",
+                            "dataElement": "WQbxPIEANG2",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:19.971",
+                            "created": "2024-11-14T09:23:19.971",
+                            "dataElement": "nYRVu7txCZi",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:45.830",
+                            "created": "2024-11-14T09:23:45.830",
+                            "dataElement": "GETKbG4mx7K",
+                            "value": "1",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:31.404",
+                            "created": "2024-11-14T09:23:31.404",
+                            "dataElement": "HTdBXSTyA6J",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:22.405",
+                            "created": "2024-11-14T09:22:22.405",
+                            "dataElement": "FqkyRzlTmOi",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:42.960",
+                            "created": "2024-11-14T09:23:42.960",
+                            "dataElement": "EzB3mvv9WxO",
+                            "value": "3",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:31:55.545",
+                            "created": "2024-11-14T09:31:55.545",
+                            "dataElement": "eDm8qhDbNrc",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:31:10.565",
+                            "created": "2024-11-14T09:31:10.565",
+                            "dataElement": "dcQ6KAMmBVY",
+                            "value": "2",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:33:07.782",
+                            "created": "2024-11-14T09:33:07.782",
+                            "dataElement": "QLNVcvT5Gi5",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:24:14.164",
+                            "created": "2024-11-14T09:24:14.164",
+                            "dataElement": "hzna1Ml5CCh",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:31:26.371",
+                            "created": "2024-11-14T09:31:26.371",
+                            "dataElement": "a7xKTwEUjfA",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:52.458",
+                            "created": "2024-11-14T09:22:52.458",
+                            "dataElement": "RyrhO77PB1F",
+                            "value": "5",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:39:10.115",
+                            "created": "2024-11-14T09:39:10.115",
+                            "dataElement": "SMp5PgX6dHS",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:22:59.675",
+                            "created": "2024-11-14T09:22:59.675",
+                            "dataElement": "N9kqxsUYsMM",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:41:16.685",
+                            "created": "2024-11-14T09:41:16.685",
+                            "dataElement": "PEKlPxmuwq7",
+                            "value": "Eating wild fruits and water lilies",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:28:44.080",
+                            "created": "2024-11-14T09:28:44.080",
+                            "dataElement": "A0ZBSwLLpv3",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:48.501",
+                            "created": "2024-11-14T09:23:48.501",
+                            "dataElement": "NoqlV5b8oRf",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:35:52.060",
+                            "created": "2024-11-14T09:35:52.060",
+                            "dataElement": "cD6pTfjKStZ",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:16.973",
+                            "created": "2024-11-14T09:23:16.973",
+                            "dataElement": "UOtLu9RQUsc",
+                            "value": "2",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:26:31.775",
+                            "created": "2024-11-14T09:26:31.775",
+                            "dataElement": "vr5M1Bo7Q8r",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:26:44.307",
+                            "created": "2024-11-14T09:26:44.307",
+                            "dataElement": "agXxZ0gdYVX",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:33:03.631",
+                            "created": "2024-11-14T09:33:03.631",
+                            "dataElement": "szoHNQIV3eU",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:37:43.812",
+                            "created": "2024-11-14T09:37:43.812",
+                            "dataElement": "UdZ027gIHoQ",
+                            "value": "2",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:29:28.372",
+                            "created": "2024-11-14T09:29:28.372",
+                            "dataElement": "hjYHpSy9ra5",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:26:22.596",
+                            "created": "2024-11-14T09:26:22.596",
+                            "dataElement": "NPcfO3M99sj",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:35:33.232",
+                            "created": "2024-11-14T09:35:33.232",
+                            "dataElement": "o7jWNMhcqWw",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:55.615",
+                            "created": "2024-11-14T09:23:55.615",
+                            "dataElement": "mS2J2bgy5Q6",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:38:11.137",
+                            "created": "2024-11-14T09:38:11.137",
+                            "dataElement": "PtorOZ992Lw",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:08.404",
+                            "created": "2024-11-14T09:23:08.404",
+                            "dataElement": "DP6umEKjJs1",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:39:26.566",
+                            "created": "2024-11-14T09:39:26.566",
+                            "dataElement": "gzxXHYXKsP2",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:11.900",
+                            "created": "2024-11-14T09:23:11.900",
+                            "dataElement": "ZRpSV1Wt5uP",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:27:07.599",
+                            "created": "2024-11-14T09:27:07.599",
+                            "dataElement": "W5EwyNQaOVm",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:28:18.263",
+                            "created": "2024-11-14T09:28:18.263",
+                            "dataElement": "aoRLGk8TgdB",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:30:58.221",
+                            "created": "2024-11-14T09:30:58.221",
+                            "dataElement": "TF9E5DaylKe",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:39:54.569",
+                            "created": "2024-11-14T09:39:54.569",
+                            "dataElement": "ZTAo54uFSbS",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:39:21.484",
+                            "created": "2024-11-14T09:39:21.484",
+                            "dataElement": "I9eTvzWTCcf",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:35:49.175",
+                            "created": "2024-11-14T09:35:49.174",
+                            "dataElement": "TnjP9zumFbk",
+                            "value": "true",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:39:34.975",
+                            "created": "2024-11-14T09:39:34.975",
+                            "dataElement": "gRNt3SvWFKB",
+                            "value": "1",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:24:58.099",
+                            "created": "2024-11-14T09:24:58.099",
+                            "dataElement": "FHlVa2WCYm5",
+                            "value": "No",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:33:41.694",
+                            "created": "2024-11-14T09:33:41.694",
+                            "dataElement": "OIVdCD9g3kY",
+                            "value": "Yes",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        },
+                        {
+                            "lastUpdated": "2024-11-14T09:23:02.554",
+                            "created": "2024-11-14T09:23:02.554",
+                            "dataElement": "pxMuVg6QJmi",
+                            "value": "0",
+                            "providedElsewhere": false,
+                            "createdByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            },
+                            "lastUpdatedByUserInfo": {
+                                "uid": "oGejPTTTS6y",
+                                "firstName": "Losih",
+                                "surname": "Losih",
+                                "username": "Losih"
+                            }
+                        }
+                    ],
+                    "notes": [],
+                    "relationships": []
+                }
+            ]
+        }
+    ]
+}

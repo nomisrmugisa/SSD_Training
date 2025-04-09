@@ -1,0 +1,25 @@
+/* ssd-training/src/components/org-unit-details/org-unit-table.css */
+
+/* Style for buttons */
+.btn {
+    margin: 0 4px; /* Add horizontal margin for spacing */
+    padding: 8px 12px; /* Add padding for better click area */
+    border: none; /* Remove default border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Change cursor to pointer */
+    transition: background-color 0.3s; /* Smooth transition for background color */
+    color: white
+}
+
+/* Flex container for buttons */
+.button-container {
+    display: flex; /* Use flexbox */
+    gap: 10px; /* Add gap between buttons */
+    margin-top: 2px;
+}
+
+
+/* Add hover effects */
+.btn:hover {
+    opacity: 0.8; /* Slightly fade on hover */
+}

@@ -8,19 +8,27 @@ import { orgUnitDetailsColumns } from '../../table/org-unit-details';
 import { OrgUnitDetails } from '../../types/org-unit-details';
 import { useTable } from '../../hooks/use-table';
 import { useHistory } from 'react-router-dom';
+
 import Modal from '../common/modal/modal';
 import React from 'react';
 
 import LivelihoodForm from '../training-forms/livelihood';
 import WaterSanitationForm from '../training-forms/waterSanitation';
 import NutritionForm from '../training-forms/nutrition';
-
-import '../org-unit-about/form-styles.css';
+import './org-unit-table.css';
 
 type Props = {
     orgUnitDetails: OrgUnitDetails[];
     orgUnitId: string;
+
 };
+
+interface FetchedData {
+    reportDate: string;
+    dueDate: string;
+    eventId: string;
+    dataValues: { [key: string]: string }; // To hold the values for each data element
+}
 
 export function OrgUnitTable(props: Props) {
     const credentials = btoa(`admin:Precommunicate30-#Helle17}`);
@@ -45,6 +53,8 @@ export function OrgUnitTable(props: Props) {
         patientID: '',
         firstMiddleName: '',
         surname: '',
+        dob: '',
+        orgUnit: '',
         topicTrainedOn: '',
         beneficiaryName: '',
         nonBeneficiaryName: '',
@@ -57,12 +67,29 @@ export function OrgUnitTable(props: Props) {
     const [isError, setIsError] = useState(false); // State to track if the message is an error
     const [loading, setLoading] = useState(false); //loader for saving entry
     const [orgUnitCode, setOrgUnitcode] = useState('');
-    const table = useTable({
-        data: props.orgUnitDetails,
-        columns: orgUnitDetailsColumns(credentials, setMessage, setIsError),
-        globalFilter: search,
-        setGlobalFilter: setSearch,
+
+    const [newRowData, setNewRowData] = useState({
+        id: '',
+        trackInstanceId: '',
+        recordDate: '',
+        track: '',
+        inactive: '',
+        beneficiaryStage: '',
+        careGiver: '',
+        careGiverAge: '',
+        patientID: '',
+        first_middleName: '',
+        surname: '',
+        dob: '',
+        orgUnit: '',
+        // topicTrainedOn: '',
+        beneficiaryName: '',
+        nonBeneficiaryName: '',
+        sex: '',
+        age: '',
     });
+
+    const [isAddingNewRow, setIsAddingNewRow] = useState(false);
 
     const [selectedFilter, setSelectedFilter] = useState(''); // State for radio button selection
     const [beneficiaryFilter, setBeneficiaryFilter] = useState(''); // State for beneficiary dropdown
@@ -75,15 +102,168 @@ export function OrgUnitTable(props: Props) {
 
     // New state variables for filters
     const [trainingFilter, setTrainingFilter] = useState('');
+    const [editableRows, setEditableRows] = useState<{ [key: string]: boolean }>({});
+    const [originalValues, setOriginalValues] = useState<{ [key: string]: OrgUnitDetails }>({});
 
     const [selectedRecord, setSelectedRecord] = useState(null); // State to hold the selected record
     const [showFilterForm, setShowFilterForm] = useState(false); // State to control filter form visibility
+
+    const [additionalColumns, setAdditionalColumns] = useState([]); // State to store additional columns
+    // Initialize state for additional columns
+    const [addColRow_lvh, setaddColRow_lvh] = useState({
+        reportDate: '',
+        dueDate: '',
+        topicsTrainedOn: {
+            harvesting: false,
+            postHarvestHandling: false,
+            landPreparation: false,
+            nurseryPreparation: false,
+            postHarvestHygiene: false,
+            lossesMarking: false,
+            weeding: false,
+            storage: false,
+        },
+        fishingMethods: {
+            fishingOilPreparation: false,
+            fishingMarketing: false,
+            fishingMethods: false,
+            estimatedFishCatch: '',
+        },
+        incomeEarned: '',
+        yieldInKgs: '',
+        caseStories: '',
+        landCultivated: '',
+        // Add other fields as necessary for Nutrition and Water Sanitation & Hygiene
+    });
+
+    const [addColRow_Wsh, setaddColRow_Wsh] = useState({
+        reportDate: '',
+        dueDate: '',
+        foodSafety: false,
+        promotersAttendance: false,
+        personalHygiene: false,
+        householdHygiene: false,
+        cleanSafeWater: false,
+        latrineDisposal: false,
+    });
+
+    const [addColRow_Nut, setaddColRow_Nut] = useState({
+        reportDate: '',
+        dueDate: '',
+        nutritionPregnancy: false,
+        earlyInitiation: false,
+        breastfeedingFirst6Months: false,
+        exclusiveBreastfeeding: false,
+        goodHygienePractices: false,
+        complementaryFeeding: false,
+        healthSeekingBehavior: false,
+        growthMonitoring: false,
+        kitchenGardens: false,
+        cookingDemonstration: false,
+        pregnant: false,
+        lactating: false,
+        other: '',
+    });
+
+    const [columns, setColumns] = useState([]);
+
+    const filterDataByDate = (data, selectedDate) => {
+        if (!selectedDate) return data; // If no date is selected, return all data
+
+        return data.filter(item => {
+            const registrationDate = new Date(item.recordDate).toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+            return registrationDate === selectedDate;
+        });
+    };
+
+    // Filtered data based on the selected date
+    // const filteredData = filterDataByDate(props.orgUnitDetails, dateFilter);
+    const [filteredData, setFilteredData] = useState(props.orgUnitDetails);
+
+    // const [fetchedDates, setFetchedDates] = useState<{ [key: string]: { reportDate: string; dueDate: string;[key: string]: string } }>({});
+    const [fetchedDates, setFetchedDates] = useState<{ [key: string]: FetchedData }>({});
+    const [currentFilter, setCurrentFilter] = useState<string>('');
+
+    useEffect(() => {
+        setFilteredData(filterDataByDate(props.orgUnitDetails, dateFilter));
+    }, [dateFilter, props.orgUnitDetails]);
+
+    // Function to determine additional columns based on the training filter
+    const getAdditionalColumns = (filter: string) => {
+        const columns = [];
+        switch (filter) {
+            case 'Livelihood':
+                columns.push(
+                    { Header: 'Report Date', accessor: 'reportDate' },
+                    { Header: 'Due Date', accessor: 'dueDate' },
+                    { Header: 'Topic Trained On', accessor: 'topicTrainedOn' },
+                    { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
+                    { Header: 'Yield in Kgs', accessor: 'yieldKgs' },
+                    { Header: 'Case Stories Generated', accessor: 'caseStories' },
+                    { Header: 'Land Cultivated in Feddans', accessor: 'landCultivated' },
+                );
+                break;
+            case 'Water Sanitation & Hygiene':
+                columns.push(
+                    { Header: 'Report Date', accessor: 'reportDate' },
+                    { Header: 'Due Date', accessor: 'dueDate' },
+                    { Header: 'Food Safety', accessor: 'foodSafety_checkBox' },
+                    { Header: 'Promoters Attendance :1. CLTS', accessor: 'promotersAttendance_checkBox' },
+                    { Header: 'Personal Hygiene', accessor: 'personalHygiene_checkBox' },
+                    { Header: 'Household Hygene', accessor: 'householdHygiene_checkBox' },
+                    { Header: 'Clean and Safe Water', accessor: 'cleanSafeWater_checkBox' },
+                    { Header: 'Use of Latrine and Excreta Disposal', accessor: 'latrineDisposal_checkBox' },
+                );
+                break;
+            case 'Nutrition':
+                columns.push(
+                    { Header: 'Report Date', accessor: 'reportDate' },
+                    { Header: 'Due Date', accessor: 'dueDate' },
+                    { Header: 'Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox' },
+                    { Header: 'Importance of early initiation of breastfeeding', accessor: 'earlyInitiation_checkBox' },
+                    { Header: 'Breastfeeding in the first 6 months', accessor: 'breastfeedingFirst6Months_checkBox' },
+                    { Header: 'Exclusive breastfeeding during the first 6 months', accessor: 'exclusiveBreastfeeding_checkBox' },
+                    { Header: 'Good hygiene practices', accessor: 'goodHygiene_checkBox' },
+                    { Header: 'Complementary feeding', accessor: 'complementaryFeeding_checkBox' },
+                    { Header: 'Health seeking behavior', accessor: 'healthSeekingBehavior_checkBox' },
+                    { Header: 'Growth monitoring', accessor: 'growthMonitoring_checkBox' },
+                    { Header: 'Kitchen gardens and fruit trees', accessor: 'kitchenGardens_checkBox' },
+                    { Header: 'Cooking Demonstration', accessor: 'cookingDemonstration_checkBox' },
+                    { Header: 'Pregnant', accessor: 'pregnant_checkBox' },
+                    { Header: 'Lactating', accessor: 'lactating_checkBox' },
+                    { Header: 'Other', accessor: 'other' },
+                );
+                break;
+            default:
+                break;
+        }
+
+        // Add the "Add / Edit Event" column
+        if (filter) {
+            columns.push({ Header: 'Add / Edit Event', accessor: 'addEditEvent' });
+        }
+
+        return columns;
+    };
+
+
+    // Update additional columns when training filter changes
+    useEffect(() => {
+        setAdditionalColumns(getAdditionalColumns(trainingFilter));
+    }, [trainingFilter]);
+
+    const table = useTable({
+        data: props.orgUnitDetails,
+        columns: columns, // Use the dynamically set columns
+        globalFilter: search,
+        setGlobalFilter: setSearch,
+    });
 
     // Function to handle beneficiary search
     const handleBeneficiarySearch = async (event) => {
         if (event.key === 'Enter') {
             try {
-                const response = await fetch(`http://localhost:5001/api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=kmfLZO8ckxY&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
+                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=kmfLZO8ckxY&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
                 const data = await response.json();
                 setSearchResults(data.rows); // Set the search results
                 setIsModalVisible(true); // Show the modal
@@ -93,6 +273,19 @@ export function OrgUnitTable(props: Props) {
                 console.error('Error fetching search results:', error);
             }
         }
+    };
+
+    // New method to handle beneficiary name search
+    const handleBeneficiarySearch1 = (event) => {
+        const searchValue = event.target.value.toLowerCase();
+        setBeneficiarySearch(searchValue);
+
+        const filteredByName = props.orgUnitDetails.filter(item =>
+            item.first_middleName.toLowerCase().includes(searchValue) ||
+            item.surname.toLowerCase().includes(searchValue)
+        );
+
+        setFilteredData(filterDataByDate(filteredByName, dateFilter));
     };
 
     // Function to close the modal
@@ -110,6 +303,9 @@ export function OrgUnitTable(props: Props) {
         console.log({ record });
     };
 
+    const handleNewBeneficiaryClick = () => {
+        setIsAddingNewRow(true);
+    };
     // Function to handle training filter change
     const handleTrainingChange = async (event) => {
         await setTrainingFilter(event.target.value);
@@ -118,14 +314,14 @@ export function OrgUnitTable(props: Props) {
     };
 
     // Function to handle place filter change
-    const handlePlaceChange = async (event) => {
-        await setPlaceFilter(event.target.value);
+    const handlePlaceChange = (event) => {
+        setPlaceFilter(event.target.value);
         // Implement your data fetching logic here
     };
 
     // Function to handle date filter change
-    const handleDateChange = async (event) => {
-        await setDateFilter(event.target.value);
+    const handleDateChange = (event) => {
+        setDateFilter(event.target.value);
         // Implement your data fetching logic here
     };
 
@@ -316,22 +512,21 @@ export function OrgUnitTable(props: Props) {
             relationships: [],
 
             attributes: [
-                { "attribute": "FwEpAEagGeK", "value": formData.track }, //hcyi8QjEwyW
-                { "attribute": "IVvy19BmIOw", "value": formData.sex },
+                { "attribute": "FwEpAEagGeK", "value": newRowData.track }, //hcyi8QjEwyW
+                { "attribute": "IVvy19BmIOw", "value": newRowData.sex },
+                { "attribute": "lvpNOLmDEEG", "value": newRowData.age },
+                { "attribute": "created", "value": newRowData.recordDate },
+                // { "attribute": "tUjM7KxKvCO", "value": addColRow_Nut.beneficiaryName },
+                // { "attribute": "lvpNOLmDEEG", "value": addColRow_Nut.nonBeneficiaryName },
+                // { "attribute": "xts0QtWHpnK", "value": addColRow_Nut.inactive },
+                // { "attribute": "OWR8KrtfN3n", "value": newRowData.topicTrainedOn },
 
-                { "attribute": "lvpNOLmDEEG", "value": formData.age },                
-                { "attribute": "r0AIdmEpPN9", "value": formData.recordDate },
-                // { "attribute": "tUjM7KxKvCO", "value": formData.beneficiaryName },
-                // { "attribute": "lvpNOLmDEEG", "value": formData.nonBeneficiaryName },
-                // { "attribute": "xts0QtWHpnK", "value": formData.inactive },
-                { "attribute": "OWR8KrtfN3n", "value": formData.topicTrainedOn},
-
-                { "attribute": "m35qF41KIdK", "value": formData.patientID},
-                { "attribute": "PQEHpxr8tzp", "value": formData.careGiver },
-                { "attribute": "kfyR35y3k3E", "value": formData.careGiverAge },
-                { "attribute": "KmxskLLhS0k", "value": formData.beneficiaryStage },                
-                { "attribute": "tUjM7KxKvCO", "value": formData.firstMiddleName },
-                { "attribute": "xts0QtWHpnK", "value": formData.surname },
+                { "attribute": "m35qF41KIdK", "value": newRowData.patientID },
+                // { "attribute": "PQEHpxr8tzp", "value": newRowData.careGiver },
+                { "attribute": "r0AIdmEpPN9", "value": newRowData.dob },
+                { "attribute": "KmxskLLhS0k", "value": newRowData.beneficiaryStage },
+                { "attribute": "tUjM7KxKvCO", "value": newRowData.first_middleName },
+                { "attribute": "xts0QtWHpnK", "value": newRowData.surname },
             ],
             enrollments: [
                 {
@@ -373,12 +568,14 @@ export function OrgUnitTable(props: Props) {
                 patientID: '',
                 firstMiddleName: '',
                 surname: '',
+                dob: '',
+                orgUnit: '',
                 topicTrainedOn: '',
                 beneficiaryName: '',
                 nonBeneficiaryName: '',
                 sex: '',
                 age: '',
-        
+
             }); // Reset form data
             setDateFilter('');
             setMessage('Data successfully saved!');
@@ -396,62 +593,6 @@ export function OrgUnitTable(props: Props) {
         setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
 
-
-    // Function to convert the array of arrays (rows) to CSV
-    const jsonToCSV = (rows) => {
-        if (!rows || !Array.isArray(rows) || rows.length === 0) {
-            throw new Error('No valid data available to convert to CSV');
-        }
-
-        const csvRows = [];
-
-        // Extract headers from the first row (if applicable)
-        const headers = rows[0]; // First array in 'rows' assumed to be headers
-        csvRows.push(headers.join(',')); // Join headers with commas
-
-        // Process the remaining rows (data)
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            const csvRow = row.map(value => {
-                const escaped = ('' + value).replace(/"/g, '\\"'); // Escape quotes in values
-                return `"${escaped}"`; // Wrap each value in quotes
-            });
-            csvRows.push(csvRow.join(',')); // Join each row's values with commas
-        }
-
-        return csvRows.join('\n'); // Join all rows with a new line character
-    };
-
-    // Handle the download button click
-    const handleDownloadCSV = async (orgUnit) => {
-        try {
-            // Send a POST request with orgUnitId in the body
-            const response = await axios.post('http://localhost:5001/trackedEntityInstances', {
-                orgUnitId: orgUnit // Sending orgUnitId in the body
-            });
-
-            // Log the API response for debugging
-            console.log('API Response:', response.data);
-
-            // Extract rows from the response
-            const rows = response.data.rows;
-
-            if (!rows || !Array.isArray(rows) || rows.length === 0) {
-                throw new Error('API returned invalid or empty data');
-            }
-
-            // Convert rows to CSV format
-            const csv = jsonToCSV(rows);
-
-            // Create a blob and trigger download
-            const blob = new Blob([csv], { type: 'text/csv' });
-            saveAs(blob, 'tracked_entity_instances.csv'); // Change the name as needed
-
-        } catch (error) {
-            console.error('Error fetching data or generating CSV:', error);
-        }
-    };
-
     const resetForm = () => {
         setFormVisible(false);
         setFormData({
@@ -464,15 +605,535 @@ export function OrgUnitTable(props: Props) {
             patientID: '',
             firstMiddleName: '',
             surname: '',
+            dob: '',
+            orgUnit: '',
             topicTrainedOn: '',
             beneficiaryName: '',
             nonBeneficiaryName: '',
             sex: '',
             age: '',
-    
+
         });
         setSelectedFilter('');
     }
+
+    // Function to handle the add action
+    const handleAdd = (id: string) => {
+        setEditableRows((prev) => ({ ...prev, [id]: true }));
+        setOriginalValues((prev) => ({ ...prev, [id]: filteredData.find((d) => d.trackInstanceId === id) }));
+    };
+
+    // Function to handle the edit action
+    const handleEdit = async (trackInstId: string) => {
+        // Set the specific row to editable
+        setEditableRows((prev) => ({ ...prev, [trackInstId]: true }));
+
+        // Fetch additional data for the row being edited
+        const activity = filteredData.find((d) => d.trackInstanceId === trackInstId);
+        if (activity) {
+            const additionalData = await fetchAdditionalData(activity.trackInstanceId, trainingFilter);
+            // setFetchedDates(additionalData); // Store fetched dates in state
+            // Set the fetched dates and data values in the expected structure
+            setFetchedDates((prev) => ({
+                ...prev,
+                [trackInstId]: {
+                    reportDate: additionalData.reportDate,
+                    dueDate: additionalData.dueDate,
+                    eventId: additionalData.eventId,
+                    dataValues: additionalData.dataValues || {}, // Spread the data values
+                },
+            }));
+
+        }
+    };
+
+    const generateEventID = (): string => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        const charactersLength = characters.length;
+        for (let i = 0; i < 11; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
+    // Function to handle save action
+    const handleSave = async (trackInstId: string, id?: string) => {
+        const isEditing = id !== undefined; // Check if we have an ID to determine if we're editing
+
+        // Generate a new event ID if not editing
+        const eventId = isEditing ? id : generateEventID();
+        // Construct the payload based on the filter
+        let payload;
+        if (currentFilter === 'Livelihood') {
+            payload = {
+                dataValues: [
+                    ...(newRowData.track === 'Farmer'
+                        ? [
+                            { value: addColRow_lvh.topicsTrainedOn.harvesting ? 'true' : 'false', dataElement: 'RiNixd9BoZE' },
+                            { value: addColRow_lvh.topicsTrainedOn.postHarvestHandling ? 'true' : 'false', dataElement: 'oLxkWBGjWkV' },
+                            { value: addColRow_lvh.topicsTrainedOn.landPreparation ? 'true' : 'false', dataElement: 'Nmh0TPGuXWS' },
+                            { value: addColRow_lvh.topicsTrainedOn.nurseryPreparation ? 'true' : 'false', dataElement: 'VyqyQ0BZISo' },
+                            { value: addColRow_lvh.topicsTrainedOn.postHarvestHygiene ? 'true' : 'false', dataElement: 'EpaLpKMZj3y' },
+                            { value: addColRow_lvh.topicsTrainedOn.lossesMarking ? 'true' : 'false', dataElement: 'aUrLyHqOf0n' },
+                            { value: addColRow_lvh.topicsTrainedOn.weeding ? 'true' : 'false', dataElement: 'vVKfsZ8VgiG' },
+                            { value: addColRow_lvh.topicsTrainedOn.storage ? 'true' : 'false', dataElement: 'YzlNvVyLIkn' },
+                            // Add other fields as necessary
+                        ]
+                        : [
+                            { value: addColRow_lvh.fishingMethods.fishingOilPreparation ? 'true' : 'false', dataElement: 'erCm8YopB1D' },
+                            { value: addColRow_lvh.fishingMethods.fishingMarketing ? 'true' : 'false', dataElement: 'QpLUEvB2sdy' },
+                            { value: addColRow_lvh.fishingMethods.fishingMethods ? 'true' : 'false', dataElement: 'vsbH6WxHVrN' },
+                            { value: addColRow_lvh.fishingMethods.estimatedFishCatch, dataElement: 'KjTJkoFvx93' },
+                        ]),
+                    { value: addColRow_lvh.incomeEarned, dataElement: 'td3WOxoQ4wN' },
+                    { value: addColRow_lvh.yieldInKgs, dataElement: 'TCSKxlymcyD' },
+                    { value: addColRow_lvh.caseStories, dataElement: 'sQShE9oP513' },
+                    { value: addColRow_lvh.landCultivated, dataElement: 'PKxWHlkevrG' },
+                ],
+                event: eventId,
+                program: 'kmfLZO8ckxY',
+                programStage: 'j3I4HeeEL0K',
+                orgUnit: props.orgUnitId,
+                trackedEntityInstance: trackInstId,
+                status: 'COMPLETED',
+                dueDate: addColRow_lvh.dueDate,
+                eventDate: addColRow_lvh.reportDate,
+                completedDate: new Date().toISOString().split('T')[0],
+            };
+        } else if (currentFilter === 'Nutrition') {
+            payload = {
+                dataValues: [
+                    { "value": addColRow_Nut.nutritionPregnancy, dataElement: 'FVIkGrGWz1s' },
+                    { "value": addColRow_Nut.earlyInitiation, "dataElement": "URD2xr6Enhc" },
+                    { "value": addColRow_Nut.breastfeedingFirst6Months, "dataElement": "LzFFXJl5Iqu" },
+                    { "value": addColRow_Nut.exclusiveBreastfeeding, "dataElement": "ecFLn0i8QrL" },
+                    { "value": addColRow_Nut.goodHygienePractices, "dataElement": "ijTViGLk6hP" },
+                    { "value": addColRow_Nut.complementaryFeeding, "dataElement": "LzGN50sTSh3" },
+                    { "value": addColRow_Nut.healthSeekingBehavior, "dataElement": "C2GoFXyTUj2" },
+                    { "value": addColRow_Nut.growthMonitoring, "dataElement": "DK06Y2Viejs" },
+                    { "value": addColRow_Nut.kitchenGardens, "dataElement": "NOIbysghola" },
+                    { "value": addColRow_Nut.cookingDemonstration, "dataElement": "LhcJpqUzqcp" },
+                    { "value": addColRow_Nut.pregnant, "dataElement": "stU3OZCy64s" },
+                    { "value": addColRow_Nut.lactating, "dataElement": "NA1ZhjvX47L" },
+                    { "value": addColRow_Nut.other, "dataElement": "TQLLkvvbCD2" }
+                    // Add other fields as necessary
+                ],
+                event: eventId,
+                program: 'kmfLZO8ckxY',
+                programStage: 'DSFjQPPKuyM',
+                orgUnit: props.orgUnitId,
+                trackedEntityInstance: trackInstId,
+                status: 'COMPLETED',
+                dueDate: addColRow_lvh.dueDate,
+                eventDate: addColRow_lvh.reportDate,
+                completedDate: new Date().toISOString().split('T')[0],
+            };
+        } else if (currentFilter === 'Water Sanitation & Hygiene') {
+            payload = {
+                dataValues: [
+                    { "value": addColRow_Wsh.foodSafety, "dataElement": 'Q4dJyNwdyyJ' },
+                    { "value": addColRow_Wsh.promotersAttendance, "dataElement": "zwumtCV5d8h" },
+                    { "value": addColRow_Wsh.personalHygiene, "dataElement": "POMbjIgo3EF" },
+                    { "value": addColRow_Wsh.householdHygiene, "dataElement": "ss6pDJe2k6h" },
+                    { "value": addColRow_Wsh.cleanSafeWater, "dataElement": "xyaOOPDyjoN" },
+                    { "value": addColRow_Wsh.latrineDisposal, "dataElement": "dnlAV3tubDJ" }
+                    // Add other fields as necessary
+                ],
+                event: eventId,
+                program: 'kmfLZO8ckxY',
+                programStage: 'QAEEGAsJ5H7',
+                orgUnit: props.orgUnitId,
+                trackedEntityInstance: trackInstId,
+                status: 'ACTIVE',
+                dueDate: addColRow_lvh.dueDate,
+                eventDate: addColRow_lvh.reportDate,
+            };
+        }
+
+        try {
+            if (isEditing) {
+                // PUT request for editing an existing record
+                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${id}`, payload);
+                console.log('Entry updated:', response.data);
+                // Handle success (e.g., update state, show message)
+            } else {
+                // POST request for adding a new record
+                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, payload);
+                console.log('New entry added:', response.data);
+                // Handle success (e.g., update state, show message)
+            }
+        } catch (error) {
+            console.error('Error saving entry:', error);
+            // Handle error (e.g., show error message)
+        }
+    };
+
+    // Function to handle cancel action
+    const handleCancel = (id: string) => {
+        // Revert to original values
+        setEditableRows((prev) => ({ ...prev, [id]: false }));
+        // Optionally, reset the original values if needed
+        setOriginalValues((prev) => {
+            const newValues = { ...prev };
+            delete newValues[id]; // Remove the original values for this row
+            return newValues;
+        });
+    };
+
+    // Function to handle input change
+    const handleInputChange1 = (id: string, accessor: string, value: string | boolean) => {
+        // Update the original values for the row
+        setOriginalValues((prev) => ({
+            ...prev,
+            [id]: {
+                ...prev[id],
+                [accessor]: value,
+            },
+        }));
+    };
+
+    const fetchAdditionalData = async (trackInstanceId: string, trainingFilter: string): Promise<FetchedData> => {
+        const programStageMap = {
+            'Livelihood': 'j3I4HeeEL0K',
+            'Nutrition': 'DSFjQPPKuyM',
+            'Water Sanitation & Hygiene': 'QAEEGAsJ5H7',
+        };
+
+        const programStage = programStageMap[trainingFilter];
+        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json?program=kmfLZO8ckxY&programStage=${programStage}&fields=enrollments[events[*]]`;
+
+        try {
+            console.log(`Fetching data from URL: ${url}`); // Log the URL being fetched
+            const response = await axios.get(url);
+            const data = response.data;
+
+            console.log('Response data:', data); // Log the entire response data
+
+            // Initialize reportDate, dueDate, and dataValues
+            let reportDate = '';
+            let dueDate = '';
+            let eventId = '';
+            const dataValues: { [key: string]: string } = {};
+
+            // Extract the report date and due date from the response
+            if (data.enrollments && data.enrollments.length > 0) {
+                const events = data.enrollments[0].events; // Get all events
+                if (events && events.length > 0) {
+                    // Iterate through all events
+                    events.forEach((event) => {
+                        console.log('Fetched Event:', event); // Log each fetched event
+                        reportDate = event.eventDate; // Extract reportDate (you may want to handle multiple dates)
+                        dueDate = event.dueDate; // Extract dueDate (you may want to handle multiple due dates)
+                        eventId = event.event;
+
+                        // Log all dataElement IDs for this event
+                        const allDataElementIds: string[] = []; // Array to hold all dataElement IDs
+                        event.dataValues.forEach((dataValue) => {
+                            const dataElementId = dataValue.dataElement;
+                            allDataElementIds.push(dataElementId); // Collect the dataElement ID
+                        });
+                        console.log('All Data Element IDs from this event:', allDataElementIds); // Log all dataElement IDs
+
+                        // Extract data values based on the dataElementMapping
+                        const dataElementMappingForFilter = dataElementMapping[trainingFilter];
+                        if (dataElementMappingForFilter) {
+                            event.dataValues.forEach((dataValue) => {
+                                const dataElementId = dataValue.dataElement;
+                                // Check if the dataElementId exists in the mapping
+                                const key = Object.keys(dataElementMappingForFilter).find(key => dataElementMappingForFilter[key] === dataElementId);
+                                if (key) {
+                                    dataValues[key] = dataValue.value; // Store the value
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+
+            // Log the extracted reportDate, dueDate, and dataValues
+            console.log('Extracted Data:', { reportDate, dueDate, eventId, dataValues });
+
+            // Return the fetched data including reportDate, dueDate, and dataValues
+            return {
+                reportDate,
+                dueDate,
+                eventId,
+                dataValues,
+            };
+
+        } catch (error) {
+            console.error('Error fetching additional data:', error);
+        }
+
+        // Return empty values if not found
+        return { reportDate: '', dueDate: '', eventId: '', dataValues: {} }; // Ensure dataValues is an empty object
+    };
+
+    const getTopicOptions = (track: string, filter: string) => {
+        if (filter === 'Livelihood') {
+            if (track === 'Fisher') {
+                return ['Fishing Oil Preparation', 'Fishing Marketing', 'Fishing Methods'];
+            } else if (track === 'Farmer') {
+                return [
+                    'Harvesting',
+                    'Post Harvest Handling',
+                    'Land Preparation',
+                    'Nursery Preparation',
+                    'Post Harvest Hygiene',
+                    'Losses Marking',
+                    'Weeding',
+                    'Storage',
+                ];
+            }
+        } else if (filter === 'Nutrition') {
+            return [
+                'Nutrition Pregnancy',
+                'Early Initiation',
+                'Breastfeeding First 6 Months',
+                'Exclusive Breastfeeding',
+                'Good Hygiene Practices',
+                'Complementary Feeding',
+                'Health Seeking Behavior',
+                'Growth Monitoring',
+                'Kitchen Gardens',
+                'Cooking Demonstration',
+                'Pregnant',
+                'Lactating',
+            ];
+        } else if (filter === 'Water Sanitation & Hygiene') {
+            return [
+                'Food Safety',
+                'Promoters Attendance',
+                'Personal Hygiene',
+                'Household Hygiene',
+                'Clean Safe Water',
+                'Latrine Disposal',
+            ];
+        }
+        return [];
+    };
+
+    const dataElementMapping = {
+        'Livelihood': {
+            'Income Earned/Week': 'td3WOxoQ4wN',
+            'Yield in Kgs': 'TCSKxlymcyD',
+            'Case Stories Generated': 'sQShE9oP513',
+            'Land Cultivated in Feddans': 'PKxWHlkevrG',
+        },
+        'Nutrition': {
+            'Nutrition during pregnancy and lactation': 'FVIkGrGWz1s',
+            'Importance of early initiation of breastfeeding': 'URD2xr6Enhc',
+            'Breastfeeding in the first 6 months': 'LzFFXJl5Iqu',
+            'Exclusive breastfeeding during the first 6 months': 'ecFLn0i8QrL',
+            'Good hygiene practices': 'ijTViGLk6hP',
+            'Complementary feeding': 'LzGN50sTSh3',
+            'Health seeking behavior': 'C2GoFXyTUj2',
+            'Growth monitoring': 'DK06Y2Viejs',
+            'Kitchen gardens and fruit trees': 'NOIbysghola',
+            'Cooking Demonstration': 'LhcJpqUzqcp',
+            'Pregnant': 'stU3OZCy64s',
+            'Lactating': 'NA1ZhjvX47L',
+            'Other': 'TQLLkvvbCD2',
+        },
+        'Water Sanitation & Hygiene': {
+            'Food Safety': 'Q4dJyNwdyyJ',
+            'Promoters Attendance :1. CLTS': 'zwumtCV5d8h',
+            'Personal Hygiene': 'POMbjIgo3EF',
+            'Household Hygene': 'ss6pDJe2k6h',
+            'Clean and Safe Water': 'xyaOOPDyjoN',
+            'Use of Latrine and Excreta Disposal': 'dnlAV3tubDJ',
+        },
+    };
+
+    const dataValueMapping = {
+        'incomeEarned': 'Income Earned/Week',
+        'yieldKgs': 'Yield in Kgs',
+        'caseStories': 'Case Stories Generated',
+        'landCultivated': 'Land Cultivated in Feddans',
+        'foodSafety_checkBox': 'Food Safety',
+        'promotersAttendance_checkBox': 'Promoters Attendance :1. CLTS',
+        'personalHygiene_checkBox': 'Personal Hygiene',
+        'householdHygiene_checkBox': 'Household Hygene',
+        'cleanSafeWater_checkBox': 'Clean and Safe Water',
+        'latrineDisposal_checkBox': 'Use of Latrine and Excreta Disposal',
+        'nutritionPregnancy_checkBox': 'Nutrition during pregnancy and lactation',
+        'earlyInitiation_checkBox': 'Importance of early initiation of breastfeeding',
+        'breastfeedingFirst6Months_checkBox': 'Breastfeeding in the first 6 months',
+        'exclusiveBreastfeeding_checkBox': 'Exclusive breastfeeding during the first 6 months',
+        'goodHygiene_checkBox': 'Good hygiene practices',
+        'complementaryFeeding_checkBox': 'Complementary feeding',
+        'healthSeekingBehavior_checkBox': 'Health seeking behavior',
+        'growthMonitoring_checkBox': 'Growth monitoring',
+        'kitchenGardens_checkBox': 'Kitchen gardens and fruit trees',
+        'cookingDemonstration_checkBox': 'Cooking Demonstration',
+        'pregnant_checkBox': 'Pregnant',
+        'lactating_checkBox': 'Lactating',
+        'other': 'Other'
+    };;
+
+
+    const renderTableRows = () => {
+
+        // const groupData = data?.groupActivities;
+        // console.log("data", groupData);
+
+        if (!filteredData || filteredData.length === 0) {
+            return (
+                <tr>
+                    <td colSpan={6}>No data available for the selected Entry, Please add new Beneficially</td>
+                </tr>
+            );
+        }
+
+        return filteredData.map((activity, index) => {
+            // console.log({ activity: activity });
+            const fetchedData: FetchedData = fetchedDates[activity.trackInstanceId] || { reportDate: '', dueDate: '', eventId: '', dataValues: {} };
+
+            return (
+                <tr key={activity.trackInstanceId || index}>
+                    <td>{index + 1}</td>
+                    <td>{activity.recordDate}</td>
+                    <td>{activity.patientID}</td>
+                    <td>{activity.first_middleName}</td>
+                    <td>{activity.surname}</td>
+                    <td>{activity.age}</td>
+                    <td>{activity.dob}</td>
+                    <td>{activity.sex}</td>
+                    <td>{activity.track}</td>
+                    <td>{activity.beneficiaryStage}</td>
+                    {/* Render additional data cells */}
+                    {additionalColumns.map((col) => (
+                        <td key={col.accessor}>
+                            {(editableRows[activity.trackInstanceId] && col.accessor !== 'addEditEvent') ?
+                                (
+                                    col.accessor === 'reportDate' ? (
+                                        <input
+                                            type="date"
+                                            defaultValue={fetchedDates[activity.trackInstanceId]?.reportDate || ''}
+                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, 'reportDate', e.target.value)}
+                                        />
+                                    ) : col.accessor === 'dueDate' ? (
+                                        <input
+                                            type="date"
+                                            defaultValue={fetchedDates[activity.trackInstanceId]?.dueDate || ''}
+                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, 'dueDate', e.target.value)}
+                                        />
+                                    ) : col.accessor.includes('checkBox') ? (
+                                        <input
+                                            type="checkbox"
+                                            checked={activity[col.accessor] || false} // Assuming activity has a boolean value for checkBox
+                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, col.accessor, e.target.checked)}
+                                        />
+                                    ) : col.accessor === 'topicTrainedOn' ? (
+                                        <select
+                                            defaultValue={activity.topicTrainedOn}
+                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, 'topicTrainedOn', e.target.value)}
+                                        >
+                                            {getTopicOptions(activity.track, trainingFilter).map((topic) => (
+                                                <option key={topic} value={topic}>
+                                                    {topic}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <input
+                                            type="text"
+                                            defaultValue={activity[col.accessor] || ''}
+                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, col.accessor, e.target.value)}
+                                        />
+                                    )) :
+                                (
+                                    // Display fetched dates when not editable
+                                    col.accessor === 'reportDate' ? (
+                                        fetchedData.reportDate || 'N/A'
+                                    ) : col.accessor === 'dueDate' ? (
+                                        fetchedData.dueDate || 'N/A'
+                                    ) : col.accessor === 'addEditEvent' ? null : (
+                                        col.accessor in dataValueMapping ? (
+                                            // Use mapping to get the correct value
+                                            fetchedData.dataValues[dataValueMapping[col.accessor]] !== undefined &&
+                                                fetchedData.dataValues[dataValueMapping[col.accessor]] !== ''
+                                                ? fetchedData.dataValues[dataValueMapping[col.accessor]]
+                                                : 'N/A'// Display 'N/A' if the value is empty or undefined
+                                        ) : (
+                                            activity[col.accessor] || '' // Fallback to activity value if not in mapping
+                                        )
+                                    )
+                                )}
+                            {/* Render the edit button in the last additional column */}
+                            {col.accessor === 'addEditEvent' && (
+                                <div className="button-container">
+                                    {editableRows[activity.trackInstanceId] ? (
+                                        <>
+                                            <button
+                                                onClick={() => handleSave(activity.trackInstanceId, fetchedDates[activity.trackInstanceId]?.eventId)}
+                                                style={{ backgroundColor: 'green' }}
+                                                className="save-button btn"
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                onClick={() => handleCancel(activity.trackInstanceId)}
+                                                style={{ backgroundColor: 'red' }}
+                                                className="cancel-button btn"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                onClick={() => handleAdd(activity.trackInstanceId)}
+                                                style={{ backgroundColor: 'grey' }}
+                                                className="add-button btn"
+                                            >
+                                                Add
+                                            </button>
+                                            <button
+                                                onClick={() => handleEdit(activity.trackInstanceId)}
+                                                style={{ backgroundColor: 'orange' }}
+                                                className="edit-button btn"
+                                            >
+                                                Edit
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+                        </td>
+                    ))}
+                </tr>
+            );
+        });
+    };
+
+    const handleFilterChange = async (newFilter: string) => {
+        setTrainingFilter(newFilter); // Update the training filter state
+
+        // Fetch additional data for all rows based on the new filter
+        const updatedFetchedDates = await Promise.all(
+            filteredData.map(async (activity) => {
+                const additionalData = await fetchAdditionalData(activity.trackInstanceId, newFilter);
+                console.log({ 'Additional Data': additionalData })
+                return {
+                    trackInstanceId: activity.trackInstanceId,
+                    reportDate: additionalData.reportDate,
+                    dueDate: additionalData.dueDate,
+                    eventId: additionalData.eventId,
+                    dataValues: additionalData.dataValues || {}
+                };
+            })
+        );
+
+        // Update the state with the fetched dates
+        // Update the state with the fetched dates
+        const newFetchedDates: { [key: string]: FetchedData } = {};
+        updatedFetchedDates.forEach(({ trackInstanceId, reportDate, dueDate, eventId, dataValues }) => {
+            newFetchedDates[trackInstanceId] = { reportDate, dueDate, eventId, dataValues };
+        });
+        setFetchedDates(newFetchedDates);
+    };
 
     return (
         <main className="space-y-4">
@@ -483,50 +1144,33 @@ export function OrgUnitTable(props: Props) {
 
             {/* Training Filters */}
             <h5 style={{ padding: '10px' }}>Training</h5>
-            <div className="flex space-x-4" style={{
-                padding: '0px 10px 10px 10px',
-                display: 'flex', gap: '15px'
-            }}>
-                <label style={{ display: 'flex', gap: '3px' }}>
-                    <input
-                        type="radio"
-                        value="Livelihood"
-                        checked={trainingFilter === 'Livelihood'}
-                        onChange={handleTrainingChange}
-                    />
-                    Livelihood
-                </label>
-                <label style={{ display: 'flex', gap: '3px' }}>
-                    <input
-                        type="radio"
-                        value="Water Sanitation & Hygiene"
-                        checked={trainingFilter === 'Water Sanitation & Hygiene'}
-                        onChange={handleTrainingChange}
-                    />
-                    Water Sanitation & Hygiene
-                </label>
-                <label style={{ display: 'flex', gap: '3px' }}>
-                    <input
-                        type="radio"
-                        value="Nutrition"
-                        checked={trainingFilter === 'Nutrition'}
-                        onChange={handleTrainingChange}
-                    />
-                    Nutrition
-                </label>
-            </div>
+            <label style={{
+                display: 'flex',
+                gap: '3px',
+                marginLeft: '10px',
+            }}>Select Date:
+                <input
+                    type="date"
+                    id="dateFilter"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    style={{ marginTop: '-5px', borderRadius: '5px' }}
+                    className="mb-4 border border-gray-300 rounded-md p-2"
+                />
+            </label>
 
             {/* Search Input for Beneficiary and other Filters */}
             <div className="flex space-x-4" style={{
                 padding: '10px',
-                display: 'flex', gap: '15px'
+                display: 'flex', gap: '15px',
+                marginTop: '-5px'
             }}>
                 <input
                     type="text"
                     placeholder="Search Beneficiary"
                     value={beneficiarySearch}
                     onChange={(e) => setBeneficiarySearch(e.target.value)}
-                    onKeyDown={handleBeneficiarySearch}
+                    onKeyDown={handleBeneficiarySearch1}
                     className="border border-gray-300 rounded-md p-2"
                     style={{ borderRadius: '5px' }}
                 />
@@ -534,12 +1178,12 @@ export function OrgUnitTable(props: Props) {
                 <button
                     type="button"
                     // onChange={handlePlaceChange}
-                    onClick={onAdd}
+                    onClick={handleNewBeneficiaryClick}
                     className="border border-gray-300 rounded-md p-2"
                     style={{ borderRadius: '5px' }}
                 >
-                    Non Beneficiary
-                </button>    
+                    New Beneficiary
+                </button>
 
                 {/* <input
                     type="text"
@@ -569,6 +1213,41 @@ export function OrgUnitTable(props: Props) {
                 </select> */}
 
 
+            </div>
+
+            {/* Training (radio button) filters */}
+            <div className="flex space-x-4" style={{
+                padding: '0px 10px 10px 10px',
+                display: 'flex', gap: '15px'
+            }}>
+
+                <label style={{ display: 'flex', gap: '3px' }}>
+                    <input
+                        type="radio"
+                        value="Livelihood"
+                        checked={trainingFilter === 'Livelihood'}
+                        onChange={() => handleFilterChange('Livelihood')}
+                    />
+                    Livelihood
+                </label>
+                <label style={{ display: 'flex', gap: '3px' }}>
+                    <input
+                        type="radio"
+                        value="Water Sanitation & Hygiene"
+                        checked={trainingFilter === 'Water Sanitation & Hygiene'}
+                        onChange={() => handleFilterChange('Water Sanitation & Hygiene')}
+                    />
+                    Water Sanitation & Hygiene
+                </label>
+                <label style={{ display: 'flex', gap: '3px' }}>
+                    <input
+                        type="radio"
+                        value="Nutrition"
+                        checked={trainingFilter === 'Nutrition'}
+                        onChange={() => setTrainingFilter('Nutrition')}
+                    />
+                    Nutrition
+                </label>
             </div>
 
             {/* Modal for Search Results */}
@@ -713,7 +1392,7 @@ export function OrgUnitTable(props: Props) {
                                 required
                             />
                         </div> */}
-                        
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Is Beneficiary an Adult or Child</label>
                             <select
@@ -771,7 +1450,7 @@ export function OrgUnitTable(props: Props) {
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                             />
-                        </div>    
+                        </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700">First Name and Middle Name</label>
                             <input
@@ -781,7 +1460,7 @@ export function OrgUnitTable(props: Props) {
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                             />
-                        </div> 
+                        </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Surname</label>
                             <input
@@ -792,7 +1471,7 @@ export function OrgUnitTable(props: Props) {
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                             />
                         </div>
-                        
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700">SSD_Select Training</label>
                             <select
@@ -808,7 +1487,7 @@ export function OrgUnitTable(props: Props) {
                                 <option value="Nutrition Centric Training">Nutrition Centric Training</option>
                             </select>
                         </div>
-                        
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Name (Beneficiary)</label>
                             <input
@@ -867,11 +1546,11 @@ export function OrgUnitTable(props: Props) {
                                 <option value="Farmer">Farmer</option>
                                 <option value="Fisher">Fisher</option>
                             </select>
-                        </div><br></br>                        
-                        
+                        </div><br></br>
+
                         <div className="button-container">
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 className="submit-button"
                                 style={{ marginLeft: '5px' }}
                             >
@@ -890,14 +1569,153 @@ export function OrgUnitTable(props: Props) {
                 </div>
             )}
 
-            {!formVisible && <Table
-                table={table}
-                className="border border-gray-300 rounded-md shadow-md"
-                onRowClick={(row) => {
-                    const id = row.getValue('id');
-                    history.push(`/${props.orgUnitId}/${id}/about`);
-                }}
-            />}
+            {!formVisible && (
+                <>
+                    <div className="table-responsive">
+                        <table className="table table-striped table-bordered table-hover table-dark-header">
+                            <thead className="text-nowrap">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Registration Date</th>
+                                    <th>Patient ID</th>
+                                    <th>First Name & Middle Name</th>
+                                    <th>Surname</th>
+                                    <th>Age</th>
+                                    <th>Date of Birth</th>
+                                    <th>Sex</th>
+                                    <th>Beneficiary Track</th>
+                                    <th>Is Beneficiary Adult / Child</th>
+                                    {/* Render additional headers */}
+                                    {additionalColumns.map((col) => (
+                                        <th key={col.accessor}>{col.Header}</th>
+                                    ))}
+                                </tr>
+                                {/* <tr>
+                                    {table.columns.map((column) => (
+                                        <th key={column.accessor || column.Header}>{column.Header}</th>
+                                    ))}
+                                </tr> */}
+                            </thead>
+                            <tbody>
+                                {renderTableRows()}
+                                {/* New row form as part of the table */}
+                                {isAddingNewRow && (
+                                    <tr>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="id"
+                                                value={newRowData.id}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, id: e.target.value })}
+                                                placeholder="Row No."
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <input
+                                                type="date"
+                                                name="recordDate"
+                                                value={newRowData.recordDate}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, recordDate: e.target.value })}
+
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="patientID"
+                                                value={newRowData.patientID}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, patientID: e.target.value })}
+                                                placeholder="Patient ID"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="first_middleName"
+                                                value={newRowData.first_middleName}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, first_middleName: e.target.value })}
+                                                placeholder="First Name and Middle Name"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="surname"
+                                                value={newRowData.surname}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, surname: e.target.value })}
+                                                placeholder="Surname"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="number"
+                                                name="age"
+                                                value={newRowData.age}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, age: e.target.value })}
+                                                placeholder="Age"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="date"
+                                                name="dob"
+                                                value={newRowData.dob}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, dob: e.target.value })}
+
+                                            />
+                                        </td>
+                                        <td>
+                                            <select
+                                                name="sex"
+                                                value={newRowData.sex}
+                                                onChange={(e) => setNewRowData({ ...newRowData, sex: e.target.value })}
+                                            >
+                                                <option value="">Select Gender</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="track"
+                                                value={newRowData.track}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, track: e.target.value })}
+                                                placeholder="Beneficiary Track"
+                                            />
+                                        </td>
+                                        <td>
+                                            <select
+                                                name="beneficiaryStage"
+                                                value={newRowData.beneficiaryStage}
+                                                onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
+                                            >
+                                                <option value="">Select Gender</option>
+                                                <option value="Adult">Adult</option>
+                                                <option value="Child">Child</option>
+                                            </select>
+                                        </td>
+                                        {/* Add more input fields for other data as needed */}
+                                        <td>
+                                            <button onClick={handleFormSubmit} className="submit-button">Save</button>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
+            )}
+
             {!formVisible && <TablePagination table={table} />}
         </main>
 

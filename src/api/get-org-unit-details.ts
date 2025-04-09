@@ -34,6 +34,7 @@ export async function getOrgUnitDetails(
 
   return rows.map((row) => ({
     id: id,
+    trackInstanceId: row[0],
     recordDate: row[1],
     track: row[18],
     topicTrainedOn: row[11],
@@ -43,5 +44,12 @@ export async function getOrgUnitDetails(
     age: row[14],
     action: row[7],
     venue: row[17],
+    inactive: "No",
+    surname: row[13],
+    dob: row[15],
+    orgUnit: row[3],
+    first_middleName: row[12],
+    patientID: row[17],
+    beneficiaryStage: row[8]
   }));
 }

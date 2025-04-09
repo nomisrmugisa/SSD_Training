@@ -1,11 +1,13 @@
 import {
     FilterFn,
     flexRender,
+    Column,
     Table as ReactTable,
     Row,
 } from '@tanstack/react-table';
 import React from 'react';
 import './Table.css';
+
 
 declare module '@tanstack/react-table' {
     interface FilterFns {
@@ -16,11 +18,12 @@ declare module '@tanstack/react-table' {
 type Props<T> = {
     table: ReactTable<T>;
     // data: T[]; // Add the data prop here
+    columns?: Column<T>[]; // Ensure columns are part of the props
     onRowClick?: (row: Row<T>) => void;
     className?: string;
 };
 
-export function Table<T>({ table, onRowClick, className }: Props<T>) {
+export function Table<T>({ table, columns, onRowClick, className }: Props<T>) {
     return (
         <div className={`table-responsive ${className}`}>
             <table className="table table-striped table-bordered table-hover table-dark-header">

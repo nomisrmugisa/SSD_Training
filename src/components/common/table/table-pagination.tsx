@@ -1,5 +1,6 @@
-import { Table } from '@tanstack/react-table';
 import React from 'react';
+import { Table } from '@tanstack/react-table';
+import './table-pagination.css';
 
 type Props<T> = {
   table: Table<T>;
@@ -7,16 +8,16 @@ type Props<T> = {
 
 export function TablePagination<T>({ table }: Props<T>) {
   return (
-    <div className="flex items-center gap-10">
-      <div className="flex items-center gap-4">
+    <div className="pagination-container">
+      <div className="pagination-controls">
         <button
-          className="border p-1"
+          className="pagination-button"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
           Previous
         </button>
-        <span>
+        <span className="pagination-info">
           Page{' '}
           <strong>
             {table.getState().pagination.pageIndex + 1} of{' '}
@@ -24,7 +25,7 @@ export function TablePagination<T>({ table }: Props<T>) {
           </strong>
         </span>
         <button
-          className="border p-1"
+          className="pagination-button"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
@@ -32,10 +33,10 @@ export function TablePagination<T>({ table }: Props<T>) {
         </button>
       </div>
 
-      <div className="flex items-center gap-4">
-        <span>Show </span>
+      <div className="pagination-controls">
+        <span className="pagination-info">Show </span>
         <select
-          className="border p-1"
+          className="page-size-select"
           value={table.getState().pagination.pageSize}
           onChange={(e) => {
             table.setPageSize(Number(e.target.value));
@@ -47,7 +48,7 @@ export function TablePagination<T>({ table }: Props<T>) {
             </option>
           ))}
         </select>
-        <span> entries</span>
+        <span className="pagination-info"> entries</span>
       </div>
     </div>
   );
