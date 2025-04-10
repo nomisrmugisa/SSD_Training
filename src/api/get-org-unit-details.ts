@@ -49,7 +49,7 @@ export async function getOrgUnitDetails(
     dob: row[15],
     orgUnit: row[3],
     first_middleName: row[12],
-    patientID: row[17],
+    patientID: row[11],
     beneficiaryStage: row[8]
   }));
 }

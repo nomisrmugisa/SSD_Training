@@ -17,6 +17,9 @@ import WaterSanitationForm from '../training-forms/waterSanitation';
 import NutritionForm from '../training-forms/nutrition';
 import './org-unit-table.css';
 
+import { InternetStatus } from '../common/InternetStatus';
+import { useOfflineSync } from '../../hooks/useOfflineSync';
+
 type Props = {
     orgUnitDetails: OrgUnitDetails[];
     orgUnitId: string;
@@ -29,6 +32,14 @@ interface FetchedData {
     eventId: string;
     dataValues: { [key: string]: string }; // To hold the values for each data element
 }
+
+type ProgramStage = 'Livelihood' | 'Water Sanitation & Hygiene' | 'Nutrition' | '';
+
+const PROGRAM_STAGE_MAPPING = {
+    'Livelihood': 'j3I4HeeEL0K',
+    'Water Sanitation & Hygiene': 'QAEEGAsJ5H7',
+    'Nutrition': 'DSFjQPPKuyM'
+};
 
 export function OrgUnitTable(props: Props) {
     const credentials = btoa(`admin:Precommunicate30-#Helle17}`);
@@ -122,17 +133,26 @@ export function OrgUnitTable(props: Props) {
             lossesMarking: false,
             weeding: false,
             storage: false,
+            appliedLessons: '',
+            increasedIncome: false,
+            increasedProduction: false,
+            newLivelihood: false,
+            increasedSkills: false,
+            increasedResilience: false,
+            others: ''
         },
         fishingMethods: {
             fishingOilPreparation: false,
             fishingMarketing: false,
             fishingMethods: false,
-            estimatedFishCatch: '',
+            postHandlingMethods: false,
+            appliedLessons: '',
+            // estimatedFishCatch: '',
         },
-        incomeEarned: '',
-        yieldInKgs: '',
-        caseStories: '',
-        landCultivated: '',
+        // incomeEarned: '',
+        // yieldInKgs: '',
+        // caseStories: '',
+        // landCultivated: '',
         // Add other fields as necessary for Nutrition and Water Sanitation & Hygiene
     });
 
@@ -184,24 +204,73 @@ export function OrgUnitTable(props: Props) {
     const [fetchedDates, setFetchedDates] = useState<{ [key: string]: FetchedData }>({});
     const [currentFilter, setCurrentFilter] = useState<string>('');
 
+    const [selectedProgramStage, setSelectedProgramStage] = useState<ProgramStage>('');
+    const [filteredProgramData, setFilteredProgramData] = useState<any[]>([]);
+
+    // handle date filtering
     useEffect(() => {
         setFilteredData(filterDataByDate(props.orgUnitDetails, dateFilter));
     }, [dateFilter, props.orgUnitDetails]);
+
+    // handle track filtering
+    useEffect(() => {
+        if (trackFilter) {
+            const filteredByTrack = props.orgUnitDetails.filter(item =>
+                item.track === trackFilter
+            );
+            setFilteredData(filteredByTrack);
+        } else {
+            setFilteredData(props.orgUnitDetails);
+        }
+    }, [trackFilter, props.orgUnitDetails]);
 
     // Function to determine additional columns based on the training filter
     const getAdditionalColumns = (filter: string) => {
         const columns = [];
         switch (filter) {
             case 'Livelihood':
-                columns.push(
-                    { Header: 'Report Date', accessor: 'reportDate' },
-                    { Header: 'Due Date', accessor: 'dueDate' },
-                    { Header: 'Topic Trained On', accessor: 'topicTrainedOn' },
-                    { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
-                    { Header: 'Yield in Kgs', accessor: 'yieldKgs' },
-                    { Header: 'Case Stories Generated', accessor: 'caseStories' },
-                    { Header: 'Land Cultivated in Feddans', accessor: 'landCultivated' },
-                );
+                if (trackFilter === 'Fisher') {
+                    columns.push(
+                        { Header: 'Report Date', accessor: 'reportDate' },
+                        { Header: 'Due Date', accessor: 'dueDate' },
+                        { Header: 'Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox' },
+                        { Header: 'Fishing Marketing', accessor: 'fishingMarketing_checkBox' },
+                        { Header: 'Fishing Methods', accessor: 'fishingMethods_checkBox' },
+                        { Header: 'Post Handling Methods', accessor: 'postHandlingMethods_checkBox' }, // Added
+                        {
+                            Header: 'Did you apply the lessons from fishery training in your life',
+                            accessor: 'appliedLessons_dropdown'
+                        }
+                        // { Header: 'Estimated Fish Catch', accessor: 'estimatedFishCatch' },
+                        // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
+                        // { Header: 'Case Stories Generated', accessor: 'caseStories' }
+                    );
+                } else if (trackFilter === 'Farmer') {
+                    columns.push(
+                        { Header: 'Report Date', accessor: 'reportDate' },
+                        { Header: 'Due Date', accessor: 'dueDate' },
+                        { Header: 'Harvesting', accessor: 'harvesting_checkBox' },
+                        { Header: 'Post Harvest Handling', accessor: 'postHarvestHandling_checkBox' },
+                        { Header: 'Land Preparation', accessor: 'landPreparation_checkBox' },
+                        { Header: 'Nursery Preparation', accessor: 'nurseryPreparation_checkBox' },
+                        { Header: 'Post Harvest Hygiene', accessor: 'postHarvestHygiene_checkBox' },
+                        { Header: 'Losses Marking', accessor: 'lossesMarking_checkBox' },
+                        { Header: 'Weeding', accessor: 'weeding_checkBox' },
+                        { Header: 'Storage', accessor: 'storage_checkBox' },
+                        { Header: 'Did you apply the lessons from the farming trainings in your life', accessor: 'appliedLessons_dropdown' },
+                        { Header: 'Increased income', accessor: 'increasedIncome_checkBox' },
+                        { Header: 'Increased agricultural production', accessor: 'increasedProduction_checkBox' },
+                        { Header: 'Started a new livelihood activity', accessor: 'newLivelihood_checkBox' },
+                        { Header: 'Increased my skills/knowledge', accessor: 'increasedSkills_checkBox' },
+                        { Header: 'Increased my family\'s resilience to shocks', accessor: 'increasedResilience_checkBox' },
+                        { Header: 'Others (specify)', accessor: 'others_text' }
+                        // Comment out these columns
+                        // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
+                        // { Header: 'Yield in Kgs', accessor: 'yieldKgs' },
+                        // { Header: 'Case Stories Generated', accessor: 'caseStories' },
+                        // { Header: 'Land Cultivated in Feddans', accessor: 'landCultivated' }
+                    );
+                }
                 break;
             case 'Water Sanitation & Hygiene':
                 columns.push(
@@ -459,20 +528,18 @@ export function OrgUnitTable(props: Props) {
 
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        // console.log("formData", formData)
         setLoading(true);
 
-        // Fetch new ID for the event
+        // Generate track instance ID
         const newId = await generateTrackInstId();
-        // if (!newId) {
-        //     console.error('Failed to generate a new trackedEntityInstance ID.');
-        //     setLoading(false);
-        //     setMessage('Failed to generate a new trackedEntityInstance ID.');
-        //     return;
-        // }
-        // console.log("id", newId)
+        if (!newId) {
+            console.error('Failed to generate a new trackedEntityInstance ID.');
+            setLoading(false);
+            setMessage('Failed to generate a new trackedEntityInstance ID.');
+            return;
+        }
 
-        // Fetch new ID for the event
+        // Fetch user data
         const userData = await fetchUser();
         if (!userData) {
             console.error('Failed to get username.');
@@ -481,84 +548,75 @@ export function OrgUnitTable(props: Props) {
             return;
         }
 
-        const enteredValues = {
-            created: new Date().toISOString(),
-            orgUnit: props.orgUnitId,
-            createdAtClient: new Date().toISOString(),
-            trackedEntityInstance: newId,
-            lastUpdated: new Date().toISOString(),
+        // First payload for tracked entity instance
+        const payload1 = {
             trackedEntityType: "b8gedH8Po5d",
-            lastUpdatedAtClient: new Date().toISOString(),
-            storedBy: "admin",// userData.username
-            potentialDuplicate: false,
-            deleted: false,
-            inactive: false,
-            featureType: "NONE",
-            lastUpdatedByUserInfo:
-            {
-                uid: "M5zQapPyTZI",//userData.id,
-                firstName: "admin",//userData.firstName,
-                surname: "admin",//userData.surname,
-                username: "admin",//userData.username
-            },
-            createdByUserInfo:
-            {
-                uid: "M5zQapPyTZI",//userData.id,
-                firstName: "admin",//userData.firstName,
-                surname: "admin",//userData.surname,
-                username: "admin",//userData.username
-            },
-            programOwners: [],
-            relationships: [],
-
+            orgUnit: props.orgUnitId,
             attributes: [
-                { "attribute": "FwEpAEagGeK", "value": newRowData.track }, //hcyi8QjEwyW
-                { "attribute": "IVvy19BmIOw", "value": newRowData.sex },
-                { "attribute": "lvpNOLmDEEG", "value": newRowData.age },
-                { "attribute": "created", "value": newRowData.recordDate },
-                // { "attribute": "tUjM7KxKvCO", "value": addColRow_Nut.beneficiaryName },
-                // { "attribute": "lvpNOLmDEEG", "value": addColRow_Nut.nonBeneficiaryName },
-                // { "attribute": "xts0QtWHpnK", "value": addColRow_Nut.inactive },
-                // { "attribute": "OWR8KrtfN3n", "value": newRowData.topicTrainedOn },
-
-                { "attribute": "m35qF41KIdK", "value": newRowData.patientID },
-                // { "attribute": "PQEHpxr8tzp", "value": newRowData.careGiver },
-                { "attribute": "r0AIdmEpPN9", "value": newRowData.dob },
-                { "attribute": "KmxskLLhS0k", "value": newRowData.beneficiaryStage },
-                { "attribute": "tUjM7KxKvCO", "value": newRowData.first_middleName },
-                { "attribute": "xts0QtWHpnK", "value": newRowData.surname },
-            ],
-            enrollments: [
-                {
-                    program: 'kmfLZO8ckxY',
-                    orgUnit: props.orgUnitId,
-                    enrollmentDate: new Date().toISOString(),
-                    incidentDate: new Date().toISOString()
-                }
+                { attribute: "FwEpAEagGeK", value: newRowData.track },
+                { attribute: "IVvy19BmIOw", value: newRowData.sex },
+                { attribute: "lvpNOLmDEEG", value: newRowData.age },
+                { attribute: "m35qF41KIdK", value: newRowData.patientID },
+                { attribute: "r0AIdmEpPN9", value: newRowData.dob },
+                { attribute: "KmxskLLhS0k", value: newRowData.beneficiaryStage },
+                { attribute: "tUjM7KxKvCO", value: newRowData.first_middleName },
+                { attribute: "xts0QtWHpnK", value: newRowData.surname },
             ]
-
-        }
+        };
 
 
         try {
-            const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances?`,
-                // `/api/trackedEntityInstances?`, //wth proxy
+            // First POST request - Create tracked entity instance
+            const response1 = await fetch(
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`,
                 {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         // 'Authorization': `Basic ${credentials}`,
                     },
-                    body: JSON.stringify(enteredValues),
-                });
+                    body: JSON.stringify(payload1),
+                }
+            );
 
-            if (!response.ok) {
-                throw new Error('Failed to post data');
+            if (!response1.ok) {
+                throw new Error('Failed to create tracked entity instance');
             }
 
-            // Hide the form after submission
-            setFormData({
+            const responseData = await response1.json();
+            const trackedEntityInstance = responseData.response.importSummaries[0].reference;
+
+            // Second payload for enrollment
+            const payload2 = {
+                trackedEntityInstance: trackedEntityInstance,
+                program: "kmfLZO8ckxY",
+                status: "ACTIVE",
+                orgUnit: props.orgUnitId,
+                enrollmentDate: newRowData.recordDate,
+                incidentDate: new Date().toISOString()
+            };
+
+            // Second POST request - Create enrollment
+            const response2 = await fetch(
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 'Authorization': `Basic ${credentials}`,
+                    },
+                    body: JSON.stringify(payload2),
+                }
+            );
+
+            if (!response2.ok) {
+                throw new Error('Failed to create enrollment');
+            }
+
+            // Reset form and show success message
+            setNewRowData({
+                id: '',
+                trackInstanceId: '',
                 recordDate: '',
                 track: '',
                 inactive: '',
@@ -566,27 +624,28 @@ export function OrgUnitTable(props: Props) {
                 careGiver: '',
                 careGiverAge: '',
                 patientID: '',
-                firstMiddleName: '',
+                first_middleName: '',
                 surname: '',
                 dob: '',
                 orgUnit: '',
-                topicTrainedOn: '',
                 beneficiaryName: '',
                 nonBeneficiaryName: '',
                 sex: '',
                 age: '',
-
-            }); // Reset form data
+            });
             setDateFilter('');
-            setMessage('Data successfully saved!');
+            setMessage('Beneficiary successfully created!');
             setIsError(false);
+            setIsAddingNewRow(false); // Close the new row form
+
         } catch (error) {
-            console.error('Error posting data:', error);
-            setMessage('Error saving data. Please try again.');
+            console.error('Error creating beneficiary:', error);
+            setMessage('Error creating beneficiary. Please try again.');
             setIsError(true);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
-    }
+    };
 
     const handleInputChange = async (event) => {
         const { name, value } = event.target;
@@ -678,18 +737,22 @@ export function OrgUnitTable(props: Props) {
                             { value: addColRow_lvh.topicsTrainedOn.lossesMarking ? 'true' : 'false', dataElement: 'aUrLyHqOf0n' },
                             { value: addColRow_lvh.topicsTrainedOn.weeding ? 'true' : 'false', dataElement: 'vVKfsZ8VgiG' },
                             { value: addColRow_lvh.topicsTrainedOn.storage ? 'true' : 'false', dataElement: 'YzlNvVyLIkn' },
-                            // Add other fields as necessary
+                            { value: addColRow_lvh.topicsTrainedOn.appliedLessons, dataElement: 'newDataElementId' },
+                            { value: addColRow_lvh.topicsTrainedOn.increasedIncome ? 'true' : 'false', dataElement: 'newDataElementId' },
+                            { value: addColRow_lvh.topicsTrainedOn.increasedProduction ? 'true' : 'false', dataElement: 'newDataElementId' },
+                            { value: addColRow_lvh.topicsTrainedOn.newLivelihood ? 'true' : 'false', dataElement: 'newDataElementId' },
+                            { value: addColRow_lvh.topicsTrainedOn.increasedSkills ? 'true' : 'false', dataElement: 'newDataElementId' },
+                            { value: addColRow_lvh.topicsTrainedOn.increasedResilience ? 'true' : 'false', dataElement: 'newDataElementId' },
+                            { value: addColRow_lvh.topicsTrainedOn.others, dataElement: 'newDataElementId' }
                         ]
                         : [
-                            { value: addColRow_lvh.fishingMethods.fishingOilPreparation ? 'true' : 'false', dataElement: 'erCm8YopB1D' },
-                            { value: addColRow_lvh.fishingMethods.fishingMarketing ? 'true' : 'false', dataElement: 'QpLUEvB2sdy' },
-                            { value: addColRow_lvh.fishingMethods.fishingMethods ? 'true' : 'false', dataElement: 'vsbH6WxHVrN' },
-                            { value: addColRow_lvh.fishingMethods.estimatedFishCatch, dataElement: 'KjTJkoFvx93' },
+                            // Fisher track data elements remain unchanged
                         ]),
-                    { value: addColRow_lvh.incomeEarned, dataElement: 'td3WOxoQ4wN' },
-                    { value: addColRow_lvh.yieldInKgs, dataElement: 'TCSKxlymcyD' },
-                    { value: addColRow_lvh.caseStories, dataElement: 'sQShE9oP513' },
-                    { value: addColRow_lvh.landCultivated, dataElement: 'PKxWHlkevrG' },
+                    // Remove the commented out fields
+                    // { value: addColRow_lvh.incomeEarned, dataElement: 'td3WOxoQ4wN' },
+                    // { value: addColRow_lvh.yieldInKgs, dataElement: 'TCSKxlymcyD' },
+                    // { value: addColRow_lvh.caseStories, dataElement: 'sQShE9oP513' },
+                    // { value: addColRow_lvh.landCultivated, dataElement: 'PKxWHlkevrG' },
                 ],
                 event: eventId,
                 program: 'kmfLZO8ckxY',
@@ -916,10 +979,33 @@ export function OrgUnitTable(props: Props) {
 
     const dataElementMapping = {
         'Livelihood': {
-            'Income Earned/Week': 'td3WOxoQ4wN',
-            'Yield in Kgs': 'TCSKxlymcyD',
-            'Case Stories Generated': 'sQShE9oP513',
-            'Land Cultivated in Feddans': 'PKxWHlkevrG',
+            'Fisher': {
+                'Fishing Oil Preparation': 'erCm8YopB1D',
+                'Fishing Marketing': 'QpLUEvB2sdy',
+                'Fishing Methods': 'vsbH6WxHVrN',
+                'Post Handling Methods': 'newDataElementId', // Need correct ID
+                'Applied Lessons': 'newDataElementId',       // Need correct ID
+                // 'Income Earned/Week': 'td3WOxoQ4wN',
+                // 'Case Stories Generated': 'sQShE9oP513'
+            },
+            'Farmer': {
+                'Harvesting': 'RiNixd9BoZE',
+                'Post Harvest Handling': 'oLxkWBGjWkV',
+                'Land Preparation': 'Nmh0TPGuXWS',
+                'Nursery Preparation': 'VyqyQ0BZISo',
+                'Post Harvest Hygiene': 'EpaLpKMZj3y',
+                'Losses Marking': 'aUrLyHqOf0n',
+                'Weeding': 'vVKfsZ8VgiG',
+                'Storage': 'YzlNvVyLIkn',
+                'Applied Lessons': 'newDataElementId',           // Need correct ID
+                'Increased income': 'newDataElementId',         // Need correct ID
+                'Increased agricultural production': 'newDataElementId', // Need correct ID
+                'Started a new livelihood activity': 'newDataElementId', // Need correct ID
+                'Increased my skills/knowledge': 'newDataElementId',    // Need correct ID
+                'Increased my family\'s resilience to shocks': 'newDataElementId', // Need correct ID
+                'Others': 'newDataElementId'                    // Need correct ID
+            }
+
         },
         'Nutrition': {
             'Nutrition during pregnancy and lactation': 'FVIkGrGWz1s',
@@ -947,10 +1033,30 @@ export function OrgUnitTable(props: Props) {
     };
 
     const dataValueMapping = {
-        'incomeEarned': 'Income Earned/Week',
-        'yieldKgs': 'Yield in Kgs',
-        'caseStories': 'Case Stories Generated',
-        'landCultivated': 'Land Cultivated in Feddans',
+        // Farmer-specific mappings
+        'harvesting_checkBox': 'Harvesting',
+        'postHarvestHandling_checkBox': 'Post Harvest Handling',
+        'landPreparation_checkBox': 'Land Preparation',
+        'nurseryPreparation_checkBox': 'Nursery Preparation',
+        'postHarvestHygiene_checkBox': 'Post Harvest Hygiene',
+        'lossesMarking_checkBox': 'Losses Marking',
+        'weeding_checkBox': 'Weeding',
+        'storage_checkBox': 'Storage',
+        'appliedLessons_dropdown': 'Applied Lessons',
+        'increasedIncome_checkBox': 'Increased income',
+        'increasedProduction_checkBox': 'Increased agricultural production',
+        'newLivelihood_checkBox': 'Started a new livelihood activity',
+        'increasedSkills_checkBox': 'Increased my skills/knowledge',
+        'increasedResilience_checkBox': 'Increased my family\'s resilience to shocks',
+        'others_text': 'Others',
+    
+        // Fisher-specific mappings (existing)
+        'fishingOilPreparation_checkBox': 'Fishing Oil Preparation',
+        'fishingMarketing_checkBox': 'Fishing Marketing',
+        'fishingMethods_checkBox': 'Fishing Methods',
+        'postHandlingMethods_checkBox': 'Post Handling Methods',
+        
+        // Other existing mappings (Nutrition, Water Sanitation)
         'foodSafety_checkBox': 'Food Safety',
         'promotersAttendance_checkBox': 'Promoters Attendance :1. CLTS',
         'personalHygiene_checkBox': 'Personal Hygiene',
@@ -970,7 +1076,13 @@ export function OrgUnitTable(props: Props) {
         'pregnant_checkBox': 'Pregnant',
         'lactating_checkBox': 'Lactating',
         'other': 'Other'
-    };;
+        
+        // Remove commented out mappings
+        // 'incomeEarned': 'Income Earned/Week',
+        // 'yieldKgs': 'Yield in Kgs',
+        // 'caseStories': 'Case Stories Generated',
+        // 'landCultivated': 'Land Cultivated in Feddans',
+    };
 
 
     const renderTableRows = () => {
@@ -1036,13 +1148,25 @@ export function OrgUnitTable(props: Props) {
                                                 </option>
                                             ))}
                                         </select>
-                                    ) : (
-                                        <input
-                                            type="text"
-                                            defaultValue={activity[col.accessor] || ''}
-                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, col.accessor, e.target.value)}
-                                        />
-                                    )) :
+                                    ) : col.accessor === 'appliedLessons_dropdown' ? (
+                                        <select
+                                            value={fetchedData.dataValues['Applied Lessons'] || ''}
+                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, 'appliedLessons_dropdown', e.target.value)}
+                                            className="form-select"
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    )
+
+                                        : (
+                                            <input
+                                                type="text"
+                                                defaultValue={activity[col.accessor] || ''}
+                                                onChange={(e) => handleInputChange1(activity.trackInstanceId, col.accessor, e.target.value)}
+                                            />
+                                        )) :
                                 (
                                     // Display fetched dates when not editable
                                     col.accessor === 'reportDate' ? (
@@ -1110,6 +1234,10 @@ export function OrgUnitTable(props: Props) {
 
     const handleFilterChange = async (newFilter: string) => {
         setTrainingFilter(newFilter); // Update the training filter state
+        setSelectedProgramStage(newFilter as ProgramStage); // Update selectedProgramStage
+
+        // Update columns immediately when filter changes
+        setAdditionalColumns(getAdditionalColumns(newFilter));
 
         // Fetch additional data for all rows based on the new filter
         const updatedFetchedDates = await Promise.all(
@@ -1135,6 +1263,70 @@ export function OrgUnitTable(props: Props) {
         setFetchedDates(newFetchedDates);
     };
 
+    // update columns when track filter changes
+    useEffect(() => {
+        if (trainingFilter === 'Livelihood') {
+            // Re-run getAdditionalColumns with current training filter to update columns
+            setAdditionalColumns(getAdditionalColumns(trainingFilter));
+        }
+    }, [trackFilter, trainingFilter]);
+
+    // Modified handleFilterChange function
+    const handleProgramStageChange = async (newFilter: ProgramStage) => {
+        setSelectedProgramStage(newFilter);
+        setTrainingFilter(newFilter);
+
+        if (!newFilter) {
+            setFilteredData(props.orgUnitDetails);
+            return;
+        }
+
+        try {
+            // Fetch data for the selected program stage
+            const programStageId = PROGRAM_STAGE_MAPPING[newFilter];
+            const fetchedData = await fetchProgramStageData(programStageId);
+
+            // Update columns based on the selected program stage
+            setAdditionalColumns(getAdditionalColumns(newFilter));
+
+            // Filter and merge data
+            const mergedData = mergeProgramStageData(props.orgUnitDetails, fetchedData);
+            setFilteredData(mergedData);
+
+        } catch (error) {
+            console.error('Error fetching program stage data:', error);
+        }
+    };
+
+    // New function to fetch program stage specific data
+    const fetchProgramStageData = async (programStageId: string) => {
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/pending?programStage=${programStageId}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Basic ${credentials}`,
+                    },
+                }
+            );
+            const data = await response.json();
+            return data.events || [];
+        } catch (error) {
+            console.error('Error fetching program stage data:', error);
+            return [];
+        }
+    };
+
+    // New function to merge program stage data with org unit details
+    const mergeProgramStageData = (orgUnitDetails: any[], programStageData: any[]) => {
+        return orgUnitDetails.filter(detail => {
+            return programStageData.some(event =>
+                event.trackedEntityInstance === detail.trackInstanceId
+            );
+        });
+    };
+
     return (
         <main className="space-y-4">
             {/* <Header
@@ -1144,25 +1336,79 @@ export function OrgUnitTable(props: Props) {
 
             {/* Training Filters */}
             <h5 style={{ padding: '10px' }}>Training</h5>
-            <label style={{
-                display: 'flex',
-                gap: '3px',
-                marginLeft: '10px',
-            }}>Select Date:
-                <input
-                    type="date"
-                    id="dateFilter"
-                    value={dateFilter}
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    style={{ marginTop: '-5px', borderRadius: '5px' }}
-                    className="mb-4 border border-gray-300 rounded-md p-2"
-                />
-            </label>
 
-            {/* Search Input for Beneficiary and other Filters */}
+            {/* First div block - Track and Program Stage filters */}
             <div className="flex space-x-4" style={{
+                padding: '0px 10px 10px 10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px'
+            }}>
+                {/* Track Filter */}
+                <select
+                    value={trackFilter}
+                    onChange={(e) => {
+                        setTrackFilter(e.target.value);
+                        if (trainingFilter === 'Livelihood') {
+                            // Force column update when track changes
+                            setAdditionalColumns(getAdditionalColumns(trainingFilter));
+                        }
+                    }}
+                    className="border border-gray-300 rounded-md p-2"
+                    style={{
+                        borderRadius: '5px',
+                        width: '150px',        // Standard width
+                        height: '40px',        // Standard height
+                        padding: '15px 10px '    // Comfortable padding
+                    }}
+                >
+                    <option value="" style={{ marginTop: '-2px' }}>Select Tracker</option>
+                    <option value="Fisher">Fisher</option>
+                    <option value="Farmer">Farmer</option>
+                </select>
+
+                {/* Program Stage Radio Buttons */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '25px'    // Increased gap between radio buttons
+                }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="radio"
+                            value="Livelihood"
+                            checked={trainingFilter === 'Livelihood'}
+                            onChange={() => handleFilterChange('Livelihood')}
+                        />
+                        Livelihood
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="radio"
+                            value="Water Sanitation & Hygiene"
+                            checked={trainingFilter === 'Water Sanitation & Hygiene'}
+                            onChange={() => handleFilterChange('Water Sanitation & Hygiene')}
+                        />
+                        Water Sanitation & Hygiene
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <input
+                            type="radio"
+                            value="Nutrition"
+                            checked={trainingFilter === 'Nutrition'}
+                            onChange={() => setTrainingFilter('Nutrition')}
+                        />
+                        Nutrition
+                    </label>
+                </div>
+            </div>
+
+            {/* Second div block - Search, New Beneficiary, and Date */}
+            <div style={{
                 padding: '10px',
-                display: 'flex', gap: '15px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '15px',
                 marginTop: '-5px'
             }}>
                 <input
@@ -1171,83 +1417,51 @@ export function OrgUnitTable(props: Props) {
                     value={beneficiarySearch}
                     onChange={(e) => setBeneficiarySearch(e.target.value)}
                     onKeyDown={handleBeneficiarySearch1}
-                    className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px' }}
+                    className="border border-gray-300 rounded-md"
+                    style={{
+                        borderRadius: '5px',
+                        width: '200px',
+                        height: '40px',
+                        padding: '5px 10px'
+                    }}
                 />
 
-                <button
-                    type="button"
-                    // onChange={handlePlaceChange}
-                    onClick={handleNewBeneficiaryClick}
-                    className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px' }}
-                >
-                    New Beneficiary
-                </button>
+                {selectedProgramStage && (
+                    <button
+                        type="button"
+                        onClick={handleNewBeneficiaryClick}
+                        className="border border-gray-300 rounded-md"
+                        style={{
+                            borderRadius: '5px',
+                            height: '40px',
+                            padding: '5px 10px',
+                            backgroundColor: '#f8f9fa',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        New Beneficiary
+                    </button>
+                )}
 
-                {/* <input
-                    type="text"
-                    placeholder="Place"
-                    value={placeFilter}
-                    onChange={handlePlaceChange}
-                    className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px' }}
-                /> */}
-                {/* <input
-                    type="date"
-                    value={dateFilter}
-                    onChange={handleDateChange}
-                    className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px' }}
-                /> */}
-                {/* <select
-                    value={trackFilter}
-                    onChange={(e) => setTrackFilter(e.target.value)}
-                    // onKeyDown={handleBeneficiarySearch}
-                    className="border border-gray-300 rounded-md p-2"
-                    style={{ borderRadius: '5px' }}
-                >
-                    <option value="Select Tracker">Select Tracker</option>
-                    <option value="Fisher">Fisher</option>
-                    <option value="Farmer">Farmer</option>
-                </select> */}
-
-
-            </div>
-
-            {/* Training (radio button) filters */}
-            <div className="flex space-x-4" style={{
-                padding: '0px 10px 10px 10px',
-                display: 'flex', gap: '15px'
-            }}>
-
-                <label style={{ display: 'flex', gap: '3px' }}>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
+                }}>
+                    <label>Select Date:</label>
                     <input
-                        type="radio"
-                        value="Livelihood"
-                        checked={trainingFilter === 'Livelihood'}
-                        onChange={() => handleFilterChange('Livelihood')}
+                        type="date"
+                        id="dateFilter"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                        className="border border-gray-300 rounded-md"
+                        style={{
+                            borderRadius: '5px',
+                            height: '35px',
+                            padding: '5px 10px'
+                        }}
                     />
-                    Livelihood
-                </label>
-                <label style={{ display: 'flex', gap: '3px' }}>
-                    <input
-                        type="radio"
-                        value="Water Sanitation & Hygiene"
-                        checked={trainingFilter === 'Water Sanitation & Hygiene'}
-                        onChange={() => handleFilterChange('Water Sanitation & Hygiene')}
-                    />
-                    Water Sanitation & Hygiene
-                </label>
-                <label style={{ display: 'flex', gap: '3px' }}>
-                    <input
-                        type="radio"
-                        value="Nutrition"
-                        checked={trainingFilter === 'Nutrition'}
-                        onChange={() => setTrainingFilter('Nutrition')}
-                    />
-                    Nutrition
-                </label>
+                </div>
             </div>
 
             {/* Modal for Search Results */}

@@ -6,6 +6,7 @@ import {OrgUnitSearchSection} from "./components/org-unit-search";
 import {OrgUnitDetails} from "./components/org-unit-details";
 import {OrgUnitAbout} from "./components/org-unit-about";
 import {SessionsPage} from "./components/sessions";
+import { InternetStatus } from "./components/common/InternetStatus";
 
 
 
@@ -23,6 +24,7 @@ export const App = observer(() => {
                   zIndex: 1000,
               }}
           /> */}
+          <InternetStatus />
           <Router>
               <Switch>
                   <Route exact path="/">
