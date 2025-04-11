@@ -19,6 +19,8 @@ import './org-unit-table.css';
 
 // import { InternetStatus } from '../common/InternetStatus';
 // import { useOfflineSync } from '../../hooks/useOfflineSync';
+// import { indexedDBManager } from '../../api/offline/indexedDB'; // Adjust the path as necessary
+// import { networkStatus } from '../../utils/networkStatus';
 
 type Props = {
     orgUnitDetails: OrgUnitDetails[];
@@ -31,6 +33,28 @@ interface FetchedData {
     dueDate: string;
     eventId: string;
     dataValues: { [key: string]: string }; // To hold the values for each data element
+}
+
+// for indexedDB 
+interface BeneficiaryEvent {
+    id: string; // Unique ID for the beneficiary
+    recordDate: string;
+    track: string;
+    inactive: string;
+    beneficiaryStage: string;
+    careGiver: string;
+    careGiverAge: string;
+    patientID: string;
+    firstMiddleName: string;
+    surname: string;
+    dob: string;
+    orgUnit: string;
+    // topicTrainedOn: string;
+    beneficiaryName: string;
+    nonBeneficiaryName: string;
+    sex: string;
+    age: string;
+    // sentOnline: boolean; // Indicates if the data has been sent to the API
 }
 
 type ProgramStage = 'Livelihood' | 'Water Sanitation & Hygiene' | 'Nutrition' | '';
@@ -408,7 +432,7 @@ export function OrgUnitTable(props: Props) {
                 // First request: Fetch the organization unit code
                 const orgUnitCodeResponse = await fetch(
                     `${process.env.REACT_APP_DHIS2_BASE_URL}/api/organisationUnits/${props.orgUnitId}`,
-                    // `/api/organisationUnits/${props.orgUnitId}`,
+                    // `api/organisationUnits/${props.orgUnitId}`,
                     {
                         method: 'GET',
                         headers: {
@@ -426,7 +450,7 @@ export function OrgUnitTable(props: Props) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
                         `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
-                        // `/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
                             headers: {
@@ -465,7 +489,7 @@ export function OrgUnitTable(props: Props) {
         try {
             const response = await fetch(
                 `${process.env.REACT_APP_DHIS2_BASE_URL}/api/system/id?`,
-                // `/api/system/id?`, //with proxy
+                // `api/system/id?`, //with proxy
                 {
                     method: 'GET',
                     headers: {
@@ -486,7 +510,7 @@ export function OrgUnitTable(props: Props) {
         try {
             const response = await fetch(
                 `${process.env.REACT_APP_DHIS2_BASE_URL}/api/me`,
-                // `/api/me`, //with proxy
+                // `api/me`, //with proxy
                 {
                     method: 'GET',
                     headers: {
@@ -531,13 +555,13 @@ export function OrgUnitTable(props: Props) {
         setLoading(true);
 
         // Generate track instance ID
-        const newId = await generateTrackInstId();
-        if (!newId) {
-            console.error('Failed to generate a new trackedEntityInstance ID.');
-            setLoading(false);
-            setMessage('Failed to generate a new trackedEntityInstance ID.');
-            return;
-        }
+        // const newId = await generateTrackInstId();
+        // if (!newId) {
+        //     console.error('Failed to generate a new trackedEntityInstance ID.');
+        //     setLoading(false);
+        //     setMessage('Failed to generate a new trackedEntityInstance ID.');
+        //     return;
+        // }
 
         // Fetch user data
         const userData = await fetchUser();
@@ -613,6 +637,51 @@ export function OrgUnitTable(props: Props) {
                 throw new Error('Failed to create enrollment');
             }
 
+            let beneficiaryId: string;
+
+        
+            // if (networkStatus.isOnline()) {
+            //     // If online, use the ID from the API response
+            //     beneficiaryId = trackedEntityInstance; // Fallback to newId if API fails
+            // } else {
+            //     // If offline, generate an offline ID
+            //     const offlineCount = await indexedDBManager.getOfflineCount(); // Implement this method to count existing offline entries
+            //     beneficiaryId = `offline${offlineCount + 1}`;
+            // }
+
+            // Step 5: Save to IndexedDB after successful API calls
+            const beneficiaryEvent: BeneficiaryEvent = {
+                id: beneficiaryId,
+                recordDate: newRowData.recordDate,
+                track: newRowData.track,
+                inactive: newRowData.inactive,
+                beneficiaryStage: newRowData.beneficiaryStage,
+                careGiver: newRowData.careGiver,
+                careGiverAge: newRowData.careGiverAge,
+                patientID: newRowData.patientID,
+                firstMiddleName: newRowData.first_middleName,
+                surname: newRowData.surname,
+                dob: newRowData.dob,
+                orgUnit: props.orgUnitId,
+                // topicTrainedOn: newRowData.topicTrainedOn,
+                beneficiaryName: newRowData.beneficiaryName,
+                nonBeneficiaryName: newRowData.nonBeneficiaryName,
+                sex: newRowData.sex,
+                age: newRowData.age,
+                // sentOnline: true // Mark as sent online
+            };
+
+            // try {
+            //     await indexedDBManager.saveBeneficiary(beneficiaryEvent); // Save to IndexedDB
+            //     // Success message for local save
+            //     // if (!networkStatus.isOnline()) {
+            //         window.alert('Beneficiary successfully created and saved locally!');
+            //     // }
+            // } catch (error) {
+            //     console.error('Error saving to IndexedDB:', error);
+            //     window.alert('Error saving beneficiary locally. Please try again.');
+            // }
+
             // Reset form and show success message
             setNewRowData({
                 id: '',
@@ -634,7 +703,9 @@ export function OrgUnitTable(props: Props) {
                 age: '',
             });
             setDateFilter('');
-            setMessage('Beneficiary successfully created!');
+
+            // await indexedDBManager.markBeneficiaryAsSynced(beneficiaryId); // change savedOnline flag to true
+            setMessage('Beneficiary successfully created and saved online!');
             setIsError(false);
             setIsAddingNewRow(false); // Close the new row form
 
@@ -737,16 +808,21 @@ export function OrgUnitTable(props: Props) {
                             { value: addColRow_lvh.topicsTrainedOn.lossesMarking ? 'true' : 'false', dataElement: 'aUrLyHqOf0n' },
                             { value: addColRow_lvh.topicsTrainedOn.weeding ? 'true' : 'false', dataElement: 'vVKfsZ8VgiG' },
                             { value: addColRow_lvh.topicsTrainedOn.storage ? 'true' : 'false', dataElement: 'YzlNvVyLIkn' },
-                            { value: addColRow_lvh.topicsTrainedOn.appliedLessons, dataElement: 'newDataElementId' },
-                            { value: addColRow_lvh.topicsTrainedOn.increasedIncome ? 'true' : 'false', dataElement: 'newDataElementId' },
-                            { value: addColRow_lvh.topicsTrainedOn.increasedProduction ? 'true' : 'false', dataElement: 'newDataElementId' },
-                            { value: addColRow_lvh.topicsTrainedOn.newLivelihood ? 'true' : 'false', dataElement: 'newDataElementId' },
-                            { value: addColRow_lvh.topicsTrainedOn.increasedSkills ? 'true' : 'false', dataElement: 'newDataElementId' },
-                            { value: addColRow_lvh.topicsTrainedOn.increasedResilience ? 'true' : 'false', dataElement: 'newDataElementId' },
-                            { value: addColRow_lvh.topicsTrainedOn.others, dataElement: 'newDataElementId' }
+                            { value: addColRow_lvh.topicsTrainedOn.appliedLessons, dataElement: 'ZBAx5UMH63F' },
+                            { value: addColRow_lvh.topicsTrainedOn.increasedIncome ? 'true' : 'false', dataElement: 'Tbnq2F0xX7D' },
+                            { value: addColRow_lvh.topicsTrainedOn.increasedProduction ? 'true' : 'false', dataElement: 'GwKxMZ8yaBm' },
+                            { value: addColRow_lvh.topicsTrainedOn.newLivelihood ? 'true' : 'false', dataElement: 'Ee8oyMX7Aoc' },
+                            { value: addColRow_lvh.topicsTrainedOn.increasedSkills ? 'true' : 'false', dataElement: 'I2KTNrvwsHT' },
+                            { value: addColRow_lvh.topicsTrainedOn.increasedResilience ? 'true' : 'false', dataElement: 'RW2BS4l5KcN' },
+                            { value: addColRow_lvh.topicsTrainedOn.others, dataElement: 'Si8dOtSlomM' }
                         ]
                         : [
                             // Fisher track data elements remain unchanged
+                            { value: addColRow_lvh.fishingMethods.fishingOilPreparation ? 'true' : 'false', dataElement: 'erCm8YopB1D' },
+                            { value: addColRow_lvh.fishingMethods.fishingMarketing ? 'true' : 'false', dataElement: 'QpLUEvB2sdy' },
+                            { value: addColRow_lvh.fishingMethods.fishingMethods ? 'true' : 'false', dataElement: 'OKc4NRIE3rS' },
+                            { value: addColRow_lvh.fishingMethods.postHandlingMethods ? 'true' : 'false', dataElement: 'SinFNAlonqG' },
+                            { value: addColRow_lvh.fishingMethods.appliedLessons ? 'true' : 'false', dataElement: 'EvDeWfQDiuz' }
                         ]),
                     // Remove the commented out fields
                     // { value: addColRow_lvh.incomeEarned, dataElement: 'td3WOxoQ4wN' },
@@ -817,7 +893,7 @@ export function OrgUnitTable(props: Props) {
         try {
             if (isEditing) {
                 // PUT request for editing an existing record
-                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${id}`, payload);
+                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${id}`, payload);
                 console.log('Entry updated:', response.data);
                 // Handle success (e.g., update state, show message)
             } else {
@@ -1049,13 +1125,13 @@ export function OrgUnitTable(props: Props) {
         'increasedSkills_checkBox': 'Increased my skills/knowledge',
         'increasedResilience_checkBox': 'Increased my family\'s resilience to shocks',
         'others_text': 'Others',
-    
+
         // Fisher-specific mappings (existing)
         'fishingOilPreparation_checkBox': 'Fishing Oil Preparation',
         'fishingMarketing_checkBox': 'Fishing Marketing',
         'fishingMethods_checkBox': 'Fishing Methods',
         'postHandlingMethods_checkBox': 'Post Handling Methods',
-        
+
         // Other existing mappings (Nutrition, Water Sanitation)
         'foodSafety_checkBox': 'Food Safety',
         'promotersAttendance_checkBox': 'Promoters Attendance :1. CLTS',
@@ -1076,14 +1152,13 @@ export function OrgUnitTable(props: Props) {
         'pregnant_checkBox': 'Pregnant',
         'lactating_checkBox': 'Lactating',
         'other': 'Other'
-        
+
         // Remove commented out mappings
         // 'incomeEarned': 'Income Earned/Week',
         // 'yieldKgs': 'Yield in Kgs',
         // 'caseStories': 'Case Stories Generated',
         // 'landCultivated': 'Land Cultivated in Feddans',
     };
-
 
     const renderTableRows = () => {
 
@@ -1134,7 +1209,8 @@ export function OrgUnitTable(props: Props) {
                                     ) : col.accessor.includes('checkBox') ? (
                                         <input
                                             type="checkbox"
-                                            checked={activity[col.accessor] || false} // Assuming activity has a boolean value for checkBox
+                                            // checked={activity[col.accessor] || false} // Assuming activity has a boolean value for checkBox
+                                            checked={!!originalValues[activity.trackInstanceId]?.[col.accessor]}
                                             onChange={(e) => handleInputChange1(activity.trackInstanceId, col.accessor, e.target.checked)}
                                         />
                                     ) : col.accessor === 'topicTrainedOn' ? (
@@ -1150,7 +1226,9 @@ export function OrgUnitTable(props: Props) {
                                         </select>
                                     ) : col.accessor === 'appliedLessons_dropdown' ? (
                                         <select
-                                            value={fetchedData.dataValues['Applied Lessons'] || ''}
+                                            // value={fetchedData.dataValues['Applied Lessons'] || ''}
+                                            value={originalValues[activity.trackInstanceId]?.[col.accessor] || ''}
+
                                             onChange={(e) => handleInputChange1(activity.trackInstanceId, 'appliedLessons_dropdown', e.target.value)}
                                             className="form-select"
                                         >
@@ -1163,7 +1241,9 @@ export function OrgUnitTable(props: Props) {
                                         : (
                                             <input
                                                 type="text"
-                                                defaultValue={activity[col.accessor] || ''}
+                                                // defaultValue={activity[col.accessor] || ''}
+                                                value={originalValues[activity.trackInstanceId]?.[col.accessor] || ''}
+
                                                 onChange={(e) => handleInputChange1(activity.trackInstanceId, col.accessor, e.target.value)}
                                             />
                                         )) :
