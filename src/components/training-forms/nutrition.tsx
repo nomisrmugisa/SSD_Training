@@ -78,7 +78,7 @@ const NutritionForm: React.FC<{ place: string; track: string; orgUnit: string; t
                 "completedDate": new Date().toISOString().split('T')[0] // Today's date
             };
 
-            const response = await fetch(process.env.REACT_APP_DHIS2_BASE_URL + '/api/events', {
+            const response = await fetch(process.env.REACT_APP_DHIS2_BASE_URL + 'api/events', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

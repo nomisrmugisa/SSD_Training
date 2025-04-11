@@ -11,25 +11,25 @@ class SyncManager {
 
   private async handleNetworkChange(online: boolean): Promise<void> {
     if (online) {
-      await this.syncPendingEvents();
+      await this.syncPendingBeneficiaries();
     }
   }
 
-  async syncPendingEvents(): Promise<void> {
+  async syncPendingBeneficiaries(): Promise<void> {
     if (this.isSyncing || !networkStatus.isOnline()) return;
 
     try {
       this.isSyncing = true;
-      const unsyncedEvents = await indexedDBManager.getUnsyncedEvents();
+      const unsyncedBeneficiaries = await indexedDBManager.getUnsyncedBeneficiaries();
 
-      for (const event of unsyncedEvents) {
+      for (const beneficiary of unsyncedBeneficiaries) {
         try {
           // Send to online API
-          await this.sendEventToServer(event);
+          await this.sendBeneficiaryToServer(beneficiary);
           // Mark as synced in IndexedDB
-          await indexedDBManager.markEventAsSynced(event.id);
+          await indexedDBManager.markBeneficiaryAsSynced(beneficiary.id);
         } catch (error) {
-          console.error('Failed to sync event:', error);
+          console.error('Failed to sync beneficiary:', error);
           // Continue with next event even if one fails
         }
       }
@@ -38,11 +38,11 @@ class SyncManager {
     }
   }
 
-  private async sendEventToServer(event: any): Promise<void> {
-    if (event.type === 'CREATE_BENEFICIARY') {
+  private async sendBeneficiaryToServer(beneficiary: any): Promise<void> {
+    if (beneficiary.type === 'CREATE_BENEFICIARY') {
       // Handle multiple payloads sequentially
       let lastResponse;
-      for (const payload of event.payloads) {
+      for (const payload of beneficiary.payloads) {
         const response = await fetch(
           `${process.env.REACT_APP_DHIS2_BASE_URL}${payload.endpoint}`,
           {
@@ -55,20 +55,20 @@ class SyncManager {
         );
 
         if (!response.ok) {
-          throw new Error(`Failed to sync event: ${response.statusText}`);
+          throw new Error(`Failed to sync beneficiary: ${response.statusText}`);
         }
 
         lastResponse = await response.json();
         
         // If this is the first payload (trackedEntityInstance creation),
         // update the trackedEntityInstance ID in the second payload
-        if (payload.endpoint === '/api/trackedEntityInstances') {
+        if (payload.endpoint === 'api/trackedEntityInstances') {
           const teiId = lastResponse.response.importSummaries[0].reference;
-          event.payloads[1].data.trackedEntityInstance = teiId;
+          beneficiary.payloads[1].data.trackedEntityInstance = teiId;
         }
       }
     } else {
-      // Handle single payload events (existing code)
+      // Handle single payload beneficiary (existing code)
       const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
         method: 'POST',
         headers: {
@@ -78,7 +78,7 @@ class SyncManager {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to sync event: ${response.statusText}`);
+        throw new Error(`Failed to sync beneficiary: ${response.statusText}`);
       }
     }
   }

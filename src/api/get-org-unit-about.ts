@@ -8,7 +8,7 @@ import {
 export async function getOrgUnitAbout(id: string) {
   const response = await axiosInstance.get<getOrgUnitAboutResponse>(
     `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${id}.json?program=kmfLZO8ckxY&fields=enrollments[events[event,dataValues[dataElement,value]]`
-    // `/api/trackedEntityInstances/${id}.json?program=kmfLZO8ckxY&fields=enrollments[events[event,dataValues[dataElement,value]]` //wth proxy
+    // `api/trackedEntityInstances/${id}.json?program=kmfLZO8ckxY&fields=enrollments[events[event,dataValues[dataElement,value]]` //wth proxy
   );
 
   // console.log("response", response);

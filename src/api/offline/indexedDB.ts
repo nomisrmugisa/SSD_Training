@@ -2,11 +2,11 @@ export const DB_NAME = 'ssdTrainingDB';
 export const DB_VERSION = 1;
 
 interface DBSchema {
-  events: {
+  beneficiaries: {
     key: string;
     value: any;
     indexes: {
-      savedOnline: boolean;
+      savedOnline: boolean,
       timestamp: number;
     };
   };
@@ -25,12 +25,12 @@ class IndexedDBManager {
         resolve();
       };
 
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        
+      request.onupgradeneeded = (beneficiary) => {
+        const db = (beneficiary.target as IDBOpenDBRequest).result;
+
         // Create stores if they don't exist
-        if (!db.objectStoreNames.contains('events')) {
-          const store = db.createObjectStore('events', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('beneficiaries')) {
+          const store = db.createObjectStore('beneficiaries', { keyPath: 'id' });
           store.createIndex('savedOnline', 'savedOnline', { unique: false });
           store.createIndex('timestamp', 'timestamp', { unique: false });
         }
@@ -38,32 +38,32 @@ class IndexedDBManager {
     });
   }
 
-  async saveEvent(event: any): Promise<void> {
+  async saveBeneficiary(beneficiary: any): Promise<void> {
     if (!this.db) await this.initDB();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(['events'], 'readwrite');
-      const store = transaction.objectStore('events');
+      const transaction = this.db!.transaction(['beneficiaries'], 'readwrite');
+      const store = transaction.objectStore('beneficiaries');
 
-      const eventWithMeta = {
-        ...event,
+      const beneficiaryWithMeta = {
+        ...beneficiary,
         savedOnline: false,
         timestamp: Date.now(),
       };
 
-      const request = store.put(eventWithMeta);
+      const request = store.put(beneficiaryWithMeta);
 
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve();
     });
   }
 
-  async getUnsyncedEvents(): Promise<any[]> {
+  async getUnsyncedBeneficiaries(): Promise<any[]> {
     if (!this.db) await this.initDB();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(['events'], 'readonly');
-      const store = transaction.objectStore('events');
+      const transaction = this.db!.transaction(['beneficiaries'], 'readonly');
+      const store = transaction.objectStore('beneficiaries');
       const index = store.index('savedOnline');
       const request = index.getAll(IDBKeyRange.only(false));
 
@@ -72,21 +72,39 @@ class IndexedDBManager {
     });
   }
 
-  async markEventAsSynced(eventId: string): Promise<void> {
+  async markBeneficiaryAsSynced(beneficiaryId: string): Promise<void> {
     if (!this.db) await this.initDB();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(['events'], 'readwrite');
-      const store = transaction.objectStore('events');
-      const request = store.get(eventId);
+      const transaction = this.db!.transaction(['beneficiaries'], 'readwrite');
+      const store = transaction.objectStore('beneficiaries');
+      const request = store.get(beneficiaryId);
 
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
-        const event = request.result;
-        event.savedOnline = true;
-        store.put(event);
+        const beneficiary = request.result;
+        if (beneficiary) {
+          beneficiary.savedOnline = true; // Update the savedOnline flag
+          store.put(beneficiary); // Save the updated beneficiary
+        }
         resolve();
       };
+    });
+  }
+
+  async getOfflineCount(): Promise<number> {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['beneficiaries'], 'readonly');
+      const store = transaction.objectStore('beneficiaries');
+      const index = store.index('savedOnline'); // Use the index for savedOnline
+
+      // Count the number of entries where savedOnline is false
+      const request = index.count(IDBKeyRange.only(false));
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
     });
   }
 }

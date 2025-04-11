@@ -4,20 +4,20 @@ import { syncManager } from '../api/offline/syncManager';
 import { networkStatus } from '../utils/networkStatus';
 
 export const useOfflineSync = () => {
-  const saveEvent = useCallback(async (event: any) => {
-    await indexedDBManager.saveEvent(event);
+  const saveBeneficiary = useCallback(async (beneficiary: any) => {
+    await indexedDBManager.saveBeneficiary(beneficiary);
     
     if (networkStatus.isOnline()) {
-      await syncManager.syncPendingEvents();
+      await syncManager.syncPendingBeneficiaries();
     }
   }, []);
 
   useEffect(() => {
     // Initial sync attempt when component mounts
     if (networkStatus.isOnline()) {
-      syncManager.syncPendingEvents();
+      syncManager.syncPendingBeneficiaries();
     }
   }, []);
 
-  return { saveEvent };
+  return { saveBeneficiary };
 };

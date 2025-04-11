@@ -121,7 +121,7 @@ export function SessionsTable(props: Props) {
         try {
             const response = await fetch(
                 `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events?`,
-                // `/api/events?`,
+                // `api/events?`,
                 {
                     method: 'POST',
                     headers: {

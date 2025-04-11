@@ -86,7 +86,7 @@ export function GroupActivitiesTable(props: Props) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
                         `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
-                        // `/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
                             headers: {
@@ -186,7 +186,7 @@ export function GroupActivitiesTable(props: Props) {
         try {
             const response = await fetch(
                 `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events?`,
-                // `/api/events?`, //wth proxy
+                // `api/events?`, //wth proxy
                 {
                     method: 'POST',
                     headers: {
@@ -226,7 +226,7 @@ export function GroupActivitiesTable(props: Props) {
         try {
             const response = await fetch(
                 `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`,
-                // `/api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`, //with proxy
+                // `api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`, //with proxy
                 {
                     method: 'GET',
                     headers: {
