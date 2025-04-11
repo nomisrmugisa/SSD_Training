@@ -17,8 +17,8 @@ import WaterSanitationForm from '../training-forms/waterSanitation';
 import NutritionForm from '../training-forms/nutrition';
 import './org-unit-table.css';
 
-import { InternetStatus } from '../common/InternetStatus';
-import { useOfflineSync } from '../../hooks/useOfflineSync';
+// import { InternetStatus } from '../common/InternetStatus';
+// import { useOfflineSync } from '../../hooks/useOfflineSync';
 
 type Props = {
     orgUnitDetails: OrgUnitDetails[];
