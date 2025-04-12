@@ -18,6 +18,10 @@ export interface OrgUnitDetails {
   first_middleName: string;
   patientID: string;
   beneficiaryStage: string;
+  initialMuac: string;
+  muacClassification: string;
+  ben_facility_RegNo: string;
+  directPatientID: string;
 }
 
 export interface GetOrgUnitDetailsResponse {

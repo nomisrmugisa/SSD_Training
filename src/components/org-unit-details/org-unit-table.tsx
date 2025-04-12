@@ -36,33 +36,33 @@ interface FetchedData {
 }
 
 // for indexedDB 
-interface BeneficiaryEvent {
-    id: string; // Unique ID for the beneficiary
-    recordDate: string;
-    track: string;
-    inactive: string;
-    beneficiaryStage: string;
-    careGiver: string;
-    careGiverAge: string;
-    patientID: string;
-    firstMiddleName: string;
-    surname: string;
-    dob: string;
-    orgUnit: string;
-    // topicTrainedOn: string;
-    beneficiaryName: string;
-    nonBeneficiaryName: string;
-    sex: string;
-    age: string;
-    // sentOnline: boolean; // Indicates if the data has been sent to the API
-}
+// interface BeneficiaryEvent {
+//     id: string; // Unique ID for the beneficiary
+//     recordDate: string;
+//     track: string;
+//     inactive: string;
+//     beneficiaryStage: string;
+//     careGiver: string;
+//     careGiverAge: string;
+//     patientID: string;
+//     firstMiddleName: string;
+//     surname: string;
+//     dob: string;
+//     orgUnit: string;
+//     // topicTrainedOn: string;
+//     beneficiaryName: string;
+//     nonBeneficiaryName: string;
+//     sex: string;
+//     age: string;
+//     // sentOnline: boolean; // Indicates if the data has been sent to the API
+// }
 
 type ProgramStage = 'Livelihood' | 'Water Sanitation & Hygiene' | 'Nutrition' | '';
 
 const PROGRAM_STAGE_MAPPING = {
-    'Livelihood': 'j3I4HeeEL0K',
-    'Water Sanitation & Hygiene': 'QAEEGAsJ5H7',
-    'Nutrition': 'DSFjQPPKuyM'
+    'Livelihood': 'H0vCgsI1d4M',
+    'Water Sanitation & Hygiene': 'bTVReRuHapT',
+    'Nutrition': 'RXTq2YFOH5c'
 };
 
 export function OrgUnitTable(props: Props) {
@@ -95,6 +95,10 @@ export function OrgUnitTable(props: Props) {
         nonBeneficiaryName: '',
         sex: '',
         age: '',
+        initialMuac: '',
+        muacClassification: '',
+        ben_facility_RegNo: '',
+        directPatientID: '',
 
     }); // Add initial form data
     // console.log("orgUnitDetails", props.orgUnitDetails);
@@ -122,6 +126,10 @@ export function OrgUnitTable(props: Props) {
         nonBeneficiaryName: '',
         sex: '',
         age: '',
+        initialMuac: '',
+        muacClassification: '',
+        ben_facility_RegNo: '',
+        directPatientID: '',
     });
 
     const [isAddingNewRow, setIsAddingNewRow] = useState(false);
@@ -255,8 +263,8 @@ export function OrgUnitTable(props: Props) {
             case 'Livelihood':
                 if (trackFilter === 'Fisher') {
                     columns.push(
-                        { Header: 'Report Date', accessor: 'reportDate' },
-                        { Header: 'Due Date', accessor: 'dueDate' },
+                        { Header: 'Date of training', accessor: 'reportDate' },
+                        // { Header: 'Due Date', accessor: 'dueDate' },
                         { Header: 'Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox' },
                         { Header: 'Fishing Marketing', accessor: 'fishingMarketing_checkBox' },
                         { Header: 'Fishing Methods', accessor: 'fishingMethods_checkBox' },
@@ -271,8 +279,8 @@ export function OrgUnitTable(props: Props) {
                     );
                 } else if (trackFilter === 'Farmer') {
                     columns.push(
-                        { Header: 'Report Date', accessor: 'reportDate' },
-                        { Header: 'Due Date', accessor: 'dueDate' },
+                        { Header: 'Date of training', accessor: 'reportDate' },
+                        // { Header: 'Due Date', accessor: 'dueDate' },
                         { Header: 'Harvesting', accessor: 'harvesting_checkBox' },
                         { Header: 'Post Harvest Handling', accessor: 'postHarvestHandling_checkBox' },
                         { Header: 'Land Preparation', accessor: 'landPreparation_checkBox' },
@@ -298,8 +306,8 @@ export function OrgUnitTable(props: Props) {
                 break;
             case 'Water Sanitation & Hygiene':
                 columns.push(
-                    { Header: 'Report Date', accessor: 'reportDate' },
-                    { Header: 'Due Date', accessor: 'dueDate' },
+                    { Header: 'Date of training', accessor: 'reportDate' },
+                        // { Header: 'Due Date', accessor: 'dueDate' },
                     { Header: 'Food Safety', accessor: 'foodSafety_checkBox' },
                     { Header: 'Promoters Attendance :1. CLTS', accessor: 'promotersAttendance_checkBox' },
                     { Header: 'Personal Hygiene', accessor: 'personalHygiene_checkBox' },
@@ -310,8 +318,8 @@ export function OrgUnitTable(props: Props) {
                 break;
             case 'Nutrition':
                 columns.push(
-                    { Header: 'Report Date', accessor: 'reportDate' },
-                    { Header: 'Due Date', accessor: 'dueDate' },
+                    { Header: 'Date of training', accessor: 'reportDate' },
+                        // { Header: 'Due Date', accessor: 'dueDate' },
                     { Header: 'Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox' },
                     { Header: 'Importance of early initiation of breastfeeding', accessor: 'earlyInitiation_checkBox' },
                     { Header: 'Breastfeeding in the first 6 months', accessor: 'breastfeedingFirst6Months_checkBox' },
@@ -356,7 +364,7 @@ export function OrgUnitTable(props: Props) {
     const handleBeneficiarySearch = async (event) => {
         if (event.key === 'Enter') {
             try {
-                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=kmfLZO8ckxY&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
+                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=n2iAPy3PGx7&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
                 const data = await response.json();
                 setSearchResults(data.rows); // Set the search results
                 setIsModalVisible(true); // Show the modal
@@ -420,7 +428,9 @@ export function OrgUnitTable(props: Props) {
 
     // Function to handle track filter change
     const handleTrackChange = async (event) => {
-        await setTrackFilter(event.target.value);
+        const selectedTrack = event.target.value;
+        setTrackFilter(selectedTrack);
+        setNewRowData((prevData) => ({ ...prevData, track: selectedTrack })); // Set the selected track in newRowData
         // Implement your data fetching logic here
     };
 
@@ -431,7 +441,7 @@ export function OrgUnitTable(props: Props) {
             try {
                 // First request: Fetch the organization unit code
                 const orgUnitCodeResponse = await fetch(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/organisationUnits/${props.orgUnitId}`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/organisationUnits/${props.orgUnitId}`,
                     // `api/organisationUnits/${props.orgUnitId}`,
                     {
                         method: 'GET',
@@ -449,7 +459,7 @@ export function OrgUnitTable(props: Props) {
                 if (orgUnitCode) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
@@ -488,7 +498,7 @@ export function OrgUnitTable(props: Props) {
     const fetchNewId = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/system/id?`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/system/id?`,
                 // `api/system/id?`, //with proxy
                 {
                     method: 'GET',
@@ -509,7 +519,7 @@ export function OrgUnitTable(props: Props) {
     const fetchUser = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/me`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/me`,
                 // `api/me`, //with proxy
                 {
                     method: 'GET',
@@ -585,6 +595,10 @@ export function OrgUnitTable(props: Props) {
                 { attribute: "KmxskLLhS0k", value: newRowData.beneficiaryStage },
                 { attribute: "tUjM7KxKvCO", value: newRowData.first_middleName },
                 { attribute: "xts0QtWHpnK", value: newRowData.surname },
+                { attribute: "MX1mGZlngtD", value: newRowData.initialMuac},
+                { attribute: "KNLojwshHCv", value: newRowData.muacClassification},
+                { attribute: "M9jR50uouZV", value: newRowData.ben_facility_RegNo},
+                { attribute: "BDFFygBWNSH", value: newRowData.directPatientID}
             ]
         };
 
@@ -592,7 +606,7 @@ export function OrgUnitTable(props: Props) {
         try {
             // First POST request - Create tracked entity instance
             const response1 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`,
                 {
                     method: 'POST',
                     headers: {
@@ -613,7 +627,7 @@ export function OrgUnitTable(props: Props) {
             // Second payload for enrollment
             const payload2 = {
                 trackedEntityInstance: trackedEntityInstance,
-                program: "kmfLZO8ckxY",
+                program: "n2iAPy3PGx7",
                 status: "ACTIVE",
                 orgUnit: props.orgUnitId,
                 enrollmentDate: newRowData.recordDate,
@@ -622,7 +636,7 @@ export function OrgUnitTable(props: Props) {
 
             // Second POST request - Create enrollment
             const response2 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`,
                 {
                     method: 'POST',
                     headers: {
@@ -639,7 +653,7 @@ export function OrgUnitTable(props: Props) {
 
             let beneficiaryId: string;
 
-        
+
             // if (networkStatus.isOnline()) {
             //     // If online, use the ID from the API response
             //     beneficiaryId = trackedEntityInstance; // Fallback to newId if API fails
@@ -650,26 +664,26 @@ export function OrgUnitTable(props: Props) {
             // }
 
             // Step 5: Save to IndexedDB after successful API calls
-            const beneficiaryEvent: BeneficiaryEvent = {
-                id: beneficiaryId,
-                recordDate: newRowData.recordDate,
-                track: newRowData.track,
-                inactive: newRowData.inactive,
-                beneficiaryStage: newRowData.beneficiaryStage,
-                careGiver: newRowData.careGiver,
-                careGiverAge: newRowData.careGiverAge,
-                patientID: newRowData.patientID,
-                firstMiddleName: newRowData.first_middleName,
-                surname: newRowData.surname,
-                dob: newRowData.dob,
-                orgUnit: props.orgUnitId,
-                // topicTrainedOn: newRowData.topicTrainedOn,
-                beneficiaryName: newRowData.beneficiaryName,
-                nonBeneficiaryName: newRowData.nonBeneficiaryName,
-                sex: newRowData.sex,
-                age: newRowData.age,
-                // sentOnline: true // Mark as sent online
-            };
+            // const beneficiaryEvent: BeneficiaryEvent = {
+            //     id: beneficiaryId,
+            //     recordDate: newRowData.recordDate,
+            //     track: newRowData.track,
+            //     inactive: newRowData.inactive,
+            //     beneficiaryStage: newRowData.beneficiaryStage,
+            //     careGiver: newRowData.careGiver,
+            //     careGiverAge: newRowData.careGiverAge,
+            //     patientID: newRowData.patientID,
+            //     firstMiddleName: newRowData.first_middleName,
+            //     surname: newRowData.surname,
+            //     dob: newRowData.dob,
+            //     orgUnit: props.orgUnitId,
+            //     // topicTrainedOn: newRowData.topicTrainedOn,
+            //     beneficiaryName: newRowData.beneficiaryName,
+            //     nonBeneficiaryName: newRowData.nonBeneficiaryName,
+            //     sex: newRowData.sex,
+            //     age: newRowData.age,
+            //     // sentOnline: true // Mark as sent online
+            // };
 
             // try {
             //     await indexedDBManager.saveBeneficiary(beneficiaryEvent); // Save to IndexedDB
@@ -701,6 +715,10 @@ export function OrgUnitTable(props: Props) {
                 nonBeneficiaryName: '',
                 sex: '',
                 age: '',
+                initialMuac: '',
+                muacClassification: '',
+                ben_facility_RegNo: '',
+                directPatientID: ''
             });
             setDateFilter('');
 
@@ -742,6 +760,10 @@ export function OrgUnitTable(props: Props) {
             nonBeneficiaryName: '',
             sex: '',
             age: '',
+            initialMuac: '',
+            muacClassification: '',
+            ben_facility_RegNo: '',
+            directPatientID: ''
 
         });
         setSelectedFilter('');
@@ -795,6 +817,7 @@ export function OrgUnitTable(props: Props) {
         const eventId = isEditing ? id : generateEventID();
         // Construct the payload based on the filter
         let payload;
+        
         if (currentFilter === 'Livelihood') {
             payload = {
                 dataValues: [
@@ -831,13 +854,13 @@ export function OrgUnitTable(props: Props) {
                     // { value: addColRow_lvh.landCultivated, dataElement: 'PKxWHlkevrG' },
                 ],
                 event: eventId,
-                program: 'kmfLZO8ckxY',
-                programStage: 'j3I4HeeEL0K',
+                program: 'n2iAPy3PGx7',
+                programStage: 'H0vCgsI1d4M',
                 orgUnit: props.orgUnitId,
                 trackedEntityInstance: trackInstId,
                 status: 'COMPLETED',
-                dueDate: addColRow_lvh.dueDate,
-                eventDate: addColRow_lvh.reportDate,
+                // dueDate: addColRow_lvh.dueDate,
+                eventDate: fetchedDates[trackInstId]?.reportDate,
                 completedDate: new Date().toISOString().split('T')[0],
             };
         } else if (currentFilter === 'Nutrition') {
@@ -859,16 +882,17 @@ export function OrgUnitTable(props: Props) {
                     // Add other fields as necessary
                 ],
                 event: eventId,
-                program: 'kmfLZO8ckxY',
-                programStage: 'DSFjQPPKuyM',
+                program: 'n2iAPy3PGx7',
+                programStage: 'RXTq2YFOH5c',
                 orgUnit: props.orgUnitId,
                 trackedEntityInstance: trackInstId,
                 status: 'COMPLETED',
-                dueDate: addColRow_lvh.dueDate,
-                eventDate: addColRow_lvh.reportDate,
+                // dueDate: addColRow_lvh.dueDate,
+                eventDate: fetchedDates[trackInstId]?.reportDate,
                 completedDate: new Date().toISOString().split('T')[0],
             };
         } else if (currentFilter === 'Water Sanitation & Hygiene') {
+            
             payload = {
                 dataValues: [
                     { "value": addColRow_Wsh.foodSafety, "dataElement": 'Q4dJyNwdyyJ' },
@@ -880,25 +904,45 @@ export function OrgUnitTable(props: Props) {
                     // Add other fields as necessary
                 ],
                 event: eventId,
-                program: 'kmfLZO8ckxY',
-                programStage: 'QAEEGAsJ5H7',
+                program: 'n2iAPy3PGx7',
+                programStage: 'bTVReRuHapT',
                 orgUnit: props.orgUnitId,
                 trackedEntityInstance: trackInstId,
                 status: 'ACTIVE',
-                dueDate: addColRow_lvh.dueDate,
-                eventDate: addColRow_lvh.reportDate,
+                // dueDate: addColRow_lvh.dueDate,
+                eventDate: fetchedDates[trackInstId]?.reportDate,
             };
         }
-
+        console.log({'Event Date': fetchedDates[trackInstId]?.reportDate,
+            'Event Date 1': addColRow_lvh.reportDate
+        })
         try {
             if (isEditing) {
                 // PUT request for editing an existing record
-                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${id}`, payload);
+                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${id}`, 
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // 'Authorization': `Basic ${credentials}`,
+                        },
+                        body: JSON.stringify(payload),
+                    }
+                );
                 console.log('Entry updated:', response.data);
                 // Handle success (e.g., update state, show message)
             } else {
                 // POST request for adding a new record
-                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, payload);
+                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, 
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // 'Authorization': `Basic ${credentials}`,
+                        },
+                        body: JSON.stringify(payload),
+                    }
+                );
                 console.log('New entry added:', response.data);
                 // Handle success (e.g., update state, show message)
             }
@@ -932,15 +976,26 @@ export function OrgUnitTable(props: Props) {
         }));
     };
 
+    const handleDateChangeForFetchedDates = (trackInstanceId: string, newDate: string) => {
+        setFetchedDates((prev) => ({
+          ...prev,
+          [trackInstanceId]: {
+            ...prev[trackInstanceId],
+            reportDate: newDate,
+          },
+        }));
+      };
+      
+
     const fetchAdditionalData = async (trackInstanceId: string, trainingFilter: string): Promise<FetchedData> => {
         const programStageMap = {
-            'Livelihood': 'j3I4HeeEL0K',
-            'Nutrition': 'DSFjQPPKuyM',
-            'Water Sanitation & Hygiene': 'QAEEGAsJ5H7',
+            'Livelihood': 'H0vCgsI1d4M',
+            'Nutrition': 'RXTq2YFOH5c',
+            'Water Sanitation & Hygiene': 'bTVReRuHapT',
         };
 
         const programStage = programStageMap[trainingFilter];
-        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json?program=kmfLZO8ckxY&programStage=${programStage}&fields=enrollments[events[*]]`;
+        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/${trackInstanceId}.json?program=n2iAPy3PGx7&programStage=${programStage}&fields=enrollments[events[*]]`;
 
         try {
             console.log(`Fetching data from URL: ${url}`); // Log the URL being fetched
@@ -1160,6 +1215,11 @@ export function OrgUnitTable(props: Props) {
         // 'landCultivated': 'Land Cultivated in Feddans',
     };
 
+    const formatDateForInput = (dateString) => {
+        if (!dateString) return '';
+        return new Date(dateString).toISOString().split('T')[0];
+      };
+
     const renderTableRows = () => {
 
         // const groupData = data?.groupActivities;
@@ -1181,14 +1241,19 @@ export function OrgUnitTable(props: Props) {
                 <tr key={activity.trackInstanceId || index}>
                     <td>{index + 1}</td>
                     <td>{activity.recordDate}</td>
+                    <td>{activity.beneficiaryStage}</td>
                     <td>{activity.patientID}</td>
                     <td>{activity.first_middleName}</td>
                     <td>{activity.surname}</td>
+                    <td>{activity.sex}</td>
                     <td>{activity.age}</td>
                     <td>{activity.dob}</td>
-                    <td>{activity.sex}</td>
+                    <td>{activity.initialMuac}</td>
+                    <td>{activity.muacClassification}</td>
+                    <td>{activity.ben_facility_RegNo}</td>                    
                     <td>{activity.track}</td>
-                    <td>{activity.beneficiaryStage}</td>
+                    <td>{activity.directPatientID}</td>
+                    
                     {/* Render additional data cells */}
                     {additionalColumns.map((col) => (
                         <td key={col.accessor}>
@@ -1197,8 +1262,9 @@ export function OrgUnitTable(props: Props) {
                                     col.accessor === 'reportDate' ? (
                                         <input
                                             type="date"
-                                            defaultValue={fetchedDates[activity.trackInstanceId]?.reportDate || ''}
-                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, 'reportDate', e.target.value)}
+                                            value={fetchedDates[activity.trackInstanceId]?.reportDate?.split('T')[0] || ''}
+                                            // value={fetchedData.reportDate || ''}
+                                            onChange={(e) => handleDateChangeForFetchedDates(activity.trackInstanceId, e.target.value)}
                                         />
                                     ) : col.accessor === 'dueDate' ? (
                                         <input
@@ -1382,7 +1448,7 @@ export function OrgUnitTable(props: Props) {
     const fetchProgramStageData = async (programStageId: string) => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/pending?programStage=${programStageId}`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/pending?programStage=${programStageId}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -1419,16 +1485,18 @@ export function OrgUnitTable(props: Props) {
 
             {/* First div block - Track and Program Stage filters */}
             <div className="flex space-x-4" style={{
-                padding: '0px 10px 10px 10px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '20px'
-            }}>
+                    padding: '0px 10px 10px 10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '20px'
+                }}>
                 {/* Track Filter */}
                 <select
                     value={trackFilter}
                     onChange={(e) => {
+                        const selectedTrack = e.target.value;
                         setTrackFilter(e.target.value);
+                        setNewRowData((prevData) => ({ ...prevData, track: selectedTrack })); // Set the selected track in newRowData
                         if (trainingFilter === 'Livelihood') {
                             // Force column update when track changes
                             setAdditionalColumns(getAdditionalColumns(trainingFilter));
@@ -1519,11 +1587,11 @@ export function OrgUnitTable(props: Props) {
                             cursor: 'pointer'
                         }}
                     >
-                        New Beneficiary
+                        Indirect Beneficiary
                     </button>
                 )}
 
-                <div style={{
+                {/* <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px'
@@ -1541,7 +1609,7 @@ export function OrgUnitTable(props: Props) {
                             padding: '5px 10px'
                         }}
                     />
-                </div>
+                </div> */}
             </div>
 
             {/* Modal for Search Results */}
@@ -1871,14 +1939,19 @@ export function OrgUnitTable(props: Props) {
                                 <tr>
                                     <th>No.</th>
                                     <th>Registration Date</th>
+                                    <th>Is Beneficiary Adult / Child</th>
                                     <th>Patient ID</th>
                                     <th>First Name & Middle Name</th>
                                     <th>Surname</th>
+                                    <th>Sex</th>
                                     <th>Age</th>
                                     <th>Date of Birth</th>
-                                    <th>Sex</th>
+                                    <th>Initial Muac</th>
+                                    <th>Muac Classification</th>
+                                    <th>Beneficiary Facility Registration Number</th>
                                     <th>Beneficiary Track</th>
-                                    <th>Is Beneficiary Adult / Child</th>
+                                    <th>Direct Patient ID</th>
+
                                     {/* Render additional headers */}
                                     {additionalColumns.map((col) => (
                                         <th key={col.accessor}>{col.Header}</th>
@@ -1917,6 +1990,17 @@ export function OrgUnitTable(props: Props) {
                                             />
                                         </td>
                                         <td>
+                                            <select
+                                                name="beneficiaryStage"
+                                                value={newRowData.beneficiaryStage}
+                                                onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
+                                            >
+                                                <option value="">Select Gender</option>
+                                                <option value="Adult">Adult</option>
+                                                <option value="Child">Child</option>
+                                            </select>
+                                        </td>
+                                        <td>
                                             <input
                                                 type="text"
                                                 name="patientID"
@@ -1947,6 +2031,17 @@ export function OrgUnitTable(props: Props) {
                                             />
                                         </td>
                                         <td>
+                                            <select
+                                                name="sex"
+                                                value={newRowData.sex}
+                                                onChange={(e) => setNewRowData({ ...newRowData, sex: e.target.value })}
+                                            >
+                                                <option value="">Select Gender</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                        </td>
+                                        <td>
                                             <input
                                                 type="number"
                                                 name="age"
@@ -1967,15 +2062,34 @@ export function OrgUnitTable(props: Props) {
                                             />
                                         </td>
                                         <td>
-                                            <select
-                                                name="sex"
-                                                value={newRowData.sex}
-                                                onChange={(e) => setNewRowData({ ...newRowData, sex: e.target.value })}
-                                            >
-                                                <option value="">Select Gender</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                            </select>
+                                            <input
+                                                type="text"
+                                                name="initialMuac"
+                                                value={newRowData.initialMuac}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, initialMuac: e.target.value })}
+                                                placeholder="Initial Muac"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="muacClassification"
+                                                value={newRowData.muacClassification}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, muacClassification: e.target.value })}
+                                                placeholder="Muac Classification"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="ben_facility_RegNo"
+                                                value={newRowData.ben_facility_RegNo}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, ben_facility_RegNo: e.target.value })}
+                                                placeholder="Beneficiary Facility Registration Number"
+                                            />
                                         </td>
                                         <td>
                                             <input
@@ -1983,21 +2097,22 @@ export function OrgUnitTable(props: Props) {
                                                 name="track"
                                                 value={newRowData.track}
                                                 // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, track: e.target.value })}
+                                                // onChange={(e) => setNewRowData({ ...newRowData, track: e.target.value })}
+                                                readOnly
                                                 placeholder="Beneficiary Track"
                                             />
                                         </td>
                                         <td>
-                                            <select
-                                                name="beneficiaryStage"
-                                                value={newRowData.beneficiaryStage}
-                                                onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
-                                            >
-                                                <option value="">Select Gender</option>
-                                                <option value="Adult">Adult</option>
-                                                <option value="Child">Child</option>
-                                            </select>
+                                            <input
+                                                type="text"
+                                                name="directPatientID"
+                                                value={newRowData.directPatientID}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, directPatientID: e.target.value })}
+                                                placeholder="Direct Patient ID"
+                                            />
                                         </td>
+                                        
                                         {/* Add more input fields for other data as needed */}
                                         <td>
                                             <button onClick={handleFormSubmit} className="submit-button">Save</button>

@@ -68,8 +68,8 @@ const NutritionForm: React.FC<{ place: string; track: string; orgUnit: string; t
                     { "value": formData.other, "dataElement": "TQLLkvvbCD2" }
                 ],
                 "event": event,
-                "program": "kmfLZO8ckxY",
-                "programStage": "DSFjQPPKuyM",
+                "program": "n2iAPy3PGx7",
+                "programStage": "RXTq2YFOH5c",
                 "orgUnit": orgUnit, // "DGY1RFEb7sO",
                 "trackedEntityInstance": trackInstance, //"kfJ7DFRjnuA",
                 "status": "COMPLETED",

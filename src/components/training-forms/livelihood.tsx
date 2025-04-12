@@ -114,8 +114,8 @@ const LivelihoodForm: React.FC<{ place: string; track: string; orgUnit: string; 
                     { value: formData.landCultivated, dataElement: 'PKxWHlkevrG' },
                 ],
                 event: eventGenerated, // 'UeeUgRVfAIs', //'Hm7ps1SGHZ0',
-                program: 'kmfLZO8ckxY',
-                programStage: 'j3I4HeeEL0K',
+                program: 'n2iAPy3PGx7',
+                programStage: 'H0vCgsI1d4M',
                 orgUnit: orgUnit, //'DGY1RFEb7sO',
                 trackedEntityInstance: trackInstance, 
                 status: 'COMPLETED',
@@ -126,7 +126,7 @@ const LivelihoodForm: React.FC<{ place: string; track: string; orgUnit: string; 
 
             console.log('Payload:', payload);
 
-            const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+            const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

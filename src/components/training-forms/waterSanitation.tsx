@@ -52,8 +52,8 @@ const WaterSanitationForm: React.FC<{ place: string; track: string; orgUnit: str
                     { "value": formData.latrineDisposal, "dataElement": "dnlAV3tubDJ" }
                 ],
                 "event": event,
-                "program": "kmfLZO8ckxY",
-                "programStage": "QAEEGAsJ5H7",
+                "program": "n2iAPy3PGx7",
+                "programStage": "bTVReRuHapT",
                 "orgUnit": orgUnit,//"DGY1RFEb7sO",
                 "trackedEntityInstance": trackInstance, //"kfJ7DFRjnuA",
                 "status": "ACTIVE",
@@ -61,7 +61,7 @@ const WaterSanitationForm: React.FC<{ place: string; track: string; orgUnit: str
                 "eventDate": formData.reportDate
             };
 
-            const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+            const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
