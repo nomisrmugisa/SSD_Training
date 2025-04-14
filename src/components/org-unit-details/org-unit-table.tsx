@@ -32,7 +32,7 @@ interface FetchedData {
     reportDate: string;
     dueDate: string;
     eventId: string;
-    dataValues: { [key: string]: string }; // To hold the values for each data element
+    dataValues: { [key: string]: string | boolean }; // To hold the values for each data element
 }
 
 // for indexedDB 
@@ -59,14 +59,177 @@ interface FetchedData {
 
 type ProgramStage = 'Livelihood' | 'Water Sanitation & Hygiene' | 'Nutrition' | '';
 
-const PROGRAM_STAGE_MAPPING = {
-    'Livelihood': 'H0vCgsI1d4M',
-    'Water Sanitation & Hygiene': 'bTVReRuHapT',
-    'Nutrition': 'RXTq2YFOH5c'
-};
 
 export function OrgUnitTable(props: Props) {
-    const credentials = btoa(`admin:Precommunicate30-#Helle17}`);
+
+    const PROGRAM_STAGE_MAPPING = {
+        'Livelihood': 'H0vCgsI1d4M',
+        'Water Sanitation & Hygiene': 'bTVReRuHapT',
+        'Nutrition': 'RXTq2YFOH5c'
+    };
+
+    const dataElementIDsByFilter = {
+        'Livelihood': {
+            'Fisher': {
+                'Fishing Oil Preparation': 'erCm8YopB1D',
+                'Fishing Marketing': 'QpLUEvB2sdy',
+                'Fishing Methods': 'OKc4NRIE3rS',
+                'Post Handling Methods': 'SinFNAlonqG',
+                'Applied Lessons': 'EvDeWfQDiuz'
+            },
+            'Farmer': {
+                'Harvesting': 'RiNixd9BoZE',
+                'Post Harvest Handling': 'oLxkWBGjWkV',
+                'Land Preparation': 'Nmh0TPGuXWS',
+                'Nursery Preparation': 'VyqyQ0BZISo',
+                'Post Harvest Hygiene': 'EpaLpKMZj3y',
+                'Losses Marking': 'aUrLyHqOf0n',
+                'Weeding': 'vVKfsZ8VgiG',
+                'Storage': 'YzlNvVyLIkn',
+                'Applied Lessons': 'ZBAx5UMH63F',
+                'Increased income': 'Tbnq2F0xX7D',
+                'Increased agricultural production': 'GwKxMZ8yaBm',
+                'Started a new livelihood activity': 'Ee8oyMX7Aoc',
+                'Increased my skills/knowledge': 'I2KTNrvwsHT',
+                'Increased my family\'s resilience to shocks': 'RW2BS4l5KcN',
+                'Others': 'Si8dOtSlomM'
+            }
+        },
+        'Nutrition': {
+            'Nutrition during pregnancy and lactation': 'FVIkGrGWz1s',
+            'Importance of early initiation of breastfeeding': 'URD2xr6Enhc',
+            'Breastfeeding in the first 6 months': 'LzFFXJl5Iqu',
+            'Exclusive breastfeeding during the first 6 months': 'ecFLn0i8QrL',
+            'Good hygiene practices': 'ijTViGLk6hP',
+            'Complementary feeding': 'LzGN50sTSh3',
+            'Health seeking behavior': 'C2GoFXyTUj2',
+            'Growth monitoring': 'DK06Y2Viejs',
+            'Kitchen gardens and fruit trees': 'NOIbysghola',
+            'Cooking Demonstration': 'LhcJpqUzqcp',
+            'Pregnant': 'stU3OZCy64s',
+            'Lactating': 'NA1ZhjvX47L',
+            'Other': 'TQLLkvvbCD2'
+        },
+        'Water Sanitation & Hygiene': {
+            'Food Safety': 'Q4dJyNwdyyJ',
+            'Promoters Attendance :1. CLTS': 'zwumtCV5d8h',
+            'Personal Hygiene': 'POMbjIgo3EF',
+            'Household Hygene': 'ss6pDJe2k6h',
+            'Clean and Safe Water': 'xyaOOPDyjoN',
+            'Use of Latrine and Excreta Disposal': 'dnlAV3tubDJ'
+        }
+    };
+
+    const dataElementMapping = {
+        'Livelihood': {
+            'Fisher': {
+                'Fishing Oil Preparation': 'erCm8YopB1D',
+                'Fishing Marketing': 'QpLUEvB2sdy',
+                'Fishing Methods': 'vsbH6WxHVrN',
+                'Post Handling Methods': 'newDataElementId', // Need correct ID
+                'Applied Lessons': 'newDataElementId',       // Need correct ID
+                // 'Income Earned/Week': 'td3WOxoQ4wN',
+                // 'Case Stories Generated': 'sQShE9oP513'
+            },
+            'Farmer': {
+                'Harvesting': 'RiNixd9BoZE',
+                'Post Harvest Handling': 'oLxkWBGjWkV',
+                'Land Preparation': 'Nmh0TPGuXWS',
+                'Nursery Preparation': 'VyqyQ0BZISo',
+                'Post Harvest Hygiene': 'EpaLpKMZj3y',
+                'Losses Marking': 'aUrLyHqOf0n',
+                'Weeding': 'vVKfsZ8VgiG',
+                'Storage': 'YzlNvVyLIkn',
+                'Applied Lessons': 'newDataElementId',           // Need correct ID
+                'Increased income': 'newDataElementId',         // Need correct ID
+                'Increased agricultural production': 'newDataElementId', // Need correct ID
+                'Started a new livelihood activity': 'newDataElementId', // Need correct ID
+                'Increased my skills/knowledge': 'newDataElementId',    // Need correct ID
+                'Increased my family\'s resilience to shocks': 'newDataElementId', // Need correct ID
+                'Others': 'newDataElementId'                    // Need correct ID
+            }
+
+        },
+        'Nutrition': {
+            'Nutrition during pregnancy and lactation': 'FVIkGrGWz1s',
+            'Importance of early initiation of breastfeeding': 'URD2xr6Enhc',
+            'Breastfeeding in the first 6 months': 'LzFFXJl5Iqu',
+            'Exclusive breastfeeding during the first 6 months': 'ecFLn0i8QrL',
+            'Good hygiene practices': 'ijTViGLk6hP',
+            'Complementary feeding': 'LzGN50sTSh3',
+            'Health seeking behavior': 'C2GoFXyTUj2',
+            'Growth monitoring': 'DK06Y2Viejs',
+            'Kitchen gardens and fruit trees': 'NOIbysghola',
+            'Cooking Demonstration': 'LhcJpqUzqcp',
+            'Pregnant': 'stU3OZCy64s',
+            'Lactating': 'NA1ZhjvX47L',
+            'Other': 'TQLLkvvbCD2',
+        },
+        'Water Sanitation & Hygiene': {
+            'Food Safety': 'Q4dJyNwdyyJ',
+            'Promoters Attendance :1. CLTS': 'zwumtCV5d8h',
+            'Personal Hygiene': 'POMbjIgo3EF',
+            'Household Hygene': 'ss6pDJe2k6h',
+            'Clean and Safe Water': 'xyaOOPDyjoN',
+            'Use of Latrine and Excreta Disposal': 'dnlAV3tubDJ',
+        },
+    };
+
+    const dataValueMapping = {
+        // Farmer-specific mappings
+        'harvesting_checkBox': 'Harvesting',
+        'postHarvestHandling_checkBox': 'Post Harvest Handling',
+        'landPreparation_checkBox': 'Land Preparation',
+        'nurseryPreparation_checkBox': 'Nursery Preparation',
+        'postHarvestHygiene_checkBox': 'Post Harvest Hygiene',
+        'lossesMarking_checkBox': 'Losses Marking',
+        'weeding_checkBox': 'Weeding',
+        'storage_checkBox': 'Storage',
+        'appliedLessons_dropdown': 'Applied Lessons',
+        'increasedIncome_checkBox': 'Increased income',
+        'increasedProduction_checkBox': 'Increased agricultural production',
+        'newLivelihood_checkBox': 'Started a new livelihood activity',
+        'increasedSkills_checkBox': 'Increased my skills/knowledge',
+        'increasedResilience_checkBox': 'Increased my family\'s resilience to shocks',
+        'others_text': 'Others',
+
+        // Fisher-specific mappings (existing)
+        'fishingOilPreparation_checkBox': 'Fishing Oil Preparation',
+        'fishingMarketing_checkBox': 'Fishing Marketing',
+        'fishingMethods_checkBox': 'Fishing Methods',
+        'postHandlingMethods_checkBox': 'Post Handling Methods',
+
+        // Other existing mappings (Nutrition, Water Sanitation)
+        'foodSafety_checkBox': 'Food Safety',
+        'promotersAttendance_checkBox': 'Promoters Attendance :1. CLTS',
+        'personalHygiene_checkBox': 'Personal Hygiene',
+        'householdHygiene_checkBox': 'Household Hygene',
+        'cleanSafeWater_checkBox': 'Clean and Safe Water',
+        'latrineDisposal_checkBox': 'Use of Latrine and Excreta Disposal',
+
+        // Nutrition 
+        'nutritionPregnancy_checkBox': 'Nutrition during pregnancy and lactation',
+        'earlyInitiation_checkBox': 'Importance of early initiation of breastfeeding',
+        'breastfeedingFirst6Months_checkBox': 'Breastfeeding in the first 6 months',
+        'exclusiveBreastfeeding_checkBox': 'Exclusive breastfeeding during the first 6 months',
+        'goodHygiene_checkBox': 'Good hygiene practices',
+        'complementaryFeeding_checkBox': 'Complementary feeding',
+        'healthSeekingBehavior_checkBox': 'Health seeking behavior',
+        'growthMonitoring_checkBox': 'Growth monitoring',
+        'kitchenGardens_checkBox': 'Kitchen gardens and fruit trees',
+        'cookingDemonstration_checkBox': 'Cooking Demonstration',
+        'pregnant_checkBox': 'Pregnant',
+        'lactating_checkBox': 'Lactating',
+        'other': 'Other'
+
+        // Remove commented out mappings
+        // 'incomeEarned': 'Income Earned/Week',
+        // 'yieldKgs': 'Yield in Kgs',
+        // 'caseStories': 'Case Stories Generated',
+        // 'landCultivated': 'Land Cultivated in Feddans',
+    };
+
+    // const credentials = btoa(`admin:Nomisr123$$$}`);
     const [search, setSearch] = useState('');
     const history = useHistory();
     const [formVisible, setFormVisible] = useState(false);
@@ -130,6 +293,7 @@ export function OrgUnitTable(props: Props) {
         muacClassification: '',
         ben_facility_RegNo: '',
         directPatientID: '',
+        muacColor: '#ffffff'
     });
 
     const [isAddingNewRow, setIsAddingNewRow] = useState(false);
@@ -256,6 +420,59 @@ export function OrgUnitTable(props: Props) {
         }
     }, [trackFilter, props.orgUnitDetails]);
 
+    // useEffect for MUAC
+    useEffect(() => {
+        const muacValue = parseFloat(newRowData.initialMuac);
+        let classification = '';
+        let color = '#ffffff'; // Default white
+
+        if (!isNaN(muacValue)) {
+            if (newRowData.beneficiaryStage === 'Child') {
+                if (muacValue < 11.5) {
+                    classification = 'Severe (Red)';
+                    color = '#ffcccc'; // Light red
+                } else if (muacValue >= 11.5 && muacValue < 12.5) {
+                    classification = 'Moderate (Yellow)';
+                    color = '#ffffcc'; // Light yellow
+                } else if (muacValue >= 12.5) {
+                    classification = 'Normal (Green)';
+                    color = '#ccffcc'; // Light green
+                }
+            } else if (newRowData.beneficiaryStage === 'Adult') {
+                if (muacValue < 21) {
+                    classification = 'Severe';
+                    color = '#ffcccc';
+                } else if (muacValue >= 21 && muacValue < 23) {
+                    classification = 'Moderate';
+                    color = '#ffffcc';
+                } else if (muacValue >= 23) {
+                    classification = 'Norma;';
+                    color = '#ccffcc';
+                }
+            }
+        }
+
+        setNewRowData(prev => ({
+            ...prev,
+            muacClassification: classification,
+            // Add a new field for color
+            muacColor: color
+        }));
+    }, [newRowData.initialMuac, newRowData.beneficiaryStage]);
+
+    // Update additional columns when training filter changes
+    useEffect(() => {
+        setAdditionalColumns(getAdditionalColumns(trainingFilter));
+    }, [trainingFilter]);
+
+    // update columns when track filter changes
+    useEffect(() => {
+        if (trainingFilter === 'Livelihood') {
+            // Re-run getAdditionalColumns with current training filter to update columns
+            setAdditionalColumns(getAdditionalColumns(trainingFilter));
+        }
+    }, [trackFilter, trainingFilter]);
+
     // Function to determine additional columns based on the training filter
     const getAdditionalColumns = (filter: string) => {
         const columns = [];
@@ -307,7 +524,7 @@ export function OrgUnitTable(props: Props) {
             case 'Water Sanitation & Hygiene':
                 columns.push(
                     { Header: 'Date of training', accessor: 'reportDate' },
-                        // { Header: 'Due Date', accessor: 'dueDate' },
+                    // { Header: 'Due Date', accessor: 'dueDate' },
                     { Header: 'Food Safety', accessor: 'foodSafety_checkBox' },
                     { Header: 'Promoters Attendance :1. CLTS', accessor: 'promotersAttendance_checkBox' },
                     { Header: 'Personal Hygiene', accessor: 'personalHygiene_checkBox' },
@@ -319,7 +536,7 @@ export function OrgUnitTable(props: Props) {
             case 'Nutrition':
                 columns.push(
                     { Header: 'Date of training', accessor: 'reportDate' },
-                        // { Header: 'Due Date', accessor: 'dueDate' },
+                    // { Header: 'Due Date', accessor: 'dueDate' },
                     { Header: 'Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox' },
                     { Header: 'Importance of early initiation of breastfeeding', accessor: 'earlyInitiation_checkBox' },
                     { Header: 'Breastfeeding in the first 6 months', accessor: 'breastfeedingFirst6Months_checkBox' },
@@ -348,11 +565,6 @@ export function OrgUnitTable(props: Props) {
     };
 
 
-    // Update additional columns when training filter changes
-    useEffect(() => {
-        setAdditionalColumns(getAdditionalColumns(trainingFilter));
-    }, [trainingFilter]);
-
     const table = useTable({
         data: props.orgUnitDetails,
         columns: columns, // Use the dynamically set columns
@@ -364,7 +576,7 @@ export function OrgUnitTable(props: Props) {
     const handleBeneficiarySearch = async (event) => {
         if (event.key === 'Enter') {
             try {
-                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=n2iAPy3PGx7&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
+                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=n2iAPy3PGx7&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
                 const data = await response.json();
                 setSearchResults(data.rows); // Set the search results
                 setIsModalVisible(true); // Show the modal
@@ -441,13 +653,13 @@ export function OrgUnitTable(props: Props) {
             try {
                 // First request: Fetch the organization unit code
                 const orgUnitCodeResponse = await fetch(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/organisationUnits/${props.orgUnitId}`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/organisationUnits/${props.orgUnitId}`,
                     // `api/organisationUnits/${props.orgUnitId}`,
                     {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Basic ${credentials}`,
+                            // 'Authorization': `Basic ${credentials}`,
                         },
                     }
                 );
@@ -459,13 +671,13 @@ export function OrgUnitTable(props: Props) {
                 if (orgUnitCode) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'Authorization': `Basic ${credentials}`,
+                                // 'Authorization': `Basic ${credentials}`,
                             },
                         }
                     );
@@ -498,13 +710,13 @@ export function OrgUnitTable(props: Props) {
     const fetchNewId = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/system/id?`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/system/id?`,
                 // `api/system/id?`, //with proxy
                 {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Basic ${credentials}`,
+                        // 'Authorization': `Basic ${credentials}`,
                     },
                 });
             const data = await response.json();
@@ -519,13 +731,13 @@ export function OrgUnitTable(props: Props) {
     const fetchUser = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/me`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/me`,
                 // `api/me`, //with proxy
                 {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Basic ${credentials}`,
+                        // 'Authorization': `Basic ${credentials}`,
                     },
                 });
             const data = await response.json();
@@ -595,10 +807,10 @@ export function OrgUnitTable(props: Props) {
                 { attribute: "KmxskLLhS0k", value: newRowData.beneficiaryStage },
                 { attribute: "tUjM7KxKvCO", value: newRowData.first_middleName },
                 { attribute: "xts0QtWHpnK", value: newRowData.surname },
-                { attribute: "MX1mGZlngtD", value: newRowData.initialMuac},
-                { attribute: "KNLojwshHCv", value: newRowData.muacClassification},
-                { attribute: "M9jR50uouZV", value: newRowData.ben_facility_RegNo},
-                { attribute: "BDFFygBWNSH", value: newRowData.directPatientID}
+                { attribute: "MX1mGZlngtD", value: newRowData.initialMuac },
+                { attribute: "KNLojwshHCv", value: newRowData.muacClassification },
+                { attribute: "M9jR50uouZV", value: newRowData.ben_facility_RegNo },
+                { attribute: "BDFFygBWNSH", value: newRowData.directPatientID }
             ]
         };
 
@@ -606,7 +818,7 @@ export function OrgUnitTable(props: Props) {
         try {
             // First POST request - Create tracked entity instance
             const response1 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`,
                 {
                     method: 'POST',
                     headers: {
@@ -636,7 +848,7 @@ export function OrgUnitTable(props: Props) {
 
             // Second POST request - Create enrollment
             const response2 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`,
                 {
                     method: 'POST',
                     headers: {
@@ -651,50 +863,44 @@ export function OrgUnitTable(props: Props) {
                 throw new Error('Failed to create enrollment');
             }
 
-            let beneficiaryId: string;
+            const enrollmentResponseData = await response2.json();
+            const enrollmentId = enrollmentResponseData.response.importSummaries[0].reference;
 
+            // Third payload - create event after enrollment
+            const payload3 = {
+                events: [{
+                    trackedEntityInstance: trackedEntityInstance,
+                    program: 'n2iAPy3PGx7',
+                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter], // Dynamic from current filter
+                    orgUnit: props.orgUnitId,
+                    enrollment: enrollmentId, // Use the enrollment from previous step
+                    dueDate: newRowData.recordDate,
+                    eventDate: newRowData.recordDate,
+                    status: 'ACTIVE'
+                }]
+            };
 
-            // if (networkStatus.isOnline()) {
-            //     // If online, use the ID from the API response
-            //     beneficiaryId = trackedEntityInstance; // Fallback to newId if API fails
-            // } else {
-            //     // If offline, generate an offline ID
-            //     const offlineCount = await indexedDBManager.getOfflineCount(); // Implement this method to count existing offline entries
-            //     beneficiaryId = `offline${offlineCount + 1}`;
-            // }
+            const response3 = await fetch(
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 'Authorization': `Basic ${credentials}`,
+                    },
+                    body: JSON.stringify(payload3),
+                }
+            );
 
-            // Step 5: Save to IndexedDB after successful API calls
-            // const beneficiaryEvent: BeneficiaryEvent = {
-            //     id: beneficiaryId,
-            //     recordDate: newRowData.recordDate,
-            //     track: newRowData.track,
-            //     inactive: newRowData.inactive,
-            //     beneficiaryStage: newRowData.beneficiaryStage,
-            //     careGiver: newRowData.careGiver,
-            //     careGiverAge: newRowData.careGiverAge,
-            //     patientID: newRowData.patientID,
-            //     firstMiddleName: newRowData.first_middleName,
-            //     surname: newRowData.surname,
-            //     dob: newRowData.dob,
-            //     orgUnit: props.orgUnitId,
-            //     // topicTrainedOn: newRowData.topicTrainedOn,
-            //     beneficiaryName: newRowData.beneficiaryName,
-            //     nonBeneficiaryName: newRowData.nonBeneficiaryName,
-            //     sex: newRowData.sex,
-            //     age: newRowData.age,
-            //     // sentOnline: true // Mark as sent online
-            // };
+            if (!response3.ok) {
+                throw new Error('Failed to create event');
+            }
 
-            // try {
-            //     await indexedDBManager.saveBeneficiary(beneficiaryEvent); // Save to IndexedDB
-            //     // Success message for local save
-            //     // if (!networkStatus.isOnline()) {
-            //         window.alert('Beneficiary successfully created and saved locally!');
-            //     // }
-            // } catch (error) {
-            //     console.error('Error saving to IndexedDB:', error);
-            //     window.alert('Error saving beneficiary locally. Please try again.');
-            // }
+            const eventResponseData = await response3.json();
+            const createdEventId = eventResponseData.response.importSummaries[0].reference;
+
+            console.log(`✅ Event created with ID: ${createdEventId}`);
+
 
             // Reset form and show success message
             setNewRowData({
@@ -718,7 +924,8 @@ export function OrgUnitTable(props: Props) {
                 initialMuac: '',
                 muacClassification: '',
                 ben_facility_RegNo: '',
-                directPatientID: ''
+                directPatientID: '',
+                muacColor: '#ffffff'
             });
             setDateFilter('');
 
@@ -783,7 +990,7 @@ export function OrgUnitTable(props: Props) {
         // Fetch additional data for the row being edited
         const activity = filteredData.find((d) => d.trackInstanceId === trackInstId);
         if (activity) {
-            const additionalData = await fetchAdditionalData(activity.trackInstanceId, trainingFilter);
+            const additionalData = await fetchAdditionalData(activity.trackInstanceId, trainingFilter, trackFilter);
             // setFetchedDates(additionalData); // Store fetched dates in state
             // Set the fetched dates and data values in the expected structure
             setFetchedDates((prev) => ({
@@ -809,7 +1016,7 @@ export function OrgUnitTable(props: Props) {
         return result;
     }
 
-    // Function to handle save action
+    // Function to handle posting additional columns 
     const handleSave = async (trackInstId: string, id?: string) => {
         const isEditing = id !== undefined; // Check if we have an ID to determine if we're editing
 
@@ -817,7 +1024,7 @@ export function OrgUnitTable(props: Props) {
         const eventId = isEditing ? id : generateEventID();
         // Construct the payload based on the filter
         let payload;
-        
+
         if (currentFilter === 'Livelihood') {
             payload = {
                 dataValues: [
@@ -848,10 +1055,7 @@ export function OrgUnitTable(props: Props) {
                             { value: addColRow_lvh.fishingMethods.appliedLessons ? 'true' : 'false', dataElement: 'EvDeWfQDiuz' }
                         ]),
                     // Remove the commented out fields
-                    // { value: addColRow_lvh.incomeEarned, dataElement: 'td3WOxoQ4wN' },
-                    // { value: addColRow_lvh.yieldInKgs, dataElement: 'TCSKxlymcyD' },
-                    // { value: addColRow_lvh.caseStories, dataElement: 'sQShE9oP513' },
-                    // { value: addColRow_lvh.landCultivated, dataElement: 'PKxWHlkevrG' },
+
                 ],
                 event: eventId,
                 program: 'n2iAPy3PGx7',
@@ -892,7 +1096,7 @@ export function OrgUnitTable(props: Props) {
                 completedDate: new Date().toISOString().split('T')[0],
             };
         } else if (currentFilter === 'Water Sanitation & Hygiene') {
-            
+
             payload = {
                 dataValues: [
                     { "value": addColRow_Wsh.foodSafety, "dataElement": 'Q4dJyNwdyyJ' },
@@ -913,13 +1117,14 @@ export function OrgUnitTable(props: Props) {
                 eventDate: fetchedDates[trackInstId]?.reportDate,
             };
         }
-        console.log({'Event Date': fetchedDates[trackInstId]?.reportDate,
+        console.log({
+            'Event Date': fetchedDates[trackInstId]?.reportDate,
             'Event Date 1': addColRow_lvh.reportDate
         })
         try {
             if (isEditing) {
                 // PUT request for editing an existing record
-                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${id}`, 
+                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${id}`,
                     {
                         method: 'PUT',
                         headers: {
@@ -933,7 +1138,7 @@ export function OrgUnitTable(props: Props) {
                 // Handle success (e.g., update state, show message)
             } else {
                 // POST request for adding a new record
-                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, 
+                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
                     {
                         method: 'POST',
                         headers: {
@@ -949,6 +1154,93 @@ export function OrgUnitTable(props: Props) {
         } catch (error) {
             console.error('Error saving entry:', error);
             // Handle error (e.g., show error message)
+        }
+    };
+
+    // POST Date - create event 
+    const handleReportDateSubmit = async (e: React.KeyboardEvent<HTMLInputElement>, trackInstanceId: string) => {
+        if (e.key === 'Enter') {
+            const reportDate = fetchedDates[trackInstanceId]?.reportDate;
+
+            if (!reportDate) return;
+
+            try {
+                const payload = {
+                    events: [{
+                        trackedEntityInstance: trackInstanceId,
+                        program: 'n2iAPy3PGx7',
+                        programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+                        enrollment: '', // Optional: can be fetched/stored
+                        orgUnit: props.orgUnitId,
+                        notes: [],
+                        dataValues: [],
+                        status: 'ACTIVE',
+                        eventDate: reportDate,
+                    }]
+                };
+
+                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, payload);
+                const createdEventId = response.data.response.importSummaries[0].reference;
+
+                setFetchedDates(prev => ({
+                    ...prev,
+                    [trackInstanceId]: {
+                        ...prev[trackInstanceId],
+                        eventId: createdEventId
+                    }
+                }));
+
+                console.log(`✅ Event created: ${createdEventId}`);
+            } catch (error) {
+                console.error('❌ Error creating event:', error);
+            }
+        }
+    };
+
+    // PUT remaining data elements 
+    const sendDataValueUpdate = async (
+        trackInstanceId: string,
+        dataElementName: string,
+        value: string | boolean
+    ) => {
+        const eventId = fetchedDates[trackInstanceId]?.eventId;
+        const orgUnit = props.orgUnitId;
+        const program = 'n2iAPy3PGx7';
+        const programStage = PROGRAM_STAGE_MAPPING[trainingFilter];
+
+        if (!eventId || !dataElementName) return;
+
+        console.log('Event ID for addn cols: ', eventId);
+
+        const dataElementId = dataElementIDsByFilter[trainingFilter]?.[trackFilter]?.[dataElementName] ||
+            dataElementIDsByFilter[trainingFilter]?.[dataElementName];
+
+        if (!dataElementId) {
+            console.warn(`❌ Missing dataElementId for ${dataElementName}`);
+            return;
+        }
+
+        const payload = {
+            event: eventId,
+            orgUnit,
+            program,
+            programStage,
+            trackedEntityInstance: trackInstanceId,
+            status: 'ACTIVE',
+            dataValues: [
+                {
+                    dataElement: dataElementId,
+                    value: typeof value === 'boolean' ? (value ? 'true' : 'false') : value,
+                    providedElsewhere: false
+                }
+            ]
+        };
+
+        try {
+            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${eventId}/${dataElementId}`, payload);
+            console.log(`✅ PUT: ${dataElementName} = ${value}`);
+        } catch (error) {
+            console.error('❌ Failed to send data value update:', error);
         }
     };
 
@@ -978,16 +1270,37 @@ export function OrgUnitTable(props: Props) {
 
     const handleDateChangeForFetchedDates = (trackInstanceId: string, newDate: string) => {
         setFetchedDates((prev) => ({
-          ...prev,
-          [trackInstanceId]: {
-            ...prev[trackInstanceId],
-            reportDate: newDate,
-          },
+            ...prev,
+            [trackInstanceId]: {
+                ...prev[trackInstanceId],
+                reportDate: newDate,
+            },
         }));
-      };
-      
+    };
 
-    const fetchAdditionalData = async (trackInstanceId: string, trainingFilter: string): Promise<FetchedData> => {
+    const handleDataValueChange = (
+        trackInstanceId: string,
+        dataElementName: string,
+        value: string | boolean
+    ) => {
+        setFetchedDates((prev) => ({
+            ...prev,
+            [trackInstanceId]: {
+                ...prev[trackInstanceId],
+                dataValues: {
+                    ...prev[trackInstanceId]?.dataValues,
+                    [dataElementName]: value,
+                },
+            },
+        }));
+
+        // Send immediately for checkboxes
+        if (typeof value === 'boolean') {
+            sendDataValueUpdate(trackInstanceId, dataElementName, value);
+        }
+    };
+
+    const fetchAdditionalData = async (trackInstanceId: string, trainingFilter: string, trackFilter: string): Promise<FetchedData> => {
         const programStageMap = {
             'Livelihood': 'H0vCgsI1d4M',
             'Nutrition': 'RXTq2YFOH5c',
@@ -995,60 +1308,46 @@ export function OrgUnitTable(props: Props) {
         };
 
         const programStage = programStageMap[trainingFilter];
-        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/${trackInstanceId}.json?program=n2iAPy3PGx7&programStage=${programStage}&fields=enrollments[events[*]]`;
+        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json?program=n2iAPy3PGx7&programStage=${programStage}&fields=enrollments[events[*]]`;
 
         try {
-            console.log(`Fetching data from URL: ${url}`); // Log the URL being fetched
             const response = await axios.get(url);
             const data = response.data;
 
-            console.log('Response data:', data); // Log the entire response data
-
-            // Initialize reportDate, dueDate, and dataValues
+            // Initialize with empty values
             let reportDate = '';
             let dueDate = '';
             let eventId = '';
             const dataValues: { [key: string]: string } = {};
 
-            // Extract the report date and due date from the response
             if (data.enrollments && data.enrollments.length > 0) {
-                const events = data.enrollments[0].events; // Get all events
-                if (events && events.length > 0) {
-                    // Iterate through all events
-                    events.forEach((event) => {
-                        console.log('Fetched Event:', event); // Log each fetched event
-                        reportDate = event.eventDate; // Extract reportDate (you may want to handle multiple dates)
-                        dueDate = event.dueDate; // Extract dueDate (you may want to handle multiple due dates)
-                        eventId = event.event;
+                const events = data.enrollments[0].events || [];
 
-                        // Log all dataElement IDs for this event
-                        const allDataElementIds: string[] = []; // Array to hold all dataElement IDs
-                        event.dataValues.forEach((dataValue) => {
-                            const dataElementId = dataValue.dataElement;
-                            allDataElementIds.push(dataElementId); // Collect the dataElement ID
+                // Find the event that matches our program stage
+                const matchingEvent = events.find((event: any) =>
+                    event.programStage === programStage
+                );
+
+                if (matchingEvent) {
+                    reportDate = matchingEvent.eventDate;
+                    dueDate = matchingEvent.dueDate;
+                    eventId = matchingEvent.event;
+
+                    // Process data values
+                    matchingEvent.dataValues?.forEach((dataValue) => {
+                        Object.entries(dataValueMapping).forEach(([accessorKey, label]) => {
+                            const expectedId = dataElementMapping[trainingFilter]?.[trackFilter]?.[label]
+                                || dataElementMapping[trainingFilter]?.[label];
+
+                            if (expectedId === dataValue.dataElement) {
+                                dataValues[label] = dataValue.value;
+                            }
                         });
-                        console.log('All Data Element IDs from this event:', allDataElementIds); // Log all dataElement IDs
-
-                        // Extract data values based on the dataElementMapping
-                        const dataElementMappingForFilter = dataElementMapping[trainingFilter];
-                        if (dataElementMappingForFilter) {
-                            event.dataValues.forEach((dataValue) => {
-                                const dataElementId = dataValue.dataElement;
-                                // Check if the dataElementId exists in the mapping
-                                const key = Object.keys(dataElementMappingForFilter).find(key => dataElementMappingForFilter[key] === dataElementId);
-                                if (key) {
-                                    dataValues[key] = dataValue.value; // Store the value
-                                }
-                            });
-                        }
                     });
+
                 }
             }
 
-            // Log the extracted reportDate, dueDate, and dataValues
-            console.log('Extracted Data:', { reportDate, dueDate, eventId, dataValues });
-
-            // Return the fetched data including reportDate, dueDate, and dataValues
             return {
                 reportDate,
                 dueDate,
@@ -1058,10 +1357,39 @@ export function OrgUnitTable(props: Props) {
 
         } catch (error) {
             console.error('Error fetching additional data:', error);
+            return { reportDate: '', dueDate: '', eventId: '', dataValues: {} };
         }
+    };
 
-        // Return empty values if not found
-        return { reportDate: '', dueDate: '', eventId: '', dataValues: {} }; // Ensure dataValues is an empty object
+    const handleFilterChange = async (newFilter: string) => {
+        setTrainingFilter(newFilter); // Update the training filter state
+        setSelectedProgramStage(newFilter as ProgramStage); // Update selectedProgramStage
+
+        // Update columns immediately when filter changes
+        setAdditionalColumns(getAdditionalColumns(newFilter));
+
+        // Fetch additional data for all rows based on the new filter
+        const updatedFetchedDates = await Promise.all(
+            filteredData.map(async (activity) => {
+                const additionalData = await fetchAdditionalData(activity.trackInstanceId, newFilter, trackFilter);
+                console.log({ 'Additional Data': additionalData })
+                return {
+                    trackInstanceId: activity.trackInstanceId,
+                    reportDate: additionalData.reportDate,
+                    dueDate: additionalData.dueDate,
+                    eventId: additionalData.eventId,
+                    dataValues: additionalData.dataValues || {}
+                };
+            })
+        );
+
+        // Update the state with the fetched dates
+        // Update the state with the fetched dates
+        const newFetchedDates: { [key: string]: FetchedData } = {};
+        updatedFetchedDates.forEach(({ trackInstanceId, reportDate, dueDate, eventId, dataValues }) => {
+            newFetchedDates[trackInstanceId] = { reportDate, dueDate, eventId, dataValues };
+        });
+        setFetchedDates(newFetchedDates);
     };
 
     const getTopicOptions = (track: string, filter: string) => {
@@ -1108,117 +1436,10 @@ export function OrgUnitTable(props: Props) {
         return [];
     };
 
-    const dataElementMapping = {
-        'Livelihood': {
-            'Fisher': {
-                'Fishing Oil Preparation': 'erCm8YopB1D',
-                'Fishing Marketing': 'QpLUEvB2sdy',
-                'Fishing Methods': 'vsbH6WxHVrN',
-                'Post Handling Methods': 'newDataElementId', // Need correct ID
-                'Applied Lessons': 'newDataElementId',       // Need correct ID
-                // 'Income Earned/Week': 'td3WOxoQ4wN',
-                // 'Case Stories Generated': 'sQShE9oP513'
-            },
-            'Farmer': {
-                'Harvesting': 'RiNixd9BoZE',
-                'Post Harvest Handling': 'oLxkWBGjWkV',
-                'Land Preparation': 'Nmh0TPGuXWS',
-                'Nursery Preparation': 'VyqyQ0BZISo',
-                'Post Harvest Hygiene': 'EpaLpKMZj3y',
-                'Losses Marking': 'aUrLyHqOf0n',
-                'Weeding': 'vVKfsZ8VgiG',
-                'Storage': 'YzlNvVyLIkn',
-                'Applied Lessons': 'newDataElementId',           // Need correct ID
-                'Increased income': 'newDataElementId',         // Need correct ID
-                'Increased agricultural production': 'newDataElementId', // Need correct ID
-                'Started a new livelihood activity': 'newDataElementId', // Need correct ID
-                'Increased my skills/knowledge': 'newDataElementId',    // Need correct ID
-                'Increased my family\'s resilience to shocks': 'newDataElementId', // Need correct ID
-                'Others': 'newDataElementId'                    // Need correct ID
-            }
-
-        },
-        'Nutrition': {
-            'Nutrition during pregnancy and lactation': 'FVIkGrGWz1s',
-            'Importance of early initiation of breastfeeding': 'URD2xr6Enhc',
-            'Breastfeeding in the first 6 months': 'LzFFXJl5Iqu',
-            'Exclusive breastfeeding during the first 6 months': 'ecFLn0i8QrL',
-            'Good hygiene practices': 'ijTViGLk6hP',
-            'Complementary feeding': 'LzGN50sTSh3',
-            'Health seeking behavior': 'C2GoFXyTUj2',
-            'Growth monitoring': 'DK06Y2Viejs',
-            'Kitchen gardens and fruit trees': 'NOIbysghola',
-            'Cooking Demonstration': 'LhcJpqUzqcp',
-            'Pregnant': 'stU3OZCy64s',
-            'Lactating': 'NA1ZhjvX47L',
-            'Other': 'TQLLkvvbCD2',
-        },
-        'Water Sanitation & Hygiene': {
-            'Food Safety': 'Q4dJyNwdyyJ',
-            'Promoters Attendance :1. CLTS': 'zwumtCV5d8h',
-            'Personal Hygiene': 'POMbjIgo3EF',
-            'Household Hygene': 'ss6pDJe2k6h',
-            'Clean and Safe Water': 'xyaOOPDyjoN',
-            'Use of Latrine and Excreta Disposal': 'dnlAV3tubDJ',
-        },
-    };
-
-    const dataValueMapping = {
-        // Farmer-specific mappings
-        'harvesting_checkBox': 'Harvesting',
-        'postHarvestHandling_checkBox': 'Post Harvest Handling',
-        'landPreparation_checkBox': 'Land Preparation',
-        'nurseryPreparation_checkBox': 'Nursery Preparation',
-        'postHarvestHygiene_checkBox': 'Post Harvest Hygiene',
-        'lossesMarking_checkBox': 'Losses Marking',
-        'weeding_checkBox': 'Weeding',
-        'storage_checkBox': 'Storage',
-        'appliedLessons_dropdown': 'Applied Lessons',
-        'increasedIncome_checkBox': 'Increased income',
-        'increasedProduction_checkBox': 'Increased agricultural production',
-        'newLivelihood_checkBox': 'Started a new livelihood activity',
-        'increasedSkills_checkBox': 'Increased my skills/knowledge',
-        'increasedResilience_checkBox': 'Increased my family\'s resilience to shocks',
-        'others_text': 'Others',
-
-        // Fisher-specific mappings (existing)
-        'fishingOilPreparation_checkBox': 'Fishing Oil Preparation',
-        'fishingMarketing_checkBox': 'Fishing Marketing',
-        'fishingMethods_checkBox': 'Fishing Methods',
-        'postHandlingMethods_checkBox': 'Post Handling Methods',
-
-        // Other existing mappings (Nutrition, Water Sanitation)
-        'foodSafety_checkBox': 'Food Safety',
-        'promotersAttendance_checkBox': 'Promoters Attendance :1. CLTS',
-        'personalHygiene_checkBox': 'Personal Hygiene',
-        'householdHygiene_checkBox': 'Household Hygene',
-        'cleanSafeWater_checkBox': 'Clean and Safe Water',
-        'latrineDisposal_checkBox': 'Use of Latrine and Excreta Disposal',
-        'nutritionPregnancy_checkBox': 'Nutrition during pregnancy and lactation',
-        'earlyInitiation_checkBox': 'Importance of early initiation of breastfeeding',
-        'breastfeedingFirst6Months_checkBox': 'Breastfeeding in the first 6 months',
-        'exclusiveBreastfeeding_checkBox': 'Exclusive breastfeeding during the first 6 months',
-        'goodHygiene_checkBox': 'Good hygiene practices',
-        'complementaryFeeding_checkBox': 'Complementary feeding',
-        'healthSeekingBehavior_checkBox': 'Health seeking behavior',
-        'growthMonitoring_checkBox': 'Growth monitoring',
-        'kitchenGardens_checkBox': 'Kitchen gardens and fruit trees',
-        'cookingDemonstration_checkBox': 'Cooking Demonstration',
-        'pregnant_checkBox': 'Pregnant',
-        'lactating_checkBox': 'Lactating',
-        'other': 'Other'
-
-        // Remove commented out mappings
-        // 'incomeEarned': 'Income Earned/Week',
-        // 'yieldKgs': 'Yield in Kgs',
-        // 'caseStories': 'Case Stories Generated',
-        // 'landCultivated': 'Land Cultivated in Feddans',
-    };
-
     const formatDateForInput = (dateString) => {
         if (!dateString) return '';
         return new Date(dateString).toISOString().split('T')[0];
-      };
+    };
 
     const renderTableRows = () => {
 
@@ -1250,94 +1471,123 @@ export function OrgUnitTable(props: Props) {
                     <td>{activity.dob}</td>
                     <td>{activity.initialMuac}</td>
                     <td>{activity.muacClassification}</td>
-                    <td>{activity.ben_facility_RegNo}</td>                    
-                    <td>{activity.track}</td>
+                    <td>{activity.ben_facility_RegNo}</td>
                     <td>{activity.directPatientID}</td>
-                    
+                    <td>{activity.track}</td>
+
                     {/* Render additional data cells */}
                     {additionalColumns.map((col) => (
                         <td key={col.accessor}>
-                            {(editableRows[activity.trackInstanceId] && col.accessor !== 'addEditEvent') ?
-                                (
-                                    col.accessor === 'reportDate' ? (
-                                        <input
-                                            type="date"
-                                            value={fetchedDates[activity.trackInstanceId]?.reportDate?.split('T')[0] || ''}
-                                            // value={fetchedData.reportDate || ''}
-                                            onChange={(e) => handleDateChangeForFetchedDates(activity.trackInstanceId, e.target.value)}
-                                        />
-                                    ) : col.accessor === 'dueDate' ? (
-                                        <input
-                                            type="date"
-                                            defaultValue={fetchedDates[activity.trackInstanceId]?.dueDate || ''}
-                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, 'dueDate', e.target.value)}
-                                        />
-                                    ) : col.accessor.includes('checkBox') ? (
-                                        <input
-                                            type="checkbox"
-                                            // checked={activity[col.accessor] || false} // Assuming activity has a boolean value for checkBox
-                                            checked={!!originalValues[activity.trackInstanceId]?.[col.accessor]}
-                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, col.accessor, e.target.checked)}
-                                        />
-                                    ) : col.accessor === 'topicTrainedOn' ? (
-                                        <select
-                                            defaultValue={activity.topicTrainedOn}
-                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, 'topicTrainedOn', e.target.value)}
-                                        >
-                                            {getTopicOptions(activity.track, trainingFilter).map((topic) => (
-                                                <option key={topic} value={topic}>
-                                                    {topic}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : col.accessor === 'appliedLessons_dropdown' ? (
-                                        <select
-                                            // value={fetchedData.dataValues['Applied Lessons'] || ''}
-                                            value={originalValues[activity.trackInstanceId]?.[col.accessor] || ''}
-
-                                            onChange={(e) => handleInputChange1(activity.trackInstanceId, 'appliedLessons_dropdown', e.target.value)}
-                                            className="form-select"
-                                        >
-                                            <option value="">Select</option>
-                                            <option value="Yes">Yes</option>
-                                            <option value="No">No</option>
-                                        </select>
+                            {(editableRows[activity.trackInstanceId] && col.accessor !== 'addEditEvent') ? (
+                                col.accessor === 'reportDate' ? (
+                                    <input
+                                        type="date"
+                                        value={fetchedDates[activity.trackInstanceId]?.reportDate?.split('T')[0] || ''}
+                                        onChange={(e) =>
+                                            handleDateChangeForFetchedDates(activity.trackInstanceId, e.target.value)
+                                        }
+                                        onKeyDown={(e) =>
+                                            handleReportDateSubmit(e, activity.trackInstanceId)
+                                        }
+                                    />
+                                ) : col.accessor.includes('checkBox') ? (
+                                    <input
+                                        type="checkbox"
+                                        checked={
+                                            fetchedDates[activity.trackInstanceId]?.dataValues[
+                                            dataValueMapping[col.accessor]
+                                            ] === true ||
+                                            fetchedDates[activity.trackInstanceId]?.dataValues[
+                                            dataValueMapping[col.accessor]
+                                            ] === 'true'
+                                        }
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                activity.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.checked
+                                            )
+                                        }
+                                    />
+                                ) : col.accessor === 'appliedLessons_dropdown' ? (
+                                    <select
+                                        value={
+                                            String(
+                                                fetchedDates[activity.trackInstanceId]?.dataValues[
+                                                dataValueMapping[col.accessor]
+                                                ] || ''
+                                            )
+                                        }
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                activity.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.value
+                                            )
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                sendDataValueUpdate(activity.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value === 'Yes' ? true : false);// ✅ boolean here
+                                            }
+                                        }}
+                                        className="form-select"
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        value={
+                                            String(
+                                                fetchedDates[activity.trackInstanceId]?.dataValues[
+                                                dataValueMapping[col.accessor]
+                                                ] || ''
+                                            )
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                sendDataValueUpdate(activity.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value);
+                                            }
+                                        }}
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                activity.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                )
+                            ) : (
+                                col.accessor === 'reportDate' ? (
+                                    fetchedDates[activity.trackInstanceId]?.reportDate?.split('T')[0] || 'N/A'
+                                ) : col.accessor === 'dueDate' ? (
+                                    fetchedDates[activity.trackInstanceId]?.dueDate?.split('T')[0] || 'N/A'
+                                ) : col.accessor === 'addEditEvent' ? null : (
+                                    col.accessor in dataValueMapping ? (
+                                        fetchedDates[activity.trackInstanceId]?.dataValues[
+                                        dataValueMapping[col.accessor]
+                                        ] || 'N/A'
+                                    ) : (
+                                        activity[col.accessor] || ''
                                     )
+                                )
+                            )}
 
-                                        : (
-                                            <input
-                                                type="text"
-                                                // defaultValue={activity[col.accessor] || ''}
-                                                value={originalValues[activity.trackInstanceId]?.[col.accessor] || ''}
-
-                                                onChange={(e) => handleInputChange1(activity.trackInstanceId, col.accessor, e.target.value)}
-                                            />
-                                        )) :
-                                (
-                                    // Display fetched dates when not editable
-                                    col.accessor === 'reportDate' ? (
-                                        fetchedData.reportDate || 'N/A'
-                                    ) : col.accessor === 'dueDate' ? (
-                                        fetchedData.dueDate || 'N/A'
-                                    ) : col.accessor === 'addEditEvent' ? null : (
-                                        col.accessor in dataValueMapping ? (
-                                            // Use mapping to get the correct value
-                                            fetchedData.dataValues[dataValueMapping[col.accessor]] !== undefined &&
-                                                fetchedData.dataValues[dataValueMapping[col.accessor]] !== ''
-                                                ? fetchedData.dataValues[dataValueMapping[col.accessor]]
-                                                : 'N/A'// Display 'N/A' if the value is empty or undefined
-                                        ) : (
-                                            activity[col.accessor] || '' // Fallback to activity value if not in mapping
-                                        )
-                                    )
-                                )}
-                            {/* Render the edit button in the last additional column */}
+                            {/* Add/Edit Buttons */}
                             {col.accessor === 'addEditEvent' && (
                                 <div className="button-container">
                                     {editableRows[activity.trackInstanceId] ? (
                                         <>
                                             <button
-                                                onClick={() => handleSave(activity.trackInstanceId, fetchedDates[activity.trackInstanceId]?.eventId)}
+                                                onClick={() =>
+                                                    handleSave(
+                                                        activity.trackInstanceId,
+                                                        fetchedDates[activity.trackInstanceId]?.eventId
+                                                    )
+                                                }
                                                 style={{ backgroundColor: 'green' }}
                                                 className="save-button btn"
                                             >
@@ -1373,49 +1623,12 @@ export function OrgUnitTable(props: Props) {
                             )}
                         </td>
                     ))}
+
+
                 </tr>
             );
         });
-    };
-
-    const handleFilterChange = async (newFilter: string) => {
-        setTrainingFilter(newFilter); // Update the training filter state
-        setSelectedProgramStage(newFilter as ProgramStage); // Update selectedProgramStage
-
-        // Update columns immediately when filter changes
-        setAdditionalColumns(getAdditionalColumns(newFilter));
-
-        // Fetch additional data for all rows based on the new filter
-        const updatedFetchedDates = await Promise.all(
-            filteredData.map(async (activity) => {
-                const additionalData = await fetchAdditionalData(activity.trackInstanceId, newFilter);
-                console.log({ 'Additional Data': additionalData })
-                return {
-                    trackInstanceId: activity.trackInstanceId,
-                    reportDate: additionalData.reportDate,
-                    dueDate: additionalData.dueDate,
-                    eventId: additionalData.eventId,
-                    dataValues: additionalData.dataValues || {}
-                };
-            })
-        );
-
-        // Update the state with the fetched dates
-        // Update the state with the fetched dates
-        const newFetchedDates: { [key: string]: FetchedData } = {};
-        updatedFetchedDates.forEach(({ trackInstanceId, reportDate, dueDate, eventId, dataValues }) => {
-            newFetchedDates[trackInstanceId] = { reportDate, dueDate, eventId, dataValues };
-        });
-        setFetchedDates(newFetchedDates);
-    };
-
-    // update columns when track filter changes
-    useEffect(() => {
-        if (trainingFilter === 'Livelihood') {
-            // Re-run getAdditionalColumns with current training filter to update columns
-            setAdditionalColumns(getAdditionalColumns(trainingFilter));
-        }
-    }, [trackFilter, trainingFilter]);
+    };   
 
     // Modified handleFilterChange function
     const handleProgramStageChange = async (newFilter: ProgramStage) => {
@@ -1448,11 +1661,11 @@ export function OrgUnitTable(props: Props) {
     const fetchProgramStageData = async (programStageId: string) => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/pending?programStage=${programStageId}`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/pending?programStage=${programStageId}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Basic ${credentials}`,
+                        // 'Authorization': `Basic ${credentials}`,
                     },
                 }
             );
@@ -1485,11 +1698,11 @@ export function OrgUnitTable(props: Props) {
 
             {/* First div block - Track and Program Stage filters */}
             <div className="flex space-x-4" style={{
-                    padding: '0px 10px 10px 10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '20px'
-                }}>
+                padding: '0px 10px 10px 10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px'
+            }}>
                 {/* Track Filter */}
                 <select
                     value={trackFilter}
@@ -1949,8 +2162,8 @@ export function OrgUnitTable(props: Props) {
                                     <th>Initial Muac</th>
                                     <th>Muac Classification</th>
                                     <th>Beneficiary Facility Registration Number</th>
-                                    <th>Beneficiary Track</th>
                                     <th>Direct Patient ID</th>
+                                    <th>Beneficiary Track</th>
 
                                     {/* Render additional headers */}
                                     {additionalColumns.map((col) => (
@@ -2076,9 +2289,13 @@ export function OrgUnitTable(props: Props) {
                                                 type="text"
                                                 name="muacClassification"
                                                 value={newRowData.muacClassification}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, muacClassification: e.target.value })}
+                                                style={{
+                                                    backgroundColor: newRowData.muacColor || '#ffffff',
+                                                    fontWeight: 'bold',
+                                                    textAlign: 'center'
+                                                }}
                                                 placeholder="Muac Classification"
+                                                readOnly
                                             />
                                         </td>
                                         <td>
@@ -2094,6 +2311,16 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                name="directPatientID"
+                                                value={newRowData.directPatientID}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewRowData({ ...newRowData, directPatientID: e.target.value })}
+                                                placeholder="Direct Patient ID"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
                                                 name="track"
                                                 value={newRowData.track}
                                                 // onChange={handleNewRowInputChange}
@@ -2102,17 +2329,7 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Beneficiary Track"
                                             />
                                         </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="directPatientID"
-                                                value={newRowData.directPatientID}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, directPatientID: e.target.value })}
-                                                placeholder="Direct Patient ID"
-                                            />
-                                        </td>
-                                        
+
                                         {/* Add more input fields for other data as needed */}
                                         <td>
                                             <button onClick={handleFormSubmit} className="submit-button">Save</button>

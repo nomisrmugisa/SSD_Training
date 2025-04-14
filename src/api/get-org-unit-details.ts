@@ -13,7 +13,7 @@ export async function getOrgUnitDetails(
   trackFilter?: string
 ): Promise<OrgUnitDetails[]> {
   // Construct the base URL
-  let url = `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/query.json?ou=${id}&ouMode=SELECTED&order=created:desc&program=n2iAPy3PGx7&paging=false`;
+  let url = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ou=${id}&ouMode=SELECTED&order=created:desc&program=n2iAPy3PGx7&paging=false`;
 
   // Append filters to the URL if they are provided
   if (trainingFilter) {
@@ -36,7 +36,7 @@ export async function getOrgUnitDetails(
     id: id,
     trackInstanceId: row[0],
     recordDate: row[1],
-    track: row[18],
+    track: row[19],
     topicTrainedOn: row[11],
     beneficiaryName: row[12],
     nonBeneficiaryName: row[13],
@@ -54,6 +54,6 @@ export async function getOrgUnitDetails(
     initialMuac: row[15],
     muacClassification: row[16],
     ben_facility_RegNo: row[17],
-    directPatientID: row[19]
+    directPatientID: row[18]
   }));
 }

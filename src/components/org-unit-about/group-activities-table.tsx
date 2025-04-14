@@ -67,7 +67,7 @@ export function GroupActivitiesTable(props: Props) {
             try {
                 // First request: Fetch the organization unit code
                 const orgUnitCodeResponse = await fetch(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/organisationUnits/${props.orgUnitId}`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/organisationUnits/${props.orgUnitId}`,
                     // `/api/organisationUnits/${props.orgUnitId}`,
                     {
                         method: 'GET',
@@ -85,7 +85,7 @@ export function GroupActivitiesTable(props: Props) {
                 if (orgUnitCode) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         // `/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
@@ -130,7 +130,7 @@ export function GroupActivitiesTable(props: Props) {
     const fetchNewId = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/system/id?`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/system/id?`,
                 // `/api/system/id?`, //with proxy
                 {
                     method: 'GET',
@@ -185,7 +185,7 @@ export function GroupActivitiesTable(props: Props) {
 
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events?`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events?`,
                 // `/api/events?`, //wth proxy
                 {
                     method: 'POST',
@@ -225,7 +225,7 @@ export function GroupActivitiesTable(props: Props) {
 
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`,
                 // `/api/trackedEntityInstances/query.json?ouMode=ACCESSIBLE&program=RDEklSXCD4C&attribute=HLKc2AKR9jW:EQ:${enteredValue}&paging=false`, //with proxy
                 {
                     method: 'GET',
