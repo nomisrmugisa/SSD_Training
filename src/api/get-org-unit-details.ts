@@ -36,7 +36,7 @@ export async function getOrgUnitDetails(
     id: id,
     trackInstanceId: row[0],
     recordDate: row[1],
-    track: row[20],
+    track: row[19],
     topicTrainedOn: row[11],
     beneficiaryName: row[12],
     nonBeneficiaryName: row[13],
@@ -54,6 +54,7 @@ export async function getOrgUnitDetails(
     initialMuac: row[15],
     muacClassification: row[16],
     ben_facility_RegNo: row[17],
-    directPatientID: row[18]
+    directPatientID: row[18],
+    beneficiaryType: row[20],
   }));
 }

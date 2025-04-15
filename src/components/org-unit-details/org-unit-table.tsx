@@ -293,6 +293,7 @@ export function OrgUnitTable(props: Props) {
         muacClassification: '',
         ben_facility_RegNo: '',
         directPatientID: '',
+        beneficiaryType: '',
         muacColor: '#ffffff'
     });
 
@@ -409,7 +410,8 @@ export function OrgUnitTable(props: Props) {
         muacClassification: '',
         ben_facility_RegNo: '',
         directPatientID: '',
-        muacColor: '#ffffff'
+        
+        muacColor: '#ffffff',
     });
 
     const filterDataByDate = (data, selectedDate) => {
@@ -432,7 +434,7 @@ export function OrgUnitTable(props: Props) {
     const [selectedProgramStage, setSelectedProgramStage] = useState<ProgramStage>('');
     const [filteredProgramData, setFilteredProgramData] = useState<any[]>([]);
 
-    const [beneficiaryType, setBeneficiaryType] = useState<{ [key: string]: string }>({});
+    
 
 
     // handle date filtering
@@ -875,7 +877,8 @@ export function OrgUnitTable(props: Props) {
                 { attribute: "MX1mGZlngtD", value: newRowData.initialMuac },
                 { attribute: "KNLojwshHCv", value: newRowData.muacClassification },
                 { attribute: "M9jR50uouZV", value: newRowData.ben_facility_RegNo },
-                { attribute: "BDFFygBWNSH", value: newRowData.directPatientID }
+                { attribute: "BDFFygBWNSH", value: newRowData.directPatientID },
+                { attribute: "fTfrFfUPTDC", value: newRowData.beneficiaryType }
             ]
         };
 
@@ -990,6 +993,7 @@ export function OrgUnitTable(props: Props) {
                 muacClassification: '',
                 ben_facility_RegNo: '',
                 directPatientID: '',
+                beneficiaryType: '',
                 muacColor: '#ffffff'
             });
             setDateFilter('');
@@ -1533,6 +1537,7 @@ export function OrgUnitTable(props: Props) {
                     <td>{index + 1}</td>
                     <td>{activity.recordDate}</td>
                     <td>{activity.beneficiaryStage}</td>
+                    <td>{activity.beneficiaryType}</td>
                     <td>{activity.patientID}</td>
                     <td>{activity.first_middleName}</td>
                     <td>{activity.surname}</td>
@@ -1869,6 +1874,7 @@ export function OrgUnitTable(props: Props) {
                 muacClassification: '',
                 ben_facility_RegNo: '',
                 directPatientID: '',
+                
                 muacColor: '#ffffff'
             });
 
@@ -2356,9 +2362,8 @@ export function OrgUnitTable(props: Props) {
                                     <th>No.</th>
                                     <th>Registration Date</th>
                                     <th>Is Beneficiary Adult / Child</th>
-                                    {/* <th>Direct / Indirect Beneficiary</th> */}
+                                    <th>Beneficiary Type</th>
                                     <th>Patient ID</th>
-                                    <th>Direct / Indirect</th>
                                     <th>First Name & Middle Name</th>
                                     <th>Surname</th>
                                     <th>Sex</th>
@@ -2418,18 +2423,18 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Child">Child</option>
                                             </select>
                                         </td>
-                                        {/* <td>
+                                        <td>
                                             <select
-                                                name="directIndirect"
-                                                value={newRowData.directIndirect || "Direct"}
+                                                name="beneficiaryType"
+                                                value={newRowData.beneficiaryType || "Direct"}
                                                 onChange={(e) =>
-                                                    setNewRowData({ ...newRowData, directIndirect: e.target.value })
+                                                    setNewRowData({ ...newRowData, beneficiaryType: e.target.value })
                                                 }
                                             >
                                                 <option value="Direct">Direct</option>
                                                 <option value="Indirect">Indirect</option>
                                             </select>
-                                        </td> */}
+                                        </td>
                                         <td>
                                             <input
                                                 type="text"

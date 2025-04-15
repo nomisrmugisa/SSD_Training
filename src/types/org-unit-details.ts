@@ -22,6 +22,7 @@ export interface OrgUnitDetails {
   muacClassification: string;
   ben_facility_RegNo: string;
   directPatientID: string;
+  beneficiaryType: string;
 }
 
 export interface GetOrgUnitDetailsResponse {
