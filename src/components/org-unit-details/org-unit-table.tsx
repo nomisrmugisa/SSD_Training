@@ -487,6 +487,12 @@ export function OrgUnitTable(props: Props) {
     }, [newRowData.initialMuac, newRowData.beneficiaryStage]);
 
     useEffect(() => {
+
+        console.log('MUAC Effect triggered', {
+            muacValue: newIndirectData.initialMuac,
+            stage: newIndirectData.beneficiaryStage
+        });
+        
         const muacValue = parseFloat(newIndirectData.initialMuac);
         let classification = '';
 
@@ -1083,8 +1089,8 @@ export function OrgUnitTable(props: Props) {
                     { attribute: "xts0QtWHpnK", value: newIndirectData.surname },
                     { attribute: "MX1mGZlngtD", value: newIndirectData.initialMuac },
                     { attribute: "KNLojwshHCv", value: newIndirectData.muacClassification },
-                    { attribute: "BDFFygBWNSH", value: newRowData.ben_facility_RegNo },
-                    { attribute: "M9jR50uouZV", value: newRowData.directPatientID }, // Auto-populated
+                    { attribute: "BDFFygBWNSH", value: newIndirectData.ben_facility_RegNo },
+                    { attribute: "M9jR50uouZV", value: newIndirectData.directPatientID }, // Auto-populated
                     { attribute: "fTfrFfUPTDC", value: 'Indirect Beneficiary' }
                 ]
             };
@@ -2820,7 +2826,7 @@ export function OrgUnitTable(props: Props) {
                                                 name="track"
                                                 value={newRowData.track}
                                                 // onChange={handleNewRowInputChange}
-                                                // onChange={(e) => setNewRowData({ ...newRowData, track: e.target.value })}
+                                                onChange={(e) => setNewRowData({ ...newRowData, track: e.target.value })}
                                                 readOnly
                                                 placeholder="Beneficiary Track"
                                             />
@@ -2991,11 +2997,7 @@ export function OrgUnitTable(props: Props) {
                                                 type="text"
                                                 name="muacClassification"
                                                 value={newIndirectData.muacClassification}
-                                                style={{
-                                                    backgroundColor: newIndirectData.muacColor || '#ffffff',
-                                                    fontWeight: 'bold',
-                                                    textAlign: 'center'
-                                                }}
+                                                
                                                 placeholder="Muac Classification"
                                                 readOnly
                                             />
@@ -3016,8 +3018,9 @@ export function OrgUnitTable(props: Props) {
                                                 name="directPatientID"
                                                 value={newIndirectData.directPatientID}
                                                 // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, directPatientID: e.target.value })}
+                                                // onChange={(e) => setNewIndirectData({ ...newIndirectData, directPatientID: e.target.value })}
                                                 placeholder="Direct Patient ID"
+                                                readOnly
                                             />
                                         </td>
                                         <td>
@@ -3026,7 +3029,7 @@ export function OrgUnitTable(props: Props) {
                                                 name="track"
                                                 value={newIndirectData.track}
                                                 // onChange={handleNewRowInputChange}
-                                                // onChange={(e) => setNewRowData({ ...newRowData, track: e.target.value })}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, track: e.target.value })}
                                                 readOnly
                                                 placeholder="Beneficiary Track"
                                             />
