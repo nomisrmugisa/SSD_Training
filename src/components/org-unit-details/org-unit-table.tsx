@@ -436,8 +436,71 @@ export function OrgUnitTable(props: Props) {
 
     const [hasValidDate, setHasValidDate] = useState<{ [key: string]: boolean }>({});
 
+    useEffect(() => {
+        // Reset all additional column states when training filter changes
+        setaddColRow_lvh({
+            reportDate: '',
+            dueDate: '',
+            topicsTrainedOn: {
+                harvesting: false,
+                postHarvestHandling: false,
+                landPreparation: false,
+                nurseryPreparation: false,
+                postHarvestHygiene: false,
+                lossesMarking: false,
+                weeding: false,
+                storage: false,
+                appliedLessons: '',
+                increasedIncome: false,
+                increasedProduction: false,
+                newLivelihood: false,
+                increasedSkills: false,
+                increasedResilience: false,
+                others: ''
+            },
+            fishingMethods: {
+                fishingOilPreparation: false,
+                fishingMarketing: false,
+                fishingMethods: false,
+                postHandlingMethods: false,
+                appliedLessons: '',
+            }
+        });
 
+        setaddColRow_Wsh({
+            reportDate: '',
+            dueDate: '',
+            foodSafety: false,
+            promotersAttendance: false,
+            personalHygiene: false,
+            householdHygiene: false,
+            cleanSafeWater: false,
+            latrineDisposal: false,
+        });
 
+        setaddColRow_Nut({
+            reportDate: '',
+            dueDate: '',
+            nutritionPregnancy: false,
+            earlyInitiation: false,
+            breastfeedingFirst6Months: false,
+            exclusiveBreastfeeding: false,
+            goodHygienePractices: false,
+            complementaryFeeding: false,
+            healthSeekingBehavior: false,
+            growthMonitoring: false,
+            kitchenGardens: false,
+            cookingDemonstration: false,
+            pregnant: false,
+            lactating: false,
+            other: '',
+        });
+
+        // Clear fetched dates and data values
+        setFetchedDates({});
+        setHasValidDate({});
+
+    }, [trainingFilter]); // Trigger when trainingFilter changes
 
     // handle date filtering
     useEffect(() => {
@@ -543,15 +606,31 @@ export function OrgUnitTable(props: Props) {
             case 'Livelihood':
                 if (trackFilter === 'Fisher') {
                     columns.push(
-                        { Header: 'Date of training', accessor: 'reportDate' },
+                        {
+                            Header: 'Date of training', accessor: 'reportDate',
+                            headerClassName: 'additional-header-cell'
+                        },
                         // { Header: 'Due Date', accessor: 'dueDate' },
-                        { Header: 'Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox' },
-                        { Header: 'Fishing Marketing', accessor: 'fishingMarketing_checkBox' },
-                        { Header: 'Fishing Methods', accessor: 'fishingMethods_checkBox' },
-                        { Header: 'Post Handling Methods', accessor: 'postHandlingMethods_checkBox' }, // Added
+                        {
+                            Header: 'Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Fishing Marketing', accessor: 'fishingMarketing_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Fishing Methods', accessor: 'fishingMethods_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Post Handling Methods', accessor: 'postHandlingMethods_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        }, // Added
                         {
                             Header: 'Did you apply the lessons from fishery training in your life',
-                            accessor: 'appliedLessons_dropdown'
+                            accessor: 'appliedLessons_dropdown',
+                            headerClassName: 'additional-header-cell'
                         }
                         // { Header: 'Estimated Fish Catch', accessor: 'estimatedFishCatch' },
                         // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
@@ -559,23 +638,71 @@ export function OrgUnitTable(props: Props) {
                     );
                 } else if (trackFilter === 'Farmer') {
                     columns.push(
-                        { Header: 'Date of training', accessor: 'reportDate' },
+                        {
+                            Header: 'Date of training', accessor: 'reportDate',
+                            headerClassName: 'additional-header-cell'
+                        },
                         // { Header: 'Due Date', accessor: 'dueDate' },
-                        { Header: 'Harvesting', accessor: 'harvesting_checkBox' },
-                        { Header: 'Post Harvest Handling', accessor: 'postHarvestHandling_checkBox' },
-                        { Header: 'Land Preparation', accessor: 'landPreparation_checkBox' },
-                        { Header: 'Nursery Preparation', accessor: 'nurseryPreparation_checkBox' },
-                        { Header: 'Post Harvest Hygiene', accessor: 'postHarvestHygiene_checkBox' },
-                        { Header: 'Losses Marking', accessor: 'lossesMarking_checkBox' },
-                        { Header: 'Weeding', accessor: 'weeding_checkBox' },
-                        { Header: 'Storage', accessor: 'storage_checkBox' },
-                        { Header: 'Did you apply the lessons from the farming trainings in your life', accessor: 'appliedLessons_dropdown' },
-                        { Header: 'Increased income', accessor: 'increasedIncome_checkBox' },
-                        { Header: 'Increased agricultural production', accessor: 'increasedProduction_checkBox' },
-                        { Header: 'Started a new livelihood activity', accessor: 'newLivelihood_checkBox' },
-                        { Header: 'Increased my skills/knowledge', accessor: 'increasedSkills_checkBox' },
-                        { Header: 'Increased my family\'s resilience to shocks', accessor: 'increasedResilience_checkBox' },
-                        { Header: 'Others (specify)', accessor: 'others_text' }
+                        {
+                            Header: 'Harvesting', accessor: 'harvesting_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Post Harvest Handling', accessor: 'postHarvestHandling_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Land Preparation', accessor: 'landPreparation_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Nursery Preparation', accessor: 'nurseryPreparation_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Post Harvest Hygiene', accessor: 'postHarvestHygiene_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Losses Marking', accessor: 'lossesMarking_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Weeding', accessor: 'weeding_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Storage', accessor: 'storage_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Did you apply the lessons from the farming trainings in your life', accessor: 'appliedLessons_dropdown',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Increased income', accessor: 'increasedIncome_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Increased agricultural production', accessor: 'increasedProduction_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Started a new livelihood activity', accessor: 'newLivelihood_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Increased my skills/knowledge', accessor: 'increasedSkills_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Increased my family\'s resilience to shocks', accessor: 'increasedResilience_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Others (specify)', accessor: 'others_text',
+                            headerClassName: 'additional-header-cell'
+                        }
                         // Comment out these columns
                         // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
                         // { Header: 'Yield in Kgs', accessor: 'yieldKgs' },
@@ -586,33 +713,96 @@ export function OrgUnitTable(props: Props) {
                 break;
             case 'Water Sanitation & Hygiene':
                 columns.push(
-                    { Header: 'Date of training', accessor: 'reportDate' },
+                    {
+                        Header: 'Date of training', accessor: 'reportDate',
+                        headerClassName: 'additional-header-cell'
+                    },
                     // { Header: 'Due Date', accessor: 'dueDate' },
-                    { Header: 'Food Safety', accessor: 'foodSafety_checkBox' },
-                    { Header: 'Promoters Attendance :1. CLTS', accessor: 'promotersAttendance_checkBox' },
-                    { Header: 'Personal Hygiene', accessor: 'personalHygiene_checkBox' },
-                    { Header: 'Household Hygene', accessor: 'householdHygiene_checkBox' },
-                    { Header: 'Clean and Safe Water', accessor: 'cleanSafeWater_checkBox' },
-                    { Header: 'Use of Latrine and Excreta Disposal', accessor: 'latrineDisposal_checkBox' },
+                    {
+                        Header: 'Food Safety', accessor: 'foodSafety_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Promoters Attendance :1. CLTS', accessor: 'promotersAttendance_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Personal Hygiene', accessor: 'personalHygiene_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Household Hygene', accessor: 'householdHygiene_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Clean and Safe Water', accessor: 'cleanSafeWater_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Use of Latrine and Excreta Disposal', accessor: 'latrineDisposal_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
                 );
                 break;
             case 'Nutrition':
                 columns.push(
-                    { Header: 'Date of training', accessor: 'reportDate' },
+                    {
+                        Header: 'Date of training', accessor: 'reportDate',
+                        headerClassName: 'additional-header-cell'
+                    },
                     // { Header: 'Due Date', accessor: 'dueDate' },
-                    { Header: 'Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox' },
-                    { Header: 'Importance of early initiation of breastfeeding', accessor: 'earlyInitiation_checkBox' },
-                    { Header: 'Breastfeeding in the first 6 months', accessor: 'breastfeedingFirst6Months_checkBox' },
-                    { Header: 'Exclusive breastfeeding during the first 6 months', accessor: 'exclusiveBreastfeeding_checkBox' },
-                    { Header: 'Good hygiene practices', accessor: 'goodHygiene_checkBox' },
-                    { Header: 'Complementary feeding', accessor: 'complementaryFeeding_checkBox' },
-                    { Header: 'Health seeking behavior', accessor: 'healthSeekingBehavior_checkBox' },
-                    { Header: 'Growth monitoring', accessor: 'growthMonitoring_checkBox' },
-                    { Header: 'Kitchen gardens and fruit trees', accessor: 'kitchenGardens_checkBox' },
-                    { Header: 'Cooking Demonstration', accessor: 'cookingDemonstration_checkBox' },
-                    { Header: 'Pregnant', accessor: 'pregnant_checkBox' },
-                    { Header: 'Lactating', accessor: 'lactating_checkBox' },
-                    { Header: 'Other', accessor: 'other' },
+                    {
+                        Header: 'Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Importance of early initiation of breastfeeding', accessor: 'earlyInitiation_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Breastfeeding in the first 6 months', accessor: 'breastfeedingFirst6Months_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Exclusive breastfeeding during the first 6 months', accessor: 'exclusiveBreastfeeding_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Good hygiene practices', accessor: 'goodHygiene_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Complementary feeding', accessor: 'complementaryFeeding_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Health seeking behavior', accessor: 'healthSeekingBehavior_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Growth monitoring', accessor: 'growthMonitoring_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Kitchen gardens and fruit trees', accessor: 'kitchenGardens_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Cooking Demonstration', accessor: 'cookingDemonstration_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Pregnant', accessor: 'pregnant_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Lactating', accessor: 'lactating_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: 'Other', accessor: 'other',
+                        headerClassName: 'additional-header-cell'
+                    },
                 );
                 break;
             default:
@@ -621,7 +811,10 @@ export function OrgUnitTable(props: Props) {
 
         // Add the "Add / Edit Event" column
         if (filter) {
-            columns.push({ Header: 'Add / Edit Event', accessor: 'addEditEvent' });
+            columns.push({
+                Header: 'Add / Edit Event', accessor: 'addEditEvent',
+                headerClassName: 'additional-header-cell'
+            });
         }
 
         return columns;
@@ -702,7 +895,6 @@ export function OrgUnitTable(props: Props) {
         }
     };
 
-
     const handleNewBeneficiaryClick = async () => {
         // Auto generate the Patient ID
         const newPatientId = await generatePatientId();
@@ -732,9 +924,6 @@ export function OrgUnitTable(props: Props) {
         // Trigger the display of your indirect beneficiary input form
         setIsAddingIndirect(true);
     };
-
-
-
 
     // Function to handle training filter change
     const handleTrainingChange = async (event) => {
@@ -1189,7 +1378,6 @@ export function OrgUnitTable(props: Props) {
             setLoading(false);
         }
     };
-
 
     const handleInputChange = async (event) => {
         const { name, value } = event.target;
@@ -2264,8 +2452,6 @@ export function OrgUnitTable(props: Props) {
         setIndirectBeneficiaries(indirect);
     };
 
-
-
     return (
         <main className="space-y-4">
             {/* <Header
@@ -2761,7 +2947,9 @@ export function OrgUnitTable(props: Props) {
 
                                     {/* Render additional headers */}
                                     {additionalColumns.map((col) => (
-                                        <th key={col.accessor}>{col.Header}</th>
+                                        <th key={col.accessor}
+                                            className={col.headerClassName}
+                                        >{col.Header}</th>
                                     ))}
                                 </tr>
                                 {/* <tr>
@@ -2778,6 +2966,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="id"
                                                 value={newRowData.id}
                                                 // onChange={handleNewRowInputChange}
@@ -2798,6 +2987,7 @@ export function OrgUnitTable(props: Props) {
                                         </td>
                                         <td>
                                             <select
+                                                className="table-select"
                                                 name="beneficiaryStage"
                                                 value={newRowData.beneficiaryStage}
                                                 // onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
@@ -2820,6 +3010,7 @@ export function OrgUnitTable(props: Props) {
                                         </td>
                                         <td>
                                             <select
+                                                className="table-select"
                                                 name="beneficiaryType"
                                                 value={newRowData.beneficiaryType}
                                                 onChange={(e) =>
@@ -2834,6 +3025,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="patientID"
                                                 value={newRowData.patientID}
                                                 // onChange={handleNewRowInputChange}
@@ -2845,6 +3037,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="first_middleName"
                                                 value={newRowData.first_middleName}
                                                 // onChange={handleNewRowInputChange}
@@ -2855,6 +3048,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="surname"
                                                 value={newRowData.surname}
                                                 // onChange={handleNewRowInputChange}
@@ -2864,6 +3058,7 @@ export function OrgUnitTable(props: Props) {
                                         </td>
                                         <td>
                                             <select
+                                                className="table-select"
                                                 name="sex"
                                                 value={newRowData.sex}
                                                 onChange={(e) => setNewRowData({ ...newRowData, sex: e.target.value })}
@@ -2876,6 +3071,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="number"
+                                                className="table-input"
                                                 name="age"
                                                 value={newRowData.age}
                                                 // onChange={handleNewRowInputChange}
@@ -2896,6 +3092,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="initialMuac"
                                                 value={newRowData.initialMuac}
                                                 // onChange={handleNewRowInputChange}
@@ -2918,6 +3115,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="muacClassification"
                                                 value={newRowData.muacClassification}
 
@@ -2928,6 +3126,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="ben_facility_RegNo"
                                                 value={newRowData.ben_facility_RegNo}
                                                 // onChange={handleNewRowInputChange}
@@ -2938,6 +3137,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="directPatientID"
                                                 value={newRowData.directPatientID}
                                                 // onChange={handleNewRowInputChange}
@@ -2948,6 +3148,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="track"
                                                 value={newRowData.track}
                                                 // onChange={handleNewRowInputChange}
@@ -3019,7 +3220,9 @@ export function OrgUnitTable(props: Props) {
 
                                     {/* Additional columns header */}
                                     {additionalColumns.map((col) => (
-                                        <th key={col.accessor}>{col.Header}</th>
+                                        <th key={col.accessor}
+                                            className={col.headerClassName}
+                                        >{col.Header}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -3049,6 +3252,7 @@ export function OrgUnitTable(props: Props) {
                                         </td>
                                         <td>
                                             <select
+                                                className="table-select"
                                                 name="beneficiaryStage"
                                                 value={newIndirectData.beneficiaryStage}
                                                 // onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
@@ -3072,6 +3276,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 value={newIndirectData.patientID}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, patientID: e.target.value })}
                                                 readOnly
@@ -3087,12 +3292,14 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 value={newIndirectData.surname}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, surname: e.target.value })}
                                             />
                                         </td>
                                         <td>
                                             <select
+                                                className="table-select"
                                                 value={newIndirectData.sex}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, sex: e.target.value })}
                                             >
@@ -3103,6 +3310,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="number"
+                                                className="table-input"
                                                 name="age"
                                                 value={newIndirectData.age}
                                                 // onChange={handleNewRowInputChange}
@@ -3123,6 +3331,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="initialMuac"
                                                 value={newIndirectData.initialMuac}
                                                 // onChange={handleNewRowInputChange}
@@ -3144,6 +3353,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="muacClassification"
                                                 value={newIndirectData.muacClassification}
 
@@ -3154,6 +3364,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="ben_facility_RegNo"
                                                 value={newIndirectData.ben_facility_RegNo}
                                                 // onChange={handleNewRowInputChange}
@@ -3164,6 +3375,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="directPatientID"
                                                 value={newIndirectData.directPatientID}
                                                 // onChange={handleNewRowInputChange}
@@ -3175,6 +3387,7 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <input
                                                 type="text"
+                                                className="table-input"
                                                 name="track"
                                                 value={newIndirectData.track}
                                                 // onChange={handleNewRowInputChange}

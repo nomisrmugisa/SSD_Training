@@ -104,3 +104,132 @@
     opacity: 0.7;
     cursor: not-allowed;
   }
+
+  /* Additional column headers */
+.additional-column-header {
+  background-color: #e3f2fd !important; /* Light blue background */
+  color: #1a237e !important; /* Darker text for contrast */
+}
+
+/* Improved input/select styling */
+.table td input[type="text"],
+.table td input[type="date"],
+.table td input[type="number"] {
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 200px;
+  font-size: 14px;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.table td input:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Checkbox styling */
+.table td input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin: 0 auto;
+  display: block;
+}
+
+/* Select dropdown styling */
+.table td select {
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+  width: 100%;
+  max-width: 200px;
+}
+
+/* Button styling */
+.button-container .btn {
+  padding: 4px 8px;
+  font-size: 12px;
+  margin: 2px;
+  min-width: 60px;
+}
+
+/* Error/Success messages */
+.error-message {
+  color: #721c24;
+  background-color: #f8d7da;
+  padding: 8px;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.success-message {
+  color: #155724;
+  background-color: #d4edda;
+  padding: 8px;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+/* org-unit-table.css */
+/* Additional column headers */
+.additional-header-cell {
+  background-color: #e3f2fd !important;
+  color: #1a237e !important;
+  font-weight: 600;
+}
+
+/* Style all data cells */
+.table td {
+  vertical-align: middle;
+  padding: 8px 12px;
+}
+
+/* Form control styling */
+.table-input {
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 200px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.table-input:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Checkbox styling */
+.table-checkbox {
+  width: 18px;
+  height: 18px;
+  margin: 0 auto;
+  display: block;
+  cursor: pointer;
+}
+
+/* Select dropdown styling */
+.table-select {
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+  width: 100%;
+  max-width: 200px;
+  appearance: none;
+}
+
+/* Button container */
+.button-container {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
