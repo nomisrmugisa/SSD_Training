@@ -383,6 +383,35 @@ export function OrgUnitTable(props: Props) {
 
     const [columns, setColumns] = useState([]);
 
+    const [selectedBeneficiary, setSelectedBeneficiary] = useState<OrgUnitDetails | null>(null);
+    const [indirectBeneficiaries, setIndirectBeneficiaries] = useState<OrgUnitDetails[]>([]);
+    const [isAddingIndirect, setIsAddingIndirect] = useState(false);
+    const [newIndirectData, setNewIndirectData] = useState({
+        id: '',
+        trackInstanceId: '',
+        recordDate: '',
+        track: '',
+        inactive: '',
+        beneficiaryStage: '',
+        careGiver: '',
+        careGiverAge: '',
+        patientID: '',
+        first_middleName: '',
+        surname: '',
+        dob: '',
+        orgUnit: '',
+        // topicTrainedOn: '',
+        beneficiaryName: '',
+        nonBeneficiaryName: '',
+        sex: '',
+        age: '',
+        initialMuac: '',
+        muacClassification: '',
+        ben_facility_RegNo: '',
+        directPatientID: '',
+        muacColor: '#ffffff'
+    });
+
     const filterDataByDate = (data, selectedDate) => {
         if (!selectedDate) return data; // If no date is selected, return all data
 
@@ -589,16 +618,30 @@ export function OrgUnitTable(props: Props) {
     };
 
     // New method to handle beneficiary name search
+
     const handleBeneficiarySearch1 = (event) => {
         const searchValue = event.target.value.toLowerCase();
         setBeneficiarySearch(searchValue);
 
-        const filteredByName = props.orgUnitDetails.filter(item =>
-            item.first_middleName.toLowerCase().includes(searchValue) ||
-            item.surname.toLowerCase().includes(searchValue)
-        );
+        const filtered = props.orgUnitDetails.filter(item => {
+            const searchFields = [
+                item.recordDate?.toLowerCase(),
+                item.beneficiaryStage?.toLowerCase(),
+                item.patientID?.toLowerCase(),
+                item.first_middleName?.toLowerCase(),
+                item.surname?.toLowerCase(),
+                item.sex?.toLowerCase(),
+                item.initialMuac?.toString().toLowerCase(),
+                item.muacClassification?.toLowerCase(),
+                item.ben_facility_RegNo?.toLowerCase(),
+                item.directPatientID?.toLowerCase(),
+                item.track?.toLowerCase()
+            ];
 
-        setFilteredData(filterDataByDate(filteredByName, dateFilter));
+            return searchFields.some(field => field?.includes(searchValue));
+        });
+
+        setFilteredData(filterDataByDate(filtered, dateFilter));
     };
 
     // Function to close the modal
@@ -608,12 +651,6 @@ export function OrgUnitTable(props: Props) {
         setBeneficiarySearch(''); // Reset search input
         setSelectedRecord(null); // Reset selected record
         setShowFilterForm(false); // Hide filter form
-    };
-
-    const handleRecordClick = (record) => {
-        setSelectedRecord(record); // Set the selected record
-        setShowFilterForm(true); // Show the filter form
-        console.log({ record });
     };
 
     const handleNewBeneficiaryClick = () => {
@@ -1459,7 +1496,12 @@ export function OrgUnitTable(props: Props) {
             const fetchedData: FetchedData = fetchedDates[activity.trackInstanceId] || { reportDate: '', dueDate: '', eventId: '', dataValues: {} };
 
             return (
-                <tr key={activity.trackInstanceId || index}>
+                <tr key={activity.trackInstanceId || index}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleRecordClick(activity)
+                    }}
+                >
                     <td>{index + 1}</td>
                     <td>{activity.recordDate}</td>
                     <td>{activity.beneficiaryStage}</td>
@@ -1582,19 +1624,23 @@ export function OrgUnitTable(props: Props) {
                                     {editableRows[activity.trackInstanceId] ? (
                                         <>
                                             <button
-                                                onClick={() =>
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
                                                     handleSave(
                                                         activity.trackInstanceId,
                                                         fetchedDates[activity.trackInstanceId]?.eventId
                                                     )
-                                                }
+                                                }}
                                                 style={{ backgroundColor: 'green' }}
                                                 className="save-button btn"
                                             >
                                                 Save
                                             </button>
                                             <button
-                                                onClick={() => handleCancel(activity.trackInstanceId)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleCancel(activity.trackInstanceId)
+                                                }}
                                                 style={{ backgroundColor: 'red' }}
                                                 className="cancel-button btn"
                                             >
@@ -1604,14 +1650,20 @@ export function OrgUnitTable(props: Props) {
                                     ) : (
                                         <>
                                             <button
-                                                onClick={() => handleAdd(activity.trackInstanceId)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAdd(activity.trackInstanceId)
+                                                }}
                                                 style={{ backgroundColor: 'grey' }}
                                                 className="add-button btn"
                                             >
                                                 Add
                                             </button>
                                             <button
-                                                onClick={() => handleEdit(activity.trackInstanceId)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleEdit(activity.trackInstanceId)
+                                                }}
                                                 style={{ backgroundColor: 'orange' }}
                                                 className="edit-button btn"
                                             >
@@ -1628,7 +1680,65 @@ export function OrgUnitTable(props: Props) {
                 </tr>
             );
         });
-    };   
+    };
+
+    const renderIndirectRows = () => {
+        if (!indirectBeneficiaries || indirectBeneficiaries.length === 0) {
+            return (
+                <tr>
+                    <td colSpan={14} className="text-center">
+                        No indirect beneficiaries found for this record
+                    </td>
+                </tr>
+            );
+        }
+
+        return indirectBeneficiaries.map((beneficiary, index) => {
+            const fetchedData: FetchedData = fetchedDates[beneficiary.trackInstanceId] || {
+                reportDate: '',
+                dueDate: '',
+                eventId: '',
+                dataValues: {}
+            };
+
+            return (
+                <tr key={beneficiary.trackInstanceId || index}
+
+                    style={{ cursor: 'pointer' }}
+                >
+                    {/* Main columns */}
+                    <td>{index + 1}</td>
+                    <td>{beneficiary.recordDate}</td>
+                    <td>{beneficiary.beneficiaryStage}</td>
+                    <td>{beneficiary.patientID}</td>
+                    <td>{beneficiary.first_middleName}</td>
+                    <td>{beneficiary.surname}</td>
+                    <td>{beneficiary.sex}</td>
+                    <td>{beneficiary.age}</td>
+                    <td>{beneficiary.dob}</td>
+                    <td>{beneficiary.initialMuac}</td>
+                    <td>{beneficiary.muacClassification}</td>
+                    <td>{beneficiary.ben_facility_RegNo}</td>
+                    <td>{beneficiary.directPatientID}</td>
+                    <td>{beneficiary.track}</td>
+
+                    {/* Additional columns - same as main table */}
+                    {additionalColumns.map((col) => (
+                        <td key={col.accessor}>
+                            {/* Add similar cell rendering logic as in renderTableRows */}
+                            {col.accessor === 'reportDate' ? (
+                                fetchedData.reportDate?.split('T')[0] || 'N/A'
+                            ) : col.accessor in dataValueMapping ? (
+                                fetchedData.dataValues[dataValueMapping[col.accessor]] || 'N/A'
+                            ) : (
+                                beneficiary[col.accessor] || ''
+                            )}
+                        </td>
+                    ))}
+                </tr>
+            );
+        });
+    };
 
     // Modified handleFilterChange function
     const handleProgramStageChange = async (newFilter: ProgramStage) => {
@@ -1684,6 +1794,59 @@ export function OrgUnitTable(props: Props) {
                 event.trackedEntityInstance === detail.trackInstanceId
             );
         });
+    };
+
+    const handleRecordClick = (activity: OrgUnitDetails) => {
+        setSelectedBeneficiary(activity);
+
+        // Always set indirect beneficiaries (even if empty)
+        const indirect = activity.patientID
+            ? props.orgUnitDetails.filter(b => b.directPatientID === activity.patientID)
+            : [];
+        setIndirectBeneficiaries(indirect);
+    };
+
+    const handleSaveIndirect = async () => {
+        try {
+            // Add your API call here
+            const response = await axios.post('/api/beneficiaries', {
+                ...newIndirectData,
+                isIndirect: true,
+                parentPatientID: selectedBeneficiary?.patientID
+            });
+
+            // Update local state
+            setIndirectBeneficiaries([...indirectBeneficiaries, response.data]);
+            setIsAddingIndirect(false);
+            setNewIndirectData({
+                id: '',
+                trackInstanceId: '',
+                recordDate: '',
+                track: '',
+                inactive: '',
+                beneficiaryStage: '',
+                careGiver: '',
+                careGiverAge: '',
+                patientID: '',
+                first_middleName: '',
+                surname: '',
+                dob: '',
+                orgUnit: '',
+                // topicTrainedOn: '',
+                beneficiaryName: '',
+                nonBeneficiaryName: '',
+                sex: '',
+                age: '',
+                initialMuac: '',
+                muacClassification: '',
+                ben_facility_RegNo: '',
+                directPatientID: '',
+                muacColor: '#ffffff'
+            });
+
+        } catch (error) {
+            console.error('Error saving indirect beneficiary:', error);
+        }
     };
 
     return (
@@ -1776,8 +1939,8 @@ export function OrgUnitTable(props: Props) {
                     type="text"
                     placeholder="Search Beneficiary"
                     value={beneficiarySearch}
-                    onChange={(e) => setBeneficiarySearch(e.target.value)}
-                    onKeyDown={handleBeneficiarySearch1}
+                    // onChange={(e) => setBeneficiarySearch(e.target.value)}
+                    onChange={handleBeneficiarySearch1}
                     className="border border-gray-300 rounded-md"
                     style={{
                         borderRadius: '5px',
@@ -1790,7 +1953,10 @@ export function OrgUnitTable(props: Props) {
                 {selectedProgramStage && (
                     <button
                         type="button"
-                        onClick={handleNewBeneficiaryClick}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleNewBeneficiaryClick()
+                        }}
                         className="border border-gray-300 rounded-md"
                         style={{
                             borderRadius: '5px',
@@ -1800,7 +1966,7 @@ export function OrgUnitTable(props: Props) {
                             cursor: 'pointer'
                         }}
                     >
-                        Indirect Beneficiary
+                        + Beneficiary
                     </button>
                 )}
 
@@ -1858,7 +2024,12 @@ export function OrgUnitTable(props: Props) {
                         </thead>
                         <tbody>
                             {searchResults.map((row, index) => (
-                                <tr key={index} onClick={() => handleRecordClick(row)}>
+                                <tr key={index}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRecordClick(row)
+                                    }}
+                                >
                                     <td className="border border-gray-300">{row[4]}</td>
                                     <td className="border border-gray-300">{row[1]}</td>
                                     <td className="border border-gray-300">{"No"}</td>
@@ -2133,7 +2304,10 @@ export function OrgUnitTable(props: Props) {
                             </button>
                             <button
                                 type="button"
-                                onClick={resetForm}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    resetForm()
+                                }}
                                 className="cancel-button"
                                 style={{ marginRight: '200px' }}
                             >
@@ -2332,7 +2506,11 @@ export function OrgUnitTable(props: Props) {
 
                                         {/* Add more input fields for other data as needed */}
                                         <td>
-                                            <button onClick={handleFormSubmit} className="submit-button">Save</button>
+                                            <button onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleFormSubmit(e);
+                                            }}
+                                                className="submit-button">Save</button>
                                         </td>
                                     </tr>
                                 )}
@@ -2340,6 +2518,226 @@ export function OrgUnitTable(props: Props) {
                         </table>
                     </div>
                 </>
+            )}
+
+            {selectedBeneficiary && (
+                <div className="mt-8">
+                    <div className="flex justify-between items-center mb-4">
+                        <h5 style={{ padding: '10px' }} >Indirect Beneficiaries for Patient: {selectedBeneficiary.patientID}</h5>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsAddingIndirect(true);
+                                setNewIndirectData({
+                                    ...newIndirectData,
+                                    directPatientID: selectedBeneficiary.patientID
+                                });
+                            }}
+                            className="border border-gray-300 rounded-md"
+                            style={{
+                                borderRadius: '5px',
+                                height: '40px',
+                                padding: '5px 10px',
+                                backgroundColor: '#f8f9fa',
+                                cursor: 'pointer',
+                                marginLeft: '10px'
+                            }}
+                        >
+                            + Indirect Beneficiary
+                        </button>
+                    </div>
+
+                    <div className="table-responsive">
+                        <table className="table table-striped table-bordered table-hover table-dark-header">
+                            <thead>
+                                <tr>
+                                    {/* Same headers as main table */}
+                                    <th>No.</th>
+                                    <th>Registration Date</th>
+                                    <th>Is Beneficiary Adult / Child</th>
+                                    <th>Patient ID</th>
+                                    <th>First Name & Middle Name</th>
+                                    <th>Surname</th>
+                                    <th>Sex</th>
+                                    <th>Age</th>
+                                    <th>Date of Birth</th>
+                                    <th>Initial Muac</th>
+                                    <th>Muac Classification</th>
+                                    <th>Beneficiary Facility Registration Number</th>
+                                    <th>Direct Patient ID</th>
+                                    <th>Beneficiary Track</th>
+
+                                    {/* Additional columns header */}
+                                    {additionalColumns.map((col) => (
+                                        <th key={col.accessor}>{col.Header}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {indirectBeneficiaries.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={14} className="text-center">
+                                            No indirect beneficiaries found for this record
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    renderIndirectRows()
+                                )}
+
+                                {/* {renderIndirectRows()} */}
+
+                                {/* Editable row for new indirect beneficiary */}
+                                {isAddingIndirect && (
+                                    <tr>
+                                        <td>NEW</td>
+                                        <td>
+                                            <input
+                                                type="date"
+                                                value={newIndirectData.recordDate}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, recordDate: e.target.value })}
+                                            />
+                                        </td>
+                                        <td>
+                                            <select
+                                                value={newIndirectData.beneficiaryStage}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, beneficiaryStage: e.target.value })}
+                                            >
+                                                <option value="Adult">Adult</option>
+                                                <option value="Child">Child</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={newIndirectData.patientID}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, patientID: e.target.value })}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={newIndirectData.first_middleName}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, first_middleName: e.target.value })}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={newIndirectData.surname}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, surname: e.target.value })}
+                                            />
+                                        </td>
+                                        <td>
+                                            <select
+                                                value={newIndirectData.sex}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, sex: e.target.value })}
+                                            >
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="number"
+                                                name="age"
+                                                value={newIndirectData.age}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, age: e.target.value })}
+                                                placeholder="Age"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="date"
+                                                name="dob"
+                                                value={newIndirectData.dob}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, dob: e.target.value })}
+
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="initialMuac"
+                                                value={newIndirectData.initialMuac}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, initialMuac: e.target.value })}
+                                                placeholder="Initial Muac"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="muacClassification"
+                                                value={newIndirectData.muacClassification}
+                                                style={{
+                                                    backgroundColor: newIndirectData.muacColor || '#ffffff',
+                                                    fontWeight: 'bold',
+                                                    textAlign: 'center'
+                                                }}
+                                                placeholder="Muac Classification"
+                                                readOnly
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="ben_facility_RegNo"
+                                                value={newIndirectData.ben_facility_RegNo}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, ben_facility_RegNo: e.target.value })}
+                                                placeholder="Beneficiary Facility Registration Number"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="directPatientID"
+                                                value={newIndirectData.directPatientID}
+                                                // onChange={handleNewRowInputChange}
+                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, directPatientID: e.target.value })}
+                                                placeholder="Direct Patient ID"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="track"
+                                                value={newIndirectData.track}
+                                                // onChange={handleNewRowInputChange}
+                                                // onChange={(e) => setNewRowData({ ...newRowData, track: e.target.value })}
+                                                readOnly
+                                                placeholder="Beneficiary Track"
+                                            />
+                                        </td>
+                                        <td>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleSaveIndirect()
+                                                }
+                                                }
+                                                className="bg-green-500 text-white px-3 py-1 rounded mr-2"
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setIsAddingIndirect(false)
+                                                }}
+                                                className="bg-red-500 text-white px-3 py-1 rounded"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             )}
 
             {!formVisible && <TablePagination table={table} />}

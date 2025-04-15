@@ -1,25 +1,92 @@
 /* ssd-training/src/components/org-unit-details/org-unit-table.css */
 
+/* Table container for horizontal scroll */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 10px;
+    /* 10px left/right margins */
+    padding: 0 10px;
+    /* Optional: Add internal padding */
+    max-width: calc(100% - 20px);
+    /* Prevent overflow */
+    box-sizing: border-box;
+    /* Include padding in width calculation */
+    margin-bottom: 1rem;
+}
+
+/* For modern browsers you might want */
+@supports (margin-inline: 10px) {
+    .table-responsive {
+      margin-inline: 10px; /* Logical properties for RTL/LTR support */
+      padding-inline: 10px;
+    }
+  }
+
+/* Table header styling */
+.table-dark-header th {
+    background-color: #343a40;
+    color: white;
+    position: sticky;
+    top: 0;
+    white-space: nowrap;
+    /* Prevent header text wrapping */
+}
+
+/* Table row styling */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
 /* Style for buttons */
 .btn {
-    margin: 0 4px; /* Add horizontal margin for spacing */
-    padding: 8px 12px; /* Add padding for better click area */
-    border: none; /* Remove default border */
-    border-radius: 4px; /* Rounded corners */
-    cursor: pointer; /* Change cursor to pointer */
-    transition: background-color 0.3s; /* Smooth transition for background color */
+    margin: 0 4px;
+    /* Add horizontal margin for spacing */
+    padding: 8px 12px;
+    /* Add padding for better click area */
+    border: none;
+    /* Remove default border */
+    border-radius: 4px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Change cursor to pointer */
+    transition: background-color 0.3s;
+    /* Smooth transition for background color */
     color: white
 }
 
 /* Flex container for buttons */
 .button-container {
-    display: flex; /* Use flexbox */
-    gap: 10px; /* Add gap between buttons */
+    display: flex;
+    /* Use flexbox */
+    gap: 10px;
+    /* Add gap between buttons */
     margin-top: 2px;
 }
 
 
 /* Add hover effects */
 .btn:hover {
-    opacity: 0.8; /* Slightly fade on hover */
+    opacity: 0.8;
+    /* Slightly fade on hover */
+}
+
+/* Ensure table cells don't wrap text */
+.table-bordered td,
+.table-bordered th {
+    white-space: nowrap;
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
+/* Add horizontal scroll to tables */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-collapse: collapse;
+}
+
+.table-dark-header thead tr:first-child th {
+    border-top: 2px solid #dee2e6 !important;
 }
