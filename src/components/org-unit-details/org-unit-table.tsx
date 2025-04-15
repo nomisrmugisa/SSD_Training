@@ -432,6 +432,9 @@ export function OrgUnitTable(props: Props) {
     const [selectedProgramStage, setSelectedProgramStage] = useState<ProgramStage>('');
     const [filteredProgramData, setFilteredProgramData] = useState<any[]>([]);
 
+    const [beneficiaryType, setBeneficiaryType] = useState<{ [key: string]: string }>({});
+
+
     // handle date filtering
     useEffect(() => {
         setFilteredData(filterDataByDate(props.orgUnitDetails, dateFilter));
@@ -458,24 +461,24 @@ export function OrgUnitTable(props: Props) {
         if (!isNaN(muacValue)) {
             if (newRowData.beneficiaryStage === 'Child') {
                 if (muacValue < 11.5) {
-                    classification = 'Severe (Red)';
+                    classification = 'Severe <11.5 cm (Red)';
                     color = '#ffcccc'; // Light red
                 } else if (muacValue >= 11.5 && muacValue < 12.5) {
-                    classification = 'Moderate (Yellow)';
+                    classification = 'Moderate >=11.5 - < 12.5 cm (Yellow)';
                     color = '#ffffcc'; // Light yellow
                 } else if (muacValue >= 12.5) {
-                    classification = 'Normal (Green)';
+                    classification = 'Normal ≥12.5 cm (Green)';
                     color = '#ccffcc'; // Light green
                 }
             } else if (newRowData.beneficiaryStage === 'Adult') {
                 if (muacValue < 21) {
-                    classification = 'Severe';
+                    classification = 'Less than 21 cm (red)';
                     color = '#ffcccc';
                 } else if (muacValue >= 21 && muacValue < 23) {
-                    classification = 'Moderate';
+                    classification = 'Less than 23 cm greater than 21 cm (yellow)';
                     color = '#ffffcc';
                 } else if (muacValue >= 23) {
-                    classification = 'Norma;';
+                    classification = 'Equals to or greater than 23 cm (green)';
                     color = '#ccffcc';
                 }
             }
@@ -653,9 +656,34 @@ export function OrgUnitTable(props: Props) {
         setShowFilterForm(false); // Hide filter form
     };
 
-    const handleNewBeneficiaryClick = () => {
+    const generatePatientId = async (): Promise<string> => {
+        try {
+            const response = await axios.get(
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/m35qF41KIdK/generate`,
+                {
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+            return response.data.value;  // patient id
+        } catch (error) {
+            console.error('Error generating patient ID:', error);
+            return ''; // or handle error appropriately
+        }
+    };
+
+
+    const handleNewBeneficiaryClick = async () => {
+        // Auto generate the Patient ID
+        const newPatientId = await generatePatientId();
+        // Update newRowData to include the generated patient ID:
+        setNewRowData(prev => ({
+            ...prev,
+            patientID: newPatientId
+        }));
         setIsAddingNewRow(true);
     };
+
+
     // Function to handle training filter change
     const handleTrainingChange = async (event) => {
         await setTrainingFilter(event.target.value);
@@ -2242,6 +2270,7 @@ export function OrgUnitTable(props: Props) {
                                 value={formData.beneficiaryName}
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                readOnly
                             />
                         </div>
                         {/* <div>
@@ -2327,7 +2356,9 @@ export function OrgUnitTable(props: Props) {
                                     <th>No.</th>
                                     <th>Registration Date</th>
                                     <th>Is Beneficiary Adult / Child</th>
+                                    {/* <th>Direct / Indirect Beneficiary</th> */}
                                     <th>Patient ID</th>
+                                    <th>Direct / Indirect</th>
                                     <th>First Name & Middle Name</th>
                                     <th>Surname</th>
                                     <th>Sex</th>
@@ -2387,6 +2418,18 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Child">Child</option>
                                             </select>
                                         </td>
+                                        {/* <td>
+                                            <select
+                                                name="directIndirect"
+                                                value={newRowData.directIndirect || "Direct"}
+                                                onChange={(e) =>
+                                                    setNewRowData({ ...newRowData, directIndirect: e.target.value })
+                                                }
+                                            >
+                                                <option value="Direct">Direct</option>
+                                                <option value="Indirect">Indirect</option>
+                                            </select>
+                                        </td> */}
                                         <td>
                                             <input
                                                 type="text"
@@ -2555,6 +2598,7 @@ export function OrgUnitTable(props: Props) {
                                     <th>No.</th>
                                     <th>Registration Date</th>
                                     <th>Is Beneficiary Adult / Child</th>
+
                                     <th>Patient ID</th>
                                     <th>First Name & Middle Name</th>
                                     <th>Surname</th>

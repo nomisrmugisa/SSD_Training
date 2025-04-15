@@ -34,3 +34,17 @@
 .org-unit-item:hover {
     background-color: #ebf8ff;
 }
+
+/* Make placeholder text bold when showing org unit name */
+.search-input::placeholder {
+    font-weight: 700; /* Equivalent to bold */
+    opacity: 1; /* Ensure full visibility */
+    color: #333; /* Darker text color for better visibility */
+}
+
+
+.has-org-unit::placeholder {
+    font-weight: 700;
+    color: #2c3e50;
+    opacity: 1;
+}

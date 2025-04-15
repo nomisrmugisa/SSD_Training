@@ -36,7 +36,7 @@ export async function getOrgUnitDetails(
     id: id,
     trackInstanceId: row[0],
     recordDate: row[1],
-    track: row[19],
+    track: row[20],
     topicTrainedOn: row[11],
     beneficiaryName: row[12],
     nonBeneficiaryName: row[13],
