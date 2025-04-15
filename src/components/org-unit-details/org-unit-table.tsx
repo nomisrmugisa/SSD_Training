@@ -410,7 +410,7 @@ export function OrgUnitTable(props: Props) {
         muacClassification: '',
         ben_facility_RegNo: '',
         directPatientID: '',
-        
+
         muacColor: '#ffffff',
     });
 
@@ -434,7 +434,7 @@ export function OrgUnitTable(props: Props) {
     const [selectedProgramStage, setSelectedProgramStage] = useState<ProgramStage>('');
     const [filteredProgramData, setFilteredProgramData] = useState<any[]>([]);
 
-    
+
 
 
     // handle date filtering
@@ -455,44 +455,66 @@ export function OrgUnitTable(props: Props) {
     }, [trackFilter, props.orgUnitDetails]);
 
     // useEffect for MUAC
+    // Add this useEffect inside the OrgUnitTable component, after the state declarations
     useEffect(() => {
         const muacValue = parseFloat(newRowData.initialMuac);
         let classification = '';
-        let color = '#ffffff'; // Default white
 
         if (!isNaN(muacValue)) {
             if (newRowData.beneficiaryStage === 'Child') {
                 if (muacValue < 11.5) {
                     classification = 'Severe <11.5 cm (Red)';
-                    color = '#ffcccc'; // Light red
                 } else if (muacValue >= 11.5 && muacValue < 12.5) {
                     classification = 'Moderate >=11.5 - < 12.5 cm (Yellow)';
-                    color = '#ffffcc'; // Light yellow
                 } else if (muacValue >= 12.5) {
                     classification = 'Normal ≥12.5 cm (Green)';
-                    color = '#ccffcc'; // Light green
                 }
             } else if (newRowData.beneficiaryStage === 'Adult') {
                 if (muacValue < 21) {
                     classification = 'Less than 21 cm (red)';
-                    color = '#ffcccc';
                 } else if (muacValue >= 21 && muacValue < 23) {
                     classification = 'Less than 23 cm greater than 21 cm (yellow)';
-                    color = '#ffffcc';
                 } else if (muacValue >= 23) {
                     classification = 'Equals to or greater than 23 cm (green)';
-                    color = '#ccffcc';
                 }
             }
         }
 
         setNewRowData(prev => ({
             ...prev,
-            muacClassification: classification,
-            // Add a new field for color
-            muacColor: color
+            muacClassification: classification
         }));
     }, [newRowData.initialMuac, newRowData.beneficiaryStage]);
+
+    useEffect(() => {
+        const muacValue = parseFloat(newIndirectData.initialMuac);
+        let classification = '';
+
+        if (!isNaN(muacValue)) {
+            if (newIndirectData.beneficiaryStage === 'Child') {
+                if (muacValue < 11.5) {
+                    classification = 'Severe <11.5 cm (Red)';
+                } else if (muacValue >= 11.5 && muacValue < 12.5) {
+                    classification = 'Moderate >=11.5 - < 12.5 cm (Yellow)';
+                } else if (muacValue >= 12.5) {
+                    classification = 'Normal ≥12.5 cm (Green)';
+                }
+            } else if (newIndirectData.beneficiaryStage === 'Adult') {
+                if (muacValue < 21) {
+                    classification = 'Less than 21 cm (red)';
+                } else if (muacValue >= 21 && muacValue < 23) {
+                    classification = 'Less than 23 cm greater than 21 cm (yellow)';
+                } else if (muacValue >= 23) {
+                    classification = 'Equals to or greater than 23 cm (green)';
+                }
+            }
+        }
+
+        setNewIndirectData(prev => ({
+            ...prev,
+            muacClassification: classification
+        }));
+    }, [newIndirectData.initialMuac, newIndirectData.beneficiaryStage]);
 
     // Update additional columns when training filter changes
     useEffect(() => {
@@ -685,6 +707,27 @@ export function OrgUnitTable(props: Props) {
         setIsAddingNewRow(true);
     };
 
+    const handleIndirectBeneficiaryAdd = async () => {
+        // Generate a Patient ID from the system
+        const newIndirectPatientId = await generatePatientId();
+
+        // Ensure that directPatientID is set from the selected beneficiary. 
+        // If selectedBeneficiary is null, handle appropriately.
+        const directPatientIDValue = selectedBeneficiary ? selectedBeneficiary.patientID : '';
+
+        // Update newIndirectData state with the auto-generated IDs
+        setNewIndirectData(prev => ({
+            ...prev,
+            patientID: newIndirectPatientId,
+            directPatientID: directPatientIDValue // auto-populated
+        }));
+
+        // Trigger the display of your indirect beneficiary input form
+        setIsAddingIndirect(true);
+    };
+
+
+
 
     // Function to handle training filter change
     const handleTrainingChange = async (event) => {
@@ -876,8 +919,8 @@ export function OrgUnitTable(props: Props) {
                 { attribute: "xts0QtWHpnK", value: newRowData.surname },
                 { attribute: "MX1mGZlngtD", value: newRowData.initialMuac },
                 { attribute: "KNLojwshHCv", value: newRowData.muacClassification },
-                { attribute: "M9jR50uouZV", value: newRowData.ben_facility_RegNo },
-                { attribute: "BDFFygBWNSH", value: newRowData.directPatientID },
+                { attribute: "BDFFygBWNSH", value: newRowData.ben_facility_RegNo },
+                { attribute: "M9jR50uouZV", value: newRowData.directPatientID },
                 { attribute: "fTfrFfUPTDC", value: newRowData.beneficiaryType }
             ]
         };
@@ -1011,6 +1054,135 @@ export function OrgUnitTable(props: Props) {
             setLoading(false);
         }
     };
+
+    const handleSaveIndirect = async () => {
+        setLoading(true);
+
+        const userData = await fetchUser();
+        if (!userData) {
+            console.error('Failed to get username.');
+            setMessage('Failed to get username.');
+            setIsError(true);
+            setLoading(false);
+            return;
+        }
+
+        try {
+            // --- Payload 1: trackedEntityInstance ---
+            const payload1 = {
+                trackedEntityType: "b8gedH8Po5d",
+                orgUnit: props.orgUnitId,
+                attributes: [
+                    { attribute: "FwEpAEagGeK", value: newIndirectData.track },
+                    { attribute: "IVvy19BmIOw", value: newIndirectData.sex },
+                    { attribute: "lvpNOLmDEEG", value: newIndirectData.age },
+                    { attribute: "m35qF41KIdK", value: newIndirectData.patientID },
+                    { attribute: "r0AIdmEpPN9", value: newIndirectData.dob },
+                    { attribute: "KmxskLLhS0k", value: newIndirectData.beneficiaryStage },
+                    { attribute: "tUjM7KxKvCO", value: newIndirectData.first_middleName },
+                    { attribute: "xts0QtWHpnK", value: newIndirectData.surname },
+                    { attribute: "MX1mGZlngtD", value: newIndirectData.initialMuac },
+                    { attribute: "KNLojwshHCv", value: newIndirectData.muacClassification },
+                    { attribute: "BDFFygBWNSH", value: newRowData.ben_facility_RegNo },
+                    { attribute: "M9jR50uouZV", value: newRowData.directPatientID }, // Auto-populated
+                    { attribute: "fTfrFfUPTDC", value: 'Indirect Beneficiary' }
+                ]
+            };
+
+            const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload1)
+            });
+
+            if (!response1.ok) throw new Error('Failed to create tracked entity instance');
+
+            const trackedEntityInstance = (await response1.json()).response.importSummaries[0].reference;
+
+            // --- Payload 2: enrollment ---
+            const payload2 = {
+                trackedEntityInstance: trackedEntityInstance,
+                program: "n2iAPy3PGx7",
+                status: "ACTIVE",
+                orgUnit: props.orgUnitId,
+                enrollmentDate: newIndirectData.recordDate,
+                incidentDate: new Date().toISOString()
+            };
+
+            const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload2)
+            });
+
+            if (!response2.ok) throw new Error('Failed to create enrollment');
+
+            const enrollmentId = (await response2.json()).response.importSummaries[0].reference;
+
+            // --- Payload 3: event ---
+            const payload3 = {
+                events: [{
+                    trackedEntityInstance: trackedEntityInstance,
+                    program: 'n2iAPy3PGx7',
+                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+                    orgUnit: props.orgUnitId,
+                    enrollment: enrollmentId,
+                    dueDate: newIndirectData.recordDate,
+                    eventDate: newIndirectData.recordDate,
+                    status: 'ACTIVE'
+                }]
+            };
+
+            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload3)
+            });
+
+            if (!response3.ok) throw new Error('Failed to create event');
+
+            const createdEventId = (await response3.json()).response.importSummaries[0].reference;
+            console.log(`✅ Indirect Event created with ID: ${createdEventId}`);
+
+            // Reset the form
+            setNewIndirectData({
+                id: '',
+                trackInstanceId: '',
+                recordDate: '',
+                track: '',
+                inactive: '',
+                beneficiaryStage: '',
+                careGiver: '',
+                careGiverAge: '',
+                patientID: '',
+                first_middleName: '',
+                surname: '',
+                dob: '',
+                orgUnit: '',
+                beneficiaryName: '',
+                nonBeneficiaryName: '',
+                sex: '',
+                age: '',
+                initialMuac: '',
+                muacClassification: '',
+                ben_facility_RegNo: '',
+                directPatientID: '', // Still auto-filled before submit
+                muacColor: '#ffffff'
+            });
+
+            setMessage('Indirect beneficiary successfully saved!');
+            setIsError(false);
+            setIsAddingIndirect(false);
+
+        } catch (error) {
+            console.error('Error saving indirect beneficiary:', error);
+            setMessage('Error saving indirect beneficiary.');
+            setIsError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const handleInputChange = async (event) => {
         const { name, value } = event.target;
@@ -1758,13 +1930,158 @@ export function OrgUnitTable(props: Props) {
                     {/* Additional columns - same as main table */}
                     {additionalColumns.map((col) => (
                         <td key={col.accessor}>
-                            {/* Add similar cell rendering logic as in renderTableRows */}
-                            {col.accessor === 'reportDate' ? (
-                                fetchedData.reportDate?.split('T')[0] || 'N/A'
-                            ) : col.accessor in dataValueMapping ? (
-                                fetchedData.dataValues[dataValueMapping[col.accessor]] || 'N/A'
+                            {(editableRows[beneficiary.trackInstanceId] && col.accessor !== 'addEditEvent') ? (
+                                col.accessor === 'reportDate' ? (
+                                    <input
+                                        type="date"
+                                        value={fetchedDates[beneficiary.trackInstanceId]?.reportDate?.split('T')[0] || ''}
+                                        onChange={(e) =>
+                                            handleDateChangeForFetchedDates(beneficiary.trackInstanceId, e.target.value)
+                                        }
+                                        onKeyDown={(e) =>
+                                            handleReportDateSubmit(e, beneficiary.trackInstanceId)
+                                        }
+                                    />
+                                ) : col.accessor.includes('checkBox') ? (
+                                    <input
+                                        type="checkbox"
+                                        checked={
+                                            fetchedDates[beneficiary.trackInstanceId]?.dataValues[
+                                            dataValueMapping[col.accessor]
+                                            ] === true ||
+                                            fetchedDates[beneficiary.trackInstanceId]?.dataValues[
+                                            dataValueMapping[col.accessor]
+                                            ] === 'true'
+                                        }
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                beneficiary.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.checked
+                                            )
+                                        }
+                                    />
+                                ) : col.accessor === 'appliedLessons_dropdown' ? (
+                                    <select
+                                        value={
+                                            String(
+                                                fetchedDates[beneficiary.trackInstanceId]?.dataValues[
+                                                dataValueMapping[col.accessor]
+                                                ] || ''
+                                            )
+                                        }
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                beneficiary.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.value
+                                            )
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                sendDataValueUpdate(beneficiary.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value === 'Yes' ? true : false);// ✅ boolean here
+                                            }
+                                        }}
+                                        className="form-select"
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        value={
+                                            String(
+                                                fetchedDates[beneficiary.trackInstanceId]?.dataValues[
+                                                dataValueMapping[col.accessor]
+                                                ] || ''
+                                            )
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                sendDataValueUpdate(beneficiary.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value);
+                                            }
+                                        }}
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                beneficiary.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                )
                             ) : (
-                                beneficiary[col.accessor] || ''
+                                col.accessor === 'reportDate' ? (
+                                    fetchedDates[beneficiary.trackInstanceId]?.reportDate?.split('T')[0] || 'N/A'
+                                ) : col.accessor === 'dueDate' ? (
+                                    fetchedDates[beneficiary.trackInstanceId]?.dueDate?.split('T')[0] || 'N/A'
+                                ) : col.accessor === 'addEditEvent' ? null : (
+                                    col.accessor in dataValueMapping ? (
+                                        fetchedDates[beneficiary.trackInstanceId]?.dataValues[
+                                        dataValueMapping[col.accessor]
+                                        ] || 'N/A'
+                                    ) : (
+                                        beneficiary[col.accessor] || ''
+                                    )
+                                )
+                            )}
+
+                            {/* Add/Edit Buttons */}
+                            {col.accessor === 'addEditEvent' && (
+                                <div className="button-container">
+                                    {editableRows[beneficiary.trackInstanceId] ? (
+                                        <>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleSave(
+                                                        beneficiary.trackInstanceId,
+                                                        fetchedDates[beneficiary.trackInstanceId]?.eventId
+                                                    )
+                                                }}
+                                                style={{ backgroundColor: 'green' }}
+                                                className="save-button btn"
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleCancel(beneficiary.trackInstanceId)
+                                                }}
+                                                style={{ backgroundColor: 'red' }}
+                                                className="cancel-button btn"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAdd(beneficiary.trackInstanceId)
+                                                }}
+                                                style={{ backgroundColor: 'grey' }}
+                                                className="add-button btn"
+                                            >
+                                                Add
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleEdit(beneficiary.trackInstanceId)
+                                                }}
+                                                style={{ backgroundColor: 'orange' }}
+                                                className="edit-button btn"
+                                            >
+                                                Edit
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                             )}
                         </td>
                     ))}
@@ -1839,49 +2156,7 @@ export function OrgUnitTable(props: Props) {
         setIndirectBeneficiaries(indirect);
     };
 
-    const handleSaveIndirect = async () => {
-        try {
-            // Add your API call here
-            const response = await axios.post('/api/beneficiaries', {
-                ...newIndirectData,
-                isIndirect: true,
-                parentPatientID: selectedBeneficiary?.patientID
-            });
 
-            // Update local state
-            setIndirectBeneficiaries([...indirectBeneficiaries, response.data]);
-            setIsAddingIndirect(false);
-            setNewIndirectData({
-                id: '',
-                trackInstanceId: '',
-                recordDate: '',
-                track: '',
-                inactive: '',
-                beneficiaryStage: '',
-                careGiver: '',
-                careGiverAge: '',
-                patientID: '',
-                first_middleName: '',
-                surname: '',
-                dob: '',
-                orgUnit: '',
-                // topicTrainedOn: '',
-                beneficiaryName: '',
-                nonBeneficiaryName: '',
-                sex: '',
-                age: '',
-                initialMuac: '',
-                muacClassification: '',
-                ben_facility_RegNo: '',
-                directPatientID: '',
-                
-                muacColor: '#ffffff'
-            });
-
-        } catch (error) {
-            console.error('Error saving indirect beneficiary:', error);
-        }
-    };
 
     return (
         <main className="space-y-4">
@@ -1907,6 +2182,7 @@ export function OrgUnitTable(props: Props) {
                         const selectedTrack = e.target.value;
                         setTrackFilter(e.target.value);
                         setNewRowData((prevData) => ({ ...prevData, track: selectedTrack })); // Set the selected track in newRowData
+                        setNewIndirectData((prevData) => ({ ...prevData, track: selectedTrack })) // Set selected track in new Indirect ben Row
                         if (trainingFilter === 'Livelihood') {
                             // Force column update when track changes
                             setAdditionalColumns(getAdditionalColumns(trainingFilter));
@@ -2431,8 +2707,9 @@ export function OrgUnitTable(props: Props) {
                                                     setNewRowData({ ...newRowData, beneficiaryType: e.target.value })
                                                 }
                                             >
-                                                <option value="Direct">Direct</option>
-                                                <option value="Indirect">Indirect</option>
+                                                {/* <option value="">Select Beneficiary Type</option> */}
+                                                <option value="Direct">Direct Beneficiary</option>
+                                                <option value="Indirect">Indirect Beneficiary</option>
                                             </select>
                                         </td>
                                         <td>
@@ -2443,6 +2720,7 @@ export function OrgUnitTable(props: Props) {
                                                 // onChange={handleNewRowInputChange}
                                                 onChange={(e) => setNewRowData({ ...newRowData, patientID: e.target.value })}
                                                 placeholder="Patient ID"
+                                                readOnly
                                             />
                                         </td>
                                         <td>
@@ -2511,11 +2789,7 @@ export function OrgUnitTable(props: Props) {
                                                 type="text"
                                                 name="muacClassification"
                                                 value={newRowData.muacClassification}
-                                                style={{
-                                                    backgroundColor: newRowData.muacColor || '#ffffff',
-                                                    fontWeight: 'bold',
-                                                    textAlign: 'center'
-                                                }}
+
                                                 placeholder="Muac Classification"
                                                 readOnly
                                             />
@@ -2575,11 +2849,7 @@ export function OrgUnitTable(props: Props) {
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                setIsAddingIndirect(true);
-                                setNewIndirectData({
-                                    ...newIndirectData,
-                                    directPatientID: selectedBeneficiary.patientID
-                                });
+                                handleIndirectBeneficiaryAdd();
                             }}
                             className="border border-gray-300 rounded-md"
                             style={{
@@ -2660,6 +2930,7 @@ export function OrgUnitTable(props: Props) {
                                                 type="text"
                                                 value={newIndirectData.patientID}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, patientID: e.target.value })}
+                                                readOnly
                                             />
                                         </td>
                                         <td>

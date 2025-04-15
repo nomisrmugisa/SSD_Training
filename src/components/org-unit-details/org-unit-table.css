@@ -17,11 +17,11 @@
 
 /* For modern browsers you might want */
 @supports (margin-inline: 10px) {
-    .table-responsive {
-      margin-inline: 10px; /* Logical properties for RTL/LTR support */
-      padding-inline: 10px;
-    }
+  .table-responsive {
+    margin-inline: 10px; /* Logical properties for RTL/LTR support */
+    padding-inline: 10px;
   }
+}
 
 /* Table header styling */
 .table-dark-header th {
@@ -61,7 +61,7 @@
     /* Use flexbox */
     gap: 10px;
     /* Add gap between buttons */
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 
