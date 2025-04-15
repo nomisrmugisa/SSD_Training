@@ -434,6 +434,8 @@ export function OrgUnitTable(props: Props) {
     const [selectedProgramStage, setSelectedProgramStage] = useState<ProgramStage>('');
     const [filteredProgramData, setFilteredProgramData] = useState<any[]>([]);
 
+    const [hasValidDate, setHasValidDate] = useState<{ [key: string]: boolean }>({});
+
 
 
 
@@ -637,7 +639,7 @@ export function OrgUnitTable(props: Props) {
     const handleBeneficiarySearch = async (event) => {
         if (event.key === 'Enter') {
             try {
-                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=n2iAPy3PGx7&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
+                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=n2iAPy3PGx7&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
                 const data = await response.json();
                 setSearchResults(data.rows); // Set the search results
                 setIsModalVisible(true); // Show the modal
@@ -688,7 +690,7 @@ export function OrgUnitTable(props: Props) {
     const generatePatientId = async (): Promise<string> => {
         try {
             const response = await axios.get(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/m35qF41KIdK/generate`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/m35qF41KIdK/generate`,
                 {
                     headers: { 'Content-Type': 'application/json' }
                 }
@@ -768,7 +770,7 @@ export function OrgUnitTable(props: Props) {
             try {
                 // First request: Fetch the organization unit code
                 const orgUnitCodeResponse = await fetch(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/organisationUnits/${props.orgUnitId}`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/organisationUnits/${props.orgUnitId}`,
                     // `api/organisationUnits/${props.orgUnitId}`,
                     {
                         method: 'GET',
@@ -786,7 +788,7 @@ export function OrgUnitTable(props: Props) {
                 if (orgUnitCode) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
@@ -825,7 +827,7 @@ export function OrgUnitTable(props: Props) {
     const fetchNewId = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/system/id?`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/system/id?`,
                 // `api/system/id?`, //with proxy
                 {
                     method: 'GET',
@@ -846,7 +848,7 @@ export function OrgUnitTable(props: Props) {
     const fetchUser = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/me`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/me`,
                 // `api/me`, //with proxy
                 {
                     method: 'GET',
@@ -934,7 +936,7 @@ export function OrgUnitTable(props: Props) {
         try {
             // First POST request - Create tracked entity instance
             const response1 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`,
                 {
                     method: 'POST',
                     headers: {
@@ -964,7 +966,7 @@ export function OrgUnitTable(props: Props) {
 
             // Second POST request - Create enrollment
             const response2 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`,
                 {
                     method: 'POST',
                     headers: {
@@ -997,7 +999,7 @@ export function OrgUnitTable(props: Props) {
             };
 
             const response3 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
                 {
                     method: 'POST',
                     headers: {
@@ -1090,11 +1092,11 @@ export function OrgUnitTable(props: Props) {
                     { attribute: "KNLojwshHCv", value: newIndirectData.muacClassification },
                     { attribute: "BDFFygBWNSH", value: newIndirectData.ben_facility_RegNo },
                     { attribute: "M9jR50uouZV", value: newIndirectData.directPatientID }, // Auto-populated
-                    { attribute: "fTfrFfUPTDC", value: 'Indirect Beneficiary' }
+                    // { attribute: "fTfrFfUPTDC", value: 'Indirect Beneficiary' }
                 ]
             };
 
-            const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`, {
+            const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload1)
@@ -1114,7 +1116,7 @@ export function OrgUnitTable(props: Props) {
                 incidentDate: new Date().toISOString()
             };
 
-            const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`, {
+            const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload2)
@@ -1138,7 +1140,7 @@ export function OrgUnitTable(props: Props) {
                 }]
             };
 
-            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
+            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload3)
@@ -1370,7 +1372,7 @@ export function OrgUnitTable(props: Props) {
         try {
             if (isEditing) {
                 // PUT request for editing an existing record
-                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${id}`,
+                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${id}`,
                     {
                         method: 'PUT',
                         headers: {
@@ -1384,7 +1386,7 @@ export function OrgUnitTable(props: Props) {
                 // Handle success (e.g., update state, show message)
             } else {
                 // POST request for adding a new record
-                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
+                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
                     {
                         method: 'POST',
                         headers: {
@@ -1404,42 +1406,112 @@ export function OrgUnitTable(props: Props) {
     };
 
     // POST Date - create event 
-    const handleReportDateSubmit = async (e: React.KeyboardEvent<HTMLInputElement>, trackInstanceId: string) => {
-        if (e.key === 'Enter') {
-            const reportDate = fetchedDates[trackInstanceId]?.reportDate;
+    // const handleReportDateSubmit = async (
+    //     e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
+    //     trackInstanceId: string
+    //   ) => {
+    //     const reportDate = fetchedDates[trackInstanceId]?.reportDate;
+    //     if (e.type === 'Enter') {           
 
-            if (!reportDate) return;
+    //         if (!reportDate) {
+    //             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
+    //             setMessage('Date of training is required');
+    //             setIsError(true);
+    //             return;
+    //           }
 
-            try {
-                const payload = {
-                    events: [{
-                        trackedEntityInstance: trackInstanceId,
-                        program: 'n2iAPy3PGx7',
-                        programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
-                        enrollment: '', // Optional: can be fetched/stored
-                        orgUnit: props.orgUnitId,
-                        notes: [],
-                        dataValues: [],
-                        status: 'ACTIVE',
-                        eventDate: reportDate,
-                    }]
-                };
+    //         try {
+    //             const payload = {
+    //                 events: [{
+    //                     trackedEntityInstance: trackInstanceId,
+    //                     program: 'n2iAPy3PGx7',
+    //                     programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+    //                     enrollment: '', // Optional: can be fetched/stored
+    //                     orgUnit: props.orgUnitId,
+    //                     notes: [],
+    //                     dataValues: [],
+    //                     status: 'ACTIVE',
+    //                     eventDate: reportDate,
+    //                 }]
+    //             };
 
-                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, payload);
-                const createdEventId = response.data.response.importSummaries[0].reference;
+    //             const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, payload);
+    //             const createdEventId = response.data.response.importSummaries[0].reference;
 
-                setFetchedDates(prev => ({
-                    ...prev,
-                    [trackInstanceId]: {
-                        ...prev[trackInstanceId],
-                        eventId: createdEventId
-                    }
-                }));
+    //             setFetchedDates(prev => ({
+    //                 ...prev,
+    //                 [trackInstanceId]: {
+    //                     ...prev[trackInstanceId],
+    //                     eventId: createdEventId
+    //                 }
+    //             }));
 
-                console.log(`✅ Event created: ${createdEventId}`);
-            } catch (error) {
-                console.error('❌ Error creating event:', error);
-            }
+    //             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
+
+    //             console.log(`✅ Event created: ${createdEventId}`);
+    //         } catch (error) {
+    //             console.error('❌ Error creating event:', error);
+    //             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
+    //         }
+    //     }
+    // };
+    const handleReportDateSubmit = async (
+        e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
+        trackInstanceId: string
+    ) => {
+        // Handle both Enter key and blur events
+        if (e.type === 'keydown') {
+            const keyboardEvent = e as React.KeyboardEvent<HTMLInputElement>;
+            if (keyboardEvent.key !== 'Enter') return;
+        }
+
+        const reportDate = fetchedDates[trackInstanceId]?.reportDate;
+
+        if (!reportDate) {
+            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
+            setMessage('Date of training is required');
+            setIsError(true);
+            return;
+        }
+
+        try {
+            const payload = {
+                events: [{
+                    trackedEntityInstance: trackInstanceId,
+                    program: 'n2iAPy3PGx7',
+                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+                    enrollment: '',
+                    orgUnit: props.orgUnitId,
+                    notes: [],
+                    dataValues: [],
+                    status: 'ACTIVE',
+                    eventDate: reportDate,
+                }]
+            };
+
+            const response = await axios.post(
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                payload
+            );
+
+            const createdEventId = response.data.response.importSummaries[0].reference;
+
+            setFetchedDates(prev => ({
+                ...prev,
+                [trackInstanceId]: {
+                    ...prev[trackInstanceId],
+                    eventId: createdEventId
+                }
+            }));
+
+            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
+            console.log(`✅ Event created: ${createdEventId}`);
+
+        } catch (error) {
+            console.error('❌ Error creating event:', error);
+            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
+            setMessage('Failed to save training date');
+            setIsError(true);
         }
     };
 
@@ -1483,7 +1555,7 @@ export function OrgUnitTable(props: Props) {
         };
 
         try {
-            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}/${dataElementId}`, payload);
+            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${eventId}/${dataElementId}`, payload);
             console.log(`✅ PUT: ${dataElementName} = ${value}`);
         } catch (error) {
             console.error('❌ Failed to send data value update:', error);
@@ -1529,6 +1601,11 @@ export function OrgUnitTable(props: Props) {
         dataElementName: string,
         value: string | boolean
     ) => {
+        if (!hasValidDate[trackInstanceId]) {
+            setMessage('Please set Date of Training first');
+            setIsError(true);
+            return;
+        }
         setFetchedDates((prev) => ({
             ...prev,
             [trackInstanceId]: {
@@ -1554,7 +1631,7 @@ export function OrgUnitTable(props: Props) {
         };
 
         const programStage = programStageMap[trainingFilter];
-        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/${trackInstanceId}.json?program=n2iAPy3PGx7&programStage=${programStage}&fields=enrollments[events[*]]`;
+        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json?program=n2iAPy3PGx7&programStage=${programStage}&fields=enrollments[events[*]]`;
 
         try {
             const response = await axios.get(url);
@@ -1707,7 +1784,6 @@ export function OrgUnitTable(props: Props) {
         return '';
     };
 
-
     const renderTableRows = () => {
 
         // const groupData = data?.groupActivities;
@@ -1762,10 +1838,16 @@ export function OrgUnitTable(props: Props) {
                                         onKeyDown={(e) =>
                                             handleReportDateSubmit(e, activity.trackInstanceId)
                                         }
+                                        onBlur={(e) =>
+                                            handleReportDateSubmit(e, activity.trackInstanceId)
+                                        }
+
                                     />
                                 ) : col.accessor.includes('checkBox') ? (
                                     <input
                                         type="checkbox"
+                                        disabled={!hasValidDate[activity.trackInstanceId]}
+                                        className="form-check-input"
                                         checked={
                                             fetchedDates[activity.trackInstanceId]?.dataValues[
                                             dataValueMapping[col.accessor]
@@ -2147,7 +2229,7 @@ export function OrgUnitTable(props: Props) {
     const fetchProgramStageData = async (programStageId: string) => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/pending?programStage=${programStageId}`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/pending?programStage=${programStageId}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -2739,14 +2821,14 @@ export function OrgUnitTable(props: Props) {
                                         <td>
                                             <select
                                                 name="beneficiaryType"
-                                                value={newRowData.beneficiaryType || "Direct"}
+                                                value={newRowData.beneficiaryType}
                                                 onChange={(e) =>
                                                     setNewRowData({ ...newRowData, beneficiaryType: e.target.value })
                                                 }
                                             >
-                                                {/* <option value="">Select Beneficiary Type</option> */}
-                                                <option value="Direct">Direct Beneficiary</option>
-                                                <option value="Indirect">Indirect Beneficiary</option>
+                                                <option value="">Select Beneficiary Type</option>
+                                                <option value="Direct Beneficiary">Direct Beneficiary</option>
+                                                <option value="Indirect Beneficiary">Indirect Beneficiary</option>
                                             </select>
                                         </td>
                                         <td>

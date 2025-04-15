@@ -13,7 +13,7 @@ export async function getOrgUnitDetails(
   trackFilter?: string
 ): Promise<OrgUnitDetails[]> {
   // Construct the base URL
-  let url = `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/query.json?ou=${id}&ouMode=SELECTED&order=created:desc&program=n2iAPy3PGx7&paging=false`;
+  let url = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ou=${id}&ouMode=SELECTED&order=created:desc&program=n2iAPy3PGx7&paging=false`;
 
   // Append filters to the URL if they are provided
   if (trainingFilter) {

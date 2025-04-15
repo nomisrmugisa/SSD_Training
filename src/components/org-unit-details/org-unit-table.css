@@ -90,3 +90,17 @@
 .table-dark-header thead tr:first-child th {
     border-top: 2px solid #dee2e6 !important;
 }
+
+/* Invalid date input styling */
+.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+  
+  /* Disabled inputs styling */
+  .form-control:disabled, 
+  .form-check-input:disabled {
+    background-color: #e9ecef;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }

@@ -69,7 +69,7 @@
 //       }
 //     } else {
 //       // Handle single payload events (existing code)
-//       const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
+//       const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',

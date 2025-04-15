@@ -70,7 +70,7 @@ export function SessionsTable(props: Props) {
     const fetchNewId = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_BASE_URL}api/system/id?`,
+                `${process.env.REACT_APP_BASE_URL}/api/system/id?`,
                 // `/api/system/id?`, //with proxy
                 {
                     method: 'GET',
@@ -120,7 +120,7 @@ export function SessionsTable(props: Props) {
 
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events?`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events?`,
                 // `/api/events?`,
                 {
                     method: 'POST',
