@@ -456,70 +456,70 @@ export function OrgUnitTable(props: Props) {
 
     // useEffect for MUAC
     // Add this useEffect inside the OrgUnitTable component, after the state declarations
-    useEffect(() => {
-        const muacValue = parseFloat(newRowData.initialMuac);
-        let classification = '';
+    // useEffect(() => {
+    //     const muacValue = parseFloat(newRowData.initialMuac);
+    //     let classification = '';
 
-        if (!isNaN(muacValue)) {
-            if (newRowData.beneficiaryStage === 'Child') {
-                if (muacValue < 11.5) {
-                    classification = 'Severe <11.5 cm (Red)';
-                } else if (muacValue >= 11.5 && muacValue < 12.5) {
-                    classification = 'Moderate >=11.5 - < 12.5 cm (Yellow)';
-                } else if (muacValue >= 12.5) {
-                    classification = 'Normal ≥12.5 cm (Green)';
-                }
-            } else if (newRowData.beneficiaryStage === 'Adult') {
-                if (muacValue < 21) {
-                    classification = 'Less than 21 cm (red)';
-                } else if (muacValue >= 21 && muacValue < 23) {
-                    classification = 'Less than 23 cm greater than 21 cm (yellow)';
-                } else if (muacValue >= 23) {
-                    classification = 'Equals to or greater than 23 cm (green)';
-                }
-            }
-        }
+    //     if (!isNaN(muacValue)) {
+    //         if (newRowData.beneficiaryStage === 'Child') {
+    //             if (muacValue < 11.5) {
+    //                 classification = 'Severe <11.5 cm (Red)';
+    //             } else if (muacValue >= 11.5 && muacValue < 12.5) {
+    //                 classification = 'Moderate >=11.5 - < 12.5 cm (Yellow)';
+    //             } else if (muacValue >= 12.5) {
+    //                 classification = 'Normal ≥12.5 cm (Green)';
+    //             }
+    //         } else if (newRowData.beneficiaryStage === 'Adult') {
+    //             if (muacValue < 21) {
+    //                 classification = 'Less than 21 cm (red)';
+    //             } else if (muacValue >= 21 && muacValue < 23) {
+    //                 classification = 'Less than 23 cm greater than 21 cm (yellow)';
+    //             } else if (muacValue >= 23) {
+    //                 classification = 'Equals to or greater than 23 cm (green)';
+    //             }
+    //         }
+    //     }
 
-        setNewRowData(prev => ({
-            ...prev,
-            muacClassification: classification
-        }));
-    }, [newRowData]);
+    //     setNewRowData(prev => ({
+    //         ...prev,
+    //         muacClassification: classification
+    //     }));
+    // }, [newRowData.initialMuac, newRowData.beneficiaryStage]);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        console.log('MUAC Effect triggered', {
-        muacValue: newIndirectData.initialMuac,
-        stage: newIndirectData.beneficiaryStage
-        });
-        const muacValue = parseFloat(newIndirectData.initialMuac);
-        let classification = '';
+    //     console.log('MUAC Effect triggered', {
+    //     muacValue: newIndirectData.initialMuac,
+    //     stage: newIndirectData.beneficiaryStage
+    //     });
+    //     const muacValue = parseFloat(newIndirectData.initialMuac);
+    //     let classification = '';
 
-        if (!isNaN(muacValue)) {
-            if (newIndirectData.beneficiaryStage === 'Child') {
-                if (muacValue < 11.5) {
-                    classification = 'Severe <11.5 cm (Red)';
-                } else if (muacValue >= 11.5 && muacValue < 12.5) {
-                    classification = 'Moderate >=11.5 - < 12.5 cm (Yellow)';
-                } else if (muacValue >= 12.5) {
-                    classification = 'Normal ≥12.5 cm (Green)';
-                }
-            } else if (newIndirectData.beneficiaryStage === 'Adult') {
-                if (muacValue < 21) {
-                    classification = 'Less than 21 cm (red)';
-                } else if (muacValue >= 21 && muacValue < 23) {
-                    classification = 'Less than 23 cm greater than 21 cm (yellow)';
-                } else if (muacValue >= 23) {
-                    classification = 'Equals to or greater than 23 cm (green)';
-                }
-            }
-        }
+    //     if (!isNaN(muacValue)) {
+    //         if (newIndirectData.beneficiaryStage === 'Child') {
+    //             if (muacValue < 11.5) {
+    //                 classification = 'Severe <11.5 cm (Red)';
+    //             } else if (muacValue >= 11.5 && muacValue < 12.5) {
+    //                 classification = 'Moderate >=11.5 - < 12.5 cm (Yellow)';
+    //             } else if (muacValue >= 12.5) {
+    //                 classification = 'Normal ≥12.5 cm (Green)';
+    //             }
+    //         } else if (newIndirectData.beneficiaryStage === 'Adult') {
+    //             if (muacValue < 21) {
+    //                 classification = 'Less than 21 cm (red)';
+    //             } else if (muacValue >= 21 && muacValue < 23) {
+    //                 classification = 'Less than 23 cm greater than 21 cm (yellow)';
+    //             } else if (muacValue >= 23) {
+    //                 classification = 'Equals to or greater than 23 cm (green)';
+    //             }
+    //         }
+    //     }
 
-        setNewIndirectData(prev => ({
-            ...prev,
-            muacClassification: classification
-        }));
-    }, [newIndirectData]);
+    //     setNewIndirectData(prev => ({
+    //         ...prev,
+    //         muacClassification: classification
+    //     }));
+    // }, [newIndirectData.initialMuac, newIndirectData.beneficiaryStage]);
 
     // Update additional columns when training filter changes
     useEffect(() => {
@@ -1687,6 +1687,27 @@ export function OrgUnitTable(props: Props) {
         return new Date(dateString).toISOString().split('T')[0];
     };
 
+    // Muac Classification
+    const computeMuacClassification = (muac: string, stage: string): string => {
+        const muacValue = parseFloat(muac);
+        if (isNaN(muacValue)) return '';
+
+        if (stage === 'Child') {
+            if (muacValue < 11.5) return 'Severe <11.5 cm (Red)';
+            if (muacValue < 12.5) return 'Moderate >=11.5 - < 12.5 cm (Yellow)';
+            return 'Normal ≥12.5 cm (Green)';
+        }
+
+        if (stage === 'Adult') {
+            if (muacValue < 21) return 'Less than 21 cm (red)';
+            if (muacValue < 23) return 'Less than 23 cm greater than 21 cm (yellow)';
+            return 'Equals to or greater than 23 cm (green)';
+        }
+
+        return '';
+    };
+
+
     const renderTableRows = () => {
 
         // const groupData = data?.groupActivities;
@@ -2697,9 +2718,20 @@ export function OrgUnitTable(props: Props) {
                                             <select
                                                 name="beneficiaryStage"
                                                 value={newRowData.beneficiaryStage}
-                                                onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
+                                                // onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
+
+                                                onChange={(e) => {
+                                                    const newStage = e.target.value;
+                                                    const classification = computeMuacClassification(newRowData.initialMuac, newStage);
+
+                                                    setNewRowData((prev) => ({
+                                                        ...prev,
+                                                        beneficiaryStage: newStage,
+                                                        muacClassification: classification,
+                                                    }));
+                                                }}
                                             >
-                                                <option value="">Select Gender</option>
+                                                <option value="">Select Beneficiary Stage</option>
                                                 <option value="Adult">Adult</option>
                                                 <option value="Child">Child</option>
                                             </select>
@@ -2785,7 +2817,19 @@ export function OrgUnitTable(props: Props) {
                                                 name="initialMuac"
                                                 value={newRowData.initialMuac}
                                                 // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, initialMuac: e.target.value })}
+                                                // onChange={(e) => {
+                                                //     setNewRowData({ ...newRowData, initialMuac: e.target.value })}
+                                                // }
+                                                onChange={(e) => {
+                                                    const newMuac = e.target.value;
+                                                    const classification = computeMuacClassification(newMuac, newRowData.beneficiaryStage);
+
+                                                    setNewRowData((prev) => ({
+                                                        ...prev,
+                                                        initialMuac: newMuac,
+                                                        muacClassification: classification,
+                                                    }));
+                                                }}
                                                 placeholder="Initial Muac"
                                             />
                                         </td>
@@ -2923,9 +2967,22 @@ export function OrgUnitTable(props: Props) {
                                         </td>
                                         <td>
                                             <select
+                                                name="beneficiaryStage"
                                                 value={newIndirectData.beneficiaryStage}
-                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, beneficiaryStage: e.target.value })}
+                                                // onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
+
+                                                onChange={(e) => {
+                                                    const newStage = e.target.value;
+                                                    const classification = computeMuacClassification(newIndirectData.initialMuac, newStage);
+
+                                                    setNewIndirectData((prev) => ({
+                                                        ...prev,
+                                                        beneficiaryStage: newStage,
+                                                        muacClassification: classification,
+                                                    }));
+                                                }}
                                             >
+                                                <option value="">Select Beneficiary Stage</option>
                                                 <option value="Adult">Adult</option>
                                                 <option value="Child">Child</option>
                                             </select>
@@ -2987,7 +3044,18 @@ export function OrgUnitTable(props: Props) {
                                                 name="initialMuac"
                                                 value={newIndirectData.initialMuac}
                                                 // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, initialMuac: e.target.value })}
+                                                // onChange={(e) => setNewIndirectData({ ...newIndirectData, initialMuac: e.target.value })}
+                                                onChange={(e) => {
+                                                    const newMuac = e.target.value;
+                                                    const classification = computeMuacClassification(newMuac, newIndirectData.beneficiaryStage);
+
+                                                    setNewIndirectData((prev) => ({
+                                                        ...prev,
+                                                        initialMuac: newMuac,
+                                                        muacClassification: classification,
+                                                    }));
+                                                }}
+
                                                 placeholder="Initial Muac"
                                             />
                                         </td>
@@ -2996,7 +3064,7 @@ export function OrgUnitTable(props: Props) {
                                                 type="text"
                                                 name="muacClassification"
                                                 value={newIndirectData.muacClassification}
-                                                
+
                                                 placeholder="Muac Classification"
                                                 readOnly
                                             />
