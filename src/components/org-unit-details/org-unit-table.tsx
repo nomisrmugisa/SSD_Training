@@ -106,9 +106,9 @@ export function OrgUnitTable(props: Props) {
             'Growth monitoring': 'DK06Y2Viejs',
             'Kitchen gardens and fruit trees': 'NOIbysghola',
             'Cooking Demonstration': 'LhcJpqUzqcp',
-            'Pregnant': 'stU3OZCy64s',
-            'Lactating': 'NA1ZhjvX47L',
-            'Other': 'TQLLkvvbCD2'
+            'Beneficiary Category': 'NA1ZhjvX47L',
+            'Other Male': 'TQLLkvvbCD2',
+            'Other Female': 'ojr5RiilqCk',
         },
         'Water Sanitation & Hygiene': {
             'Food Safety': 'Q4dJyNwdyyJ',
@@ -161,9 +161,9 @@ export function OrgUnitTable(props: Props) {
             'Growth monitoring': 'DK06Y2Viejs',
             'Kitchen gardens and fruit trees': 'NOIbysghola',
             'Cooking Demonstration': 'LhcJpqUzqcp',
-            'Pregnant': 'stU3OZCy64s',
-            'Lactating': 'NA1ZhjvX47L',
-            'Other': 'TQLLkvvbCD2',
+            'Beneficiary Category': 'NA1ZhjvX47L',
+            'Other Male': 'TQLLkvvbCD2',
+            'Other Female': 'ojr5RiilqCk',
         },
         'Water Sanitation & Hygiene': {
             'Food Safety': 'Q4dJyNwdyyJ',
@@ -218,9 +218,9 @@ export function OrgUnitTable(props: Props) {
         'growthMonitoring_checkBox': 'Growth monitoring',
         'kitchenGardens_checkBox': 'Kitchen gardens and fruit trees',
         'cookingDemonstration_checkBox': 'Cooking Demonstration',
-        'pregnant_checkBox': 'Pregnant',
-        'lactating_checkBox': 'Lactating',
-        'other': 'Other'
+        'Beneficiary_Category_dropDown': 'Beneficiary Category',
+        'Other_Male_no_input': 'Other Male',
+        'Other_Female_no_input': 'Other Female',
 
         // Remove commented out mappings
         // 'incomeEarned': 'Income Earned/Week',
@@ -792,15 +792,15 @@ export function OrgUnitTable(props: Props) {
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Pregnant', accessor: 'pregnant_checkBox',
+                        Header: 'Beneficiary Category', accessor: 'Beneficiary_Category_dropDown',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Lactating', accessor: 'lactating_checkBox',
+                        Header: 'Other Male', accessor: 'Other_Male_no_input',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Other', accessor: 'other',
+                        Header: 'Other Female', accessor: 'Other_Female_no_input',
                         headerClassName: 'additional-header-cell'
                     },
                 );
@@ -1820,6 +1820,7 @@ export function OrgUnitTable(props: Props) {
 
         const programStage = programStageMap[trainingFilter];
         const url = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json?program=n2iAPy3PGx7&programStage=${programStage}&fields=enrollments[events[*]]`;
+        console.log('API URL:', url);
 
         try {
             const response = await axios.get(url);
@@ -1850,9 +1851,12 @@ export function OrgUnitTable(props: Props) {
                             const expectedId = dataElementMapping[trainingFilter]?.[trackFilter]?.[label]
                                 || dataElementMapping[trainingFilter]?.[label];
 
+                            
                             if (expectedId === dataValue.dataElement) {
                                 dataValues[label] = dataValue.value;
                             }
+
+
                         });
                     });
 
@@ -1866,6 +1870,8 @@ export function OrgUnitTable(props: Props) {
                 dataValues,
             };
 
+
+
         } catch (error) {
             console.error('Error fetching additional data:', error);
             return { reportDate: '', dueDate: '', eventId: '', dataValues: {} };
@@ -1873,8 +1879,14 @@ export function OrgUnitTable(props: Props) {
     };
 
     const handleFilterChange = async (newFilter: string) => {
+        
+        console.log('Filter changed to:', newFilter, 'filteredData:', filteredData); 
         setTrainingFilter(newFilter); // Update the training filter state
         setSelectedProgramStage(newFilter as ProgramStage); // Update selectedProgramStage
+
+        if (newFilter === 'Nutrition') {
+            setTrackFilter(''); // Clear track selection
+          }
 
         // Update columns immediately when filter changes
         setAdditionalColumns(getAdditionalColumns(newFilter));
@@ -2079,6 +2091,57 @@ export function OrgUnitTable(props: Props) {
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
                                     </select>
+                                ) : col.accessor === 'Beneficiary_Category_dropDown' ? (
+                                    <select
+                                        value={
+                                            String(
+                                                fetchedDates[activity.trackInstanceId]?.dataValues[
+                                                dataValueMapping[col.accessor]
+                                                ] || ''
+                                            )
+                                        }
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                activity.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.value
+                                            )
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                sendDataValueUpdate(activity.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value === 'Yes' ? true : false);// ✅ boolean here
+                                            }
+                                        }}
+                                        className="form-select"
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="Pregnant">Pregnant</option>
+                                        <option value="Lactating">Lactating</option>
+                                        <option value="Care Giver">Care Giver</option>
+                                    </select>
+                                ) : col.accessor.includes('no_input') ? (
+                                    <input
+                                        type="number"
+                                        value={
+                                            Number(
+                                                fetchedDates[activity.trackInstanceId]?.dataValues[
+                                                dataValueMapping[col.accessor]
+                                                ] || ''
+                                            )
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                sendDataValueUpdate(activity.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value);
+                                            }
+                                        }}
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                activity.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.value
+                                            )
+                                        }
+                                    />
                                 ) : (
                                     <input
                                         type="text"
@@ -2284,6 +2347,57 @@ export function OrgUnitTable(props: Props) {
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
                                     </select>
+                                ) : col.accessor === 'Beneficiary_Category_dropDown' ? (
+                                    <select
+                                        value={
+                                            String(
+                                                fetchedDates[beneficiary.trackInstanceId]?.dataValues[
+                                                dataValueMapping[col.accessor]
+                                                ] || ''
+                                            )
+                                        }
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                beneficiary.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.value
+                                            )
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                sendDataValueUpdate(beneficiary.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value === 'Yes' ? true : false);// ✅ boolean here
+                                            }
+                                        }}
+                                        className="form-select"
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="Pregnant">Pregnant</option>
+                                        <option value="Lactating">Lactating</option>
+                                        <option value="Care Giver">Care Giver</option>
+                                    </select>
+                                ) : col.accessor.includes('no_input') ? (
+                                    <input
+                                        type="number"
+                                        value={
+                                            Number(
+                                                fetchedDates[beneficiary.trackInstanceId]?.dataValues[
+                                                dataValueMapping[col.accessor]
+                                                ] || ''
+                                            )
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                sendDataValueUpdate(beneficiary.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value);
+                                            }
+                                        }}
+                                        onChange={(e) =>
+                                            handleDataValueChange(
+                                                beneficiary.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.value
+                                            )
+                                        }
+                                    />
                                 ) : (
                                     <input
                                         type="text"
@@ -2524,7 +2638,7 @@ export function OrgUnitTable(props: Props) {
                             type="radio"
                             value="Nutrition"
                             checked={trainingFilter === 'Nutrition'}
-                            onChange={() => setTrainingFilter('Nutrition')}
+                            onChange={() => handleFilterChange('Nutrition')}
                         />
                         Nutrition
                     </label>
