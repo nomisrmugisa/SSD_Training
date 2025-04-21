@@ -61,7 +61,7 @@ const WaterSanitationForm: React.FC<{ place: string; track: string; orgUnit: str
                 "eventDate": formData.reportDate
             };
 
-            const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+            const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

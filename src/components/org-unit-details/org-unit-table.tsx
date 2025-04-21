@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 
@@ -17,11 +17,6 @@ import WaterSanitationForm from '../training-forms/waterSanitation';
 import NutritionForm from '../training-forms/nutrition';
 import './org-unit-table.css';
 
-// import { InternetStatus } from '../common/InternetStatus';
-// import { useOfflineSync } from '../../hooks/useOfflineSync';
-// import { indexedDBManager } from '../../api/offline/indexedDB'; // Adjust the path as necessary
-// import { networkStatus } from '../../utils/networkStatus';
-
 type Props = {
     orgUnitDetails: OrgUnitDetails[];
     orgUnitId: string;
@@ -35,27 +30,6 @@ interface FetchedData {
     dataValues: { [key: string]: string | boolean }; // To hold the values for each data element
 }
 
-// for indexedDB 
-// interface BeneficiaryEvent {
-//     id: string; // Unique ID for the beneficiary
-//     recordDate: string;
-//     track: string;
-//     inactive: string;
-//     beneficiaryStage: string;
-//     careGiver: string;
-//     careGiverAge: string;
-//     patientID: string;
-//     firstMiddleName: string;
-//     surname: string;
-//     dob: string;
-//     orgUnit: string;
-//     // topicTrainedOn: string;
-//     beneficiaryName: string;
-//     nonBeneficiaryName: string;
-//     sex: string;
-//     age: string;
-//     // sentOnline: boolean; // Indicates if the data has been sent to the API
-// }
 
 type ProgramStage = 'Livelihood' | 'Water Sanitation & Hygiene' | 'Nutrition' | '';
 
@@ -126,8 +100,8 @@ export function OrgUnitTable(props: Props) {
                 'Fishing Oil Preparation': 'erCm8YopB1D',
                 'Fishing Marketing': 'QpLUEvB2sdy',
                 'Fishing Methods': 'vsbH6WxHVrN',
-                'Post Handling Methods': 'newDataElementId', // Need correct ID
-                'Applied Lessons': 'newDataElementId',       // Need correct ID
+                'Post Handling Methods': 'SinFNAlonqG', // Need correct ID
+                'Applied Lessons': 'ZBAx5UMH63F',       // Need correct ID
                 // 'Income Earned/Week': 'td3WOxoQ4wN',
                 // 'Case Stories Generated': 'sQShE9oP513'
             },
@@ -140,13 +114,13 @@ export function OrgUnitTable(props: Props) {
                 'Losses Marking': 'aUrLyHqOf0n',
                 'Weeding': 'vVKfsZ8VgiG',
                 'Storage': 'YzlNvVyLIkn',
-                'Applied Lessons': 'newDataElementId',           // Need correct ID
-                'Increased income': 'newDataElementId',         // Need correct ID
-                'Increased agricultural production': 'newDataElementId', // Need correct ID
-                'Started a new livelihood activity': 'newDataElementId', // Need correct ID
-                'Increased my skills/knowledge': 'newDataElementId',    // Need correct ID
-                'Increased my family\'s resilience to shocks': 'newDataElementId', // Need correct ID
-                'Others': 'newDataElementId'                    // Need correct ID
+                'Applied Lessons': 'ZBAx5UMH63F',           // Need correct ID
+                'Increased income': 'Tbnq2F0xX7D',         // Need correct ID
+                'Increased agricultural production': 'GwKxMZ8yaBm', // Need correct ID
+                'Started a new livelihood activity': 'Ee8oyMX7Aoc', // Need correct ID
+                'Increased my skills/knowledge': 'I2KTNrvwsHT',    // Need correct ID
+                'Increased my family\'s resilience to shocks': 'RW2BS4l5KcN', // Need correct ID
+                'Others': 'Si8dOtSlomM'                    // Need correct ID
             }
 
         },
@@ -228,6 +202,32 @@ export function OrgUnitTable(props: Props) {
         // 'caseStories': 'Case Stories Generated',
         // 'landCultivated': 'Land Cultivated in Feddans',
     };
+
+    // list out every “original” column you currently render by header/accessor
+    const originalColumnOptions = [
+        { Header: '#', accessor: 'index', visible: true },
+        { Header: 'Registration Date', accessor: 'recordDate', visible: true },
+        { Header: 'Is Beneficiary Adult / Child', accessor: 'beneficiaryStage', visible: true },
+        { Header: 'Beneficiary Type', accessor: 'beneficiaryType', visible: true },
+        { Header: 'Patient ID', accessor: 'patientID', visible: true },
+        { Header: 'First Name & Middle Name', accessor: 'first_middleName', visible: true },
+        { Header: 'Surname', accessor: 'surname', visible: true },
+        { Header: 'Sex', accessor: 'sex', visible: true },
+        { Header: 'Age', accessor: 'age', visible: true },
+        { Header: 'Date of Birth', accessor: 'dob', visible: true },
+        { Header: 'Initial Muac', accessor: 'initialMuac', visible: true },
+        { Header: 'Muac Classification', accessor: 'muacClassification', visible: true },
+        { Header: 'Beneficiary Facility Registration Number', accessor: 'ben_facility_RegNo', visible: true },
+        { Header: 'Direct Patient ID', accessor: 'directPatientID', visible: true },
+        { Header: 'Beneficiary Track', accessor: 'track', visible: true },
+    ];
+    const [columnsVis, setColumnsVis] = useState(() => {
+        const saved = localStorage.getItem('columnsVis');
+        return saved
+            ? /** parse and validate if you like **/ JSON.parse(saved)
+            : originalColumnOptions;
+    });
+
 
     // const credentials = btoa(`admin:Nomisr123$$$}`);
     const [search, setSearch] = useState('');
@@ -436,6 +436,36 @@ export function OrgUnitTable(props: Props) {
 
     const [hasValidDate, setHasValidDate] = useState<{ [key: string]: boolean }>({});
 
+    // track each indirect row’s Present/Absent
+    const [indirectPresent, setIndirectPresent] = useState<{ [id: string]: boolean }>({});
+
+    const [showColumns, setShowColumns] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // for additional colms returning data
+    const renderCheckCell = (val?: boolean) => val === true ? '✓' : '✗';
+
+
+    useEffect(() => {
+        const onClick = (e: MouseEvent) => {
+            if (
+                showColumns &&
+                dropdownRef.current &&
+                !dropdownRef.current.contains(e.target as Node)
+            ) {
+                setShowColumns(false);
+            }
+        };
+        document.addEventListener('mousedown', onClick);
+        return () => document.removeEventListener('mousedown', onClick);
+    }, [showColumns]);
+
+
+    // 3 Keep localStorage in sync
+    useEffect(() => {
+        localStorage.setItem('columnsVis', JSON.stringify(columnsVis));
+    }, [columnsVis]);
+
     useEffect(() => {
         // Reset all additional column states when training filter changes
         setaddColRow_lvh({
@@ -519,73 +549,6 @@ export function OrgUnitTable(props: Props) {
         }
     }, [trackFilter, props.orgUnitDetails]);
 
-    // useEffect for MUAC
-    // Add this useEffect inside the OrgUnitTable component, after the state declarations
-    // useEffect(() => {
-    //     const muacValue = parseFloat(newRowData.initialMuac);
-    //     let classification = '';
-
-    //     if (!isNaN(muacValue)) {
-    //         if (newRowData.beneficiaryStage === 'Child') {
-    //             if (muacValue < 11.5) {
-    //                 classification = 'Severe <11.5 cm (Red)';
-    //             } else if (muacValue >= 11.5 && muacValue < 12.5) {
-    //                 classification = 'Moderate >=11.5 - < 12.5 cm (Yellow)';
-    //             } else if (muacValue >= 12.5) {
-    //                 classification = 'Normal ≥12.5 cm (Green)';
-    //             }
-    //         } else if (newRowData.beneficiaryStage === 'Adult') {
-    //             if (muacValue < 21) {
-    //                 classification = 'Less than 21 cm (red)';
-    //             } else if (muacValue >= 21 && muacValue < 23) {
-    //                 classification = 'Less than 23 cm greater than 21 cm (yellow)';
-    //             } else if (muacValue >= 23) {
-    //                 classification = 'Equals to or greater than 23 cm (green)';
-    //             }
-    //         }
-    //     }
-
-    //     setNewRowData(prev => ({
-    //         ...prev,
-    //         muacClassification: classification
-    //     }));
-    // }, [newRowData.initialMuac, newRowData.beneficiaryStage]);
-
-    // useEffect(() => {
-
-    //     console.log('MUAC Effect triggered', {
-    //     muacValue: newIndirectData.initialMuac,
-    //     stage: newIndirectData.beneficiaryStage
-    //     });
-    //     const muacValue = parseFloat(newIndirectData.initialMuac);
-    //     let classification = '';
-
-    //     if (!isNaN(muacValue)) {
-    //         if (newIndirectData.beneficiaryStage === 'Child') {
-    //             if (muacValue < 11.5) {
-    //                 classification = 'Severe <11.5 cm (Red)';
-    //             } else if (muacValue >= 11.5 && muacValue < 12.5) {
-    //                 classification = 'Moderate >=11.5 - < 12.5 cm (Yellow)';
-    //             } else if (muacValue >= 12.5) {
-    //                 classification = 'Normal ≥12.5 cm (Green)';
-    //             }
-    //         } else if (newIndirectData.beneficiaryStage === 'Adult') {
-    //             if (muacValue < 21) {
-    //                 classification = 'Less than 21 cm (red)';
-    //             } else if (muacValue >= 21 && muacValue < 23) {
-    //                 classification = 'Less than 23 cm greater than 21 cm (yellow)';
-    //             } else if (muacValue >= 23) {
-    //                 classification = 'Equals to or greater than 23 cm (green)';
-    //             }
-    //         }
-    //     }
-
-    //     setNewIndirectData(prev => ({
-    //         ...prev,
-    //         muacClassification: classification
-    //     }));
-    // }, [newIndirectData.initialMuac, newIndirectData.beneficiaryStage]);
-
     // Update additional columns when training filter changes
     useEffect(() => {
         setAdditionalColumns(getAdditionalColumns(trainingFilter));
@@ -599,6 +562,21 @@ export function OrgUnitTable(props: Props) {
         }
     }, [trackFilter, trainingFilter]);
 
+    useEffect(() => {
+        if (!indirectBeneficiaries.length) return;
+        const loadIndirects = async () => {
+            const updates: { [key: string]: FetchedData } = {};
+            for (const ben of indirectBeneficiaries) {
+                // re‑use your existing helper to fetch the event + dataValues for each indirect
+                updates[ben.trackInstanceId] =
+                    await fetchAdditionalData(ben.trackInstanceId, trainingFilter, trackFilter);
+            }
+            setFetchedDates(prev => ({ ...prev, ...updates }));
+        };
+        loadIndirects();
+    }, [indirectBeneficiaries, trainingFilter, trackFilter]);
+
+
     // Function to determine additional columns based on the training filter
     const getAdditionalColumns = (filter: string) => {
         const columns = [];
@@ -607,8 +585,10 @@ export function OrgUnitTable(props: Props) {
                 if (trackFilter === 'Fisher') {
                     columns.push(
                         {
-                            Header: 'Date of training', accessor: 'reportDate',
-                            headerClassName: 'additional-header-cell'
+                            Header: 'Date of Training', accessor: 'reportDate',
+                            headerClassName: 'additional-header-cell date-column', // Add class
+                            className: 'date-column',
+                            minWidth: 100
                         },
                         // { Header: 'Due Date', accessor: 'dueDate' },
                         {
@@ -630,7 +610,9 @@ export function OrgUnitTable(props: Props) {
                         {
                             Header: 'Did you apply the lessons from fishery training in your life',
                             accessor: 'appliedLessons_dropdown',
-                            headerClassName: 'additional-header-cell'
+                            headerClassName: 'additional-header-cell dropdown-column',
+                            className: 'dropdown-column',
+                            minWidth: 100
                         }
                         // { Header: 'Estimated Fish Catch', accessor: 'estimatedFishCatch' },
                         // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
@@ -639,8 +621,10 @@ export function OrgUnitTable(props: Props) {
                 } else if (trackFilter === 'Farmer') {
                     columns.push(
                         {
-                            Header: 'Date of training', accessor: 'reportDate',
-                            headerClassName: 'additional-header-cell'
+                            Header: 'Date of Training', accessor: 'reportDate',
+                            headerClassName: 'additional-header-cell date-column', // Add class
+                            className: 'date-column',
+                            minWidth: 100
                         },
                         // { Header: 'Due Date', accessor: 'dueDate' },
                         {
@@ -701,7 +685,9 @@ export function OrgUnitTable(props: Props) {
                         },
                         {
                             Header: 'Others (specify)', accessor: 'others_text',
-                            headerClassName: 'additional-header-cell'
+                            headerClassName: 'additional-header-cell text-column', // Add class
+                            className: 'text-column',
+                            minWidth: 100
                         }
                         // Comment out these columns
                         // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
@@ -714,8 +700,10 @@ export function OrgUnitTable(props: Props) {
             case 'Water Sanitation & Hygiene':
                 columns.push(
                     {
-                        Header: 'Date of training', accessor: 'reportDate',
-                        headerClassName: 'additional-header-cell'
+                        Header: 'Date of Training', accessor: 'reportDate',
+                        headerClassName: 'additional-header-cell date-column', // Add class
+                        className: 'date-column',
+                        minWidth: 100
                     },
                     // { Header: 'Due Date', accessor: 'dueDate' },
                     {
@@ -747,8 +735,10 @@ export function OrgUnitTable(props: Props) {
             case 'Nutrition':
                 columns.push(
                     {
-                        Header: 'Date of training', accessor: 'reportDate',
-                        headerClassName: 'additional-header-cell'
+                        Header: 'Date of Training', accessor: 'reportDate',
+                        headerClassName: 'additional-header-cell date-column', // Add class
+                        className: 'date-column',
+                        minWidth: 100
                     },
                     // { Header: 'Due Date', accessor: 'dueDate' },
                     {
@@ -793,15 +783,21 @@ export function OrgUnitTable(props: Props) {
                     },
                     {
                         Header: 'Beneficiary Category', accessor: 'Beneficiary_Category_dropDown',
-                        headerClassName: 'additional-header-cell'
+                        headerClassName: 'additional-header-cell dropdown-column',
+                        className: 'dropdown-column',
+                        minWidth: 100
                     },
                     {
                         Header: 'Other Male', accessor: 'Other_Male_no_input',
-                        headerClassName: 'additional-header-cell'
+                        headerClassName: 'additional-header-cell text-column', // Add class
+                        className: 'text-column',
+                        minWidth: 100
                     },
                     {
                         Header: 'Other Female', accessor: 'Other_Female_no_input',
-                        headerClassName: 'additional-header-cell'
+                        headerClassName: 'additional-header-cell text-column', // Add class
+                        className: 'text-column',
+                        minWidth: 100
                     },
                 );
                 break;
@@ -812,8 +808,12 @@ export function OrgUnitTable(props: Props) {
         // Add the "Add / Edit Event" column
         if (filter) {
             columns.push({
-                Header: 'Add / Edit Event', accessor: 'addEditEvent',
-                headerClassName: 'additional-header-cell'
+                Header: 'Add / Edit Event',
+                accessor: 'addEditEvent',
+                headerClassName: 'additional-header-cell actions-header',
+                className: 'actions-cell',
+                minWidth: 140, // Set minimum width
+                width: 140
             });
         }
 
@@ -832,7 +832,7 @@ export function OrgUnitTable(props: Props) {
     const handleBeneficiarySearch = async (event) => {
         if (event.key === 'Enter') {
             try {
-                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=n2iAPy3PGx7&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
+                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=n2iAPy3PGx7&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
                 const data = await response.json();
                 setSearchResults(data.rows); // Set the search results
                 setIsModalVisible(true); // Show the modal
@@ -883,7 +883,7 @@ export function OrgUnitTable(props: Props) {
     const generatePatientId = async (): Promise<string> => {
         try {
             const response = await axios.get(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/m35qF41KIdK/generate`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/m35qF41KIdK/generate`,
                 {
                     headers: { 'Content-Type': 'application/json' }
                 }
@@ -925,33 +925,6 @@ export function OrgUnitTable(props: Props) {
         setIsAddingIndirect(true);
     };
 
-    // Function to handle training filter change
-    const handleTrainingChange = async (event) => {
-        await setTrainingFilter(event.target.value);
-        // Fetch data based on the selected training type
-        // Implement your data fetching logic here
-    };
-
-    // Function to handle place filter change
-    const handlePlaceChange = (event) => {
-        setPlaceFilter(event.target.value);
-        // Implement your data fetching logic here
-    };
-
-    // Function to handle date filter change
-    const handleDateChange = (event) => {
-        setDateFilter(event.target.value);
-        // Implement your data fetching logic here
-    };
-
-    // Function to handle track filter change
-    const handleTrackChange = async (event) => {
-        const selectedTrack = event.target.value;
-        setTrackFilter(selectedTrack);
-        setNewRowData((prevData) => ({ ...prevData, track: selectedTrack })); // Set the selected track in newRowData
-        // Implement your data fetching logic here
-    };
-
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
@@ -959,7 +932,7 @@ export function OrgUnitTable(props: Props) {
             try {
                 // First request: Fetch the organization unit code
                 const orgUnitCodeResponse = await fetch(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/organisationUnits/${props.orgUnitId}`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/organisationUnits/${props.orgUnitId}`,
                     // `api/organisationUnits/${props.orgUnitId}`,
                     {
                         method: 'GET',
@@ -977,7 +950,7 @@ export function OrgUnitTable(props: Props) {
                 if (orgUnitCode) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
@@ -1007,37 +980,11 @@ export function OrgUnitTable(props: Props) {
         fetchData();
     }, [trigger]);
 
-    const onAdd = () => {
-        setFormVisible(true);
-        setTrigger(prevTrigger => prevTrigger + 1);
-    }
-
-    // Function to fetch a new ID
-    const fetchNewId = async () => {
-        try {
-            const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/system/id?`,
-                // `api/system/id?`, //with proxy
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // 'Authorization': `Basic ${credentials}`,
-                    },
-                });
-            const data = await response.json();
-            return data.codes[0];
-        } catch (error) {
-            console.error('Error fetching new ID:', error);
-            return null;
-        }
-    };
-
     // Function to fetch user
     const fetchUser = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/me`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/me`,
                 // `api/me`, //with proxy
                 {
                     method: 'GET',
@@ -1061,21 +1008,6 @@ export function OrgUnitTable(props: Props) {
             console.error('Error fetching user:', error);
             return null;
         }
-    };
-
-
-    const generateTrackInstId = async (length = 11): Promise<string> => {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        return new Promise((resolve) => {
-            let result = '';
-            setTimeout(() => {
-                for (let i = 0; i < length; i++) {
-                    const randomIndex = Math.floor(Math.random() * characters.length);
-                    result += characters[randomIndex];
-                }
-                resolve(result);
-            }, 100);
-        });
     };
 
     const handleFormSubmit = async (event: React.FormEvent) => {
@@ -1125,7 +1057,7 @@ export function OrgUnitTable(props: Props) {
         try {
             // First POST request - Create tracked entity instance
             const response1 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`,
                 {
                     method: 'POST',
                     headers: {
@@ -1155,7 +1087,7 @@ export function OrgUnitTable(props: Props) {
 
             // Second POST request - Create enrollment
             const response2 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`,
                 {
                     method: 'POST',
                     headers: {
@@ -1188,7 +1120,7 @@ export function OrgUnitTable(props: Props) {
             };
 
             const response3 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                 {
                     method: 'POST',
                     headers: {
@@ -1285,7 +1217,7 @@ export function OrgUnitTable(props: Props) {
                 ]
             };
 
-            const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`, {
+            const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload1)
@@ -1305,7 +1237,7 @@ export function OrgUnitTable(props: Props) {
                 incidentDate: new Date().toISOString()
             };
 
-            const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`, {
+            const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload2)
@@ -1329,7 +1261,7 @@ export function OrgUnitTable(props: Props) {
                 }]
             };
 
-            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload3)
@@ -1560,7 +1492,7 @@ export function OrgUnitTable(props: Props) {
         try {
             if (isEditing) {
                 // PUT request for editing an existing record
-                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${id}`,
+                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${id}`,
                     {
                         method: 'PUT',
                         headers: {
@@ -1574,7 +1506,7 @@ export function OrgUnitTable(props: Props) {
                 // Handle success (e.g., update state, show message)
             } else {
                 // POST request for adding a new record
-                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     {
                         method: 'POST',
                         headers: {
@@ -1594,55 +1526,7 @@ export function OrgUnitTable(props: Props) {
     };
 
     // POST Date - create event 
-    // const handleReportDateSubmit = async (
-    //     e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
-    //     trackInstanceId: string
-    //   ) => {
-    //     const reportDate = fetchedDates[trackInstanceId]?.reportDate;
-    //     if (e.type === 'Enter') {           
 
-    //         if (!reportDate) {
-    //             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
-    //             setMessage('Date of training is required');
-    //             setIsError(true);
-    //             return;
-    //           }
-
-    //         try {
-    //             const payload = {
-    //                 events: [{
-    //                     trackedEntityInstance: trackInstanceId,
-    //                     program: 'n2iAPy3PGx7',
-    //                     programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
-    //                     enrollment: '', // Optional: can be fetched/stored
-    //                     orgUnit: props.orgUnitId,
-    //                     notes: [],
-    //                     dataValues: [],
-    //                     status: 'ACTIVE',
-    //                     eventDate: reportDate,
-    //                 }]
-    //             };
-
-    //             const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, payload);
-    //             const createdEventId = response.data.response.importSummaries[0].reference;
-
-    //             setFetchedDates(prev => ({
-    //                 ...prev,
-    //                 [trackInstanceId]: {
-    //                     ...prev[trackInstanceId],
-    //                     eventId: createdEventId
-    //                 }
-    //             }));
-
-    //             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
-
-    //             console.log(`✅ Event created: ${createdEventId}`);
-    //         } catch (error) {
-    //             console.error('❌ Error creating event:', error);
-    //             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
-    //         }
-    //     }
-    // };
     const handleReportDateSubmit = async (
         e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
         trackInstanceId: string
@@ -1678,7 +1562,7 @@ export function OrgUnitTable(props: Props) {
             };
 
             const response = await axios.post(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                 payload
             );
 
@@ -1743,10 +1627,94 @@ export function OrgUnitTable(props: Props) {
         };
 
         try {
-            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${eventId}/${dataElementId}`, payload);
+            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}/${dataElementId}`, payload);
             console.log(`✅ PUT: ${dataElementName} = ${value}`);
         } catch (error) {
             console.error('❌ Failed to send data value update:', error);
+        }
+    };
+
+    //  handling present / absent indirect beneficiaries
+    const handleIndirectPresentChange = async (
+        indirectId: string,
+        isPresent: boolean
+    ) => {
+        // Optimistically update the checkbox
+        setIndirectPresent(prev => ({
+            ...prev,
+            [indirectId]: isPresent,
+        }));
+
+        // Grab parent’s training event info
+        const parentId = selectedBeneficiary?.trackInstanceId!;
+        const parentData = fetchedDates[parentId];
+        if (!parentData) return;
+
+        if (isPresent) {
+            // ─── Step A: Create the event (just like handleReportDateSubmit) ───
+            try {
+                const payload = {
+                    events: [{
+                        trackedEntityInstance: indirectId,
+                        program: 'n2iAPy3PGx7',
+                        programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+                        orgUnit: props.orgUnitId,
+                        notes: [],
+                        dataValues: [],
+                        status: 'ACTIVE',
+                        eventDate: parentData.reportDate,        // use parent’s date
+                    }]
+                };
+                const resp = await axios.post(
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
+                    payload
+                );
+                const newEventId = resp.data.response.importSummaries[0].reference;
+
+                // Update fetchedDates so we can PUT the dataValues next
+                setFetchedDates(prev => ({
+                    ...prev,
+                    [indirectId]: {
+                        ...parentData,
+                        eventId: newEventId
+                    }
+                }));
+                setHasValidDate(prev => ({
+                    ...prev,
+                    [indirectId]: true
+                }));
+                console.log(`✅ Indirect event created: ${newEventId}`);
+
+                // ─── Step B: Copy each dataValue from parent to this new event ───
+                // parentData.dataValues is { [label: string]: string|boolean }
+                for (const [label, value] of Object.entries(parentData.dataValues)) {
+                    // This calls your existing helper: it does PUT /api/events/{eventId}/{dataElementId}
+                    await sendDataValueUpdate(indirectId, label, value);
+                }
+            } catch (err) {
+                console.error('❌ Error creating indirect event + dataValues:', err);
+                // Roll back the checkbox if you like:
+                setIndirectPresent(prev => ({ ...prev, [indirectId]: false }));
+            }
+        } else {
+            // ─── Absent: delete any event and clear out the values ───
+            const existingEventId = fetchedDates[indirectId]?.eventId;
+            if (existingEventId) {
+                try {
+                    await axios.delete(
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${existingEventId}`
+                    );
+                } catch (e) {
+                    console.warn('⚠️ Failed to delete indirect event:', e);
+                }
+            }
+            // Clear out the indirect’s fetchedDates
+            setFetchedDates(prev => ({
+                ...prev,
+                [indirectId]: { reportDate: '', dueDate: '', eventId: '', dataValues: {} }
+            }));
+            setHasValidDate(prev => ({ ...prev, [indirectId]: false }));
+            console.log(`Indirect ${indirectId} marked absent, data cleared.`);
         }
     };
 
@@ -1819,7 +1787,7 @@ export function OrgUnitTable(props: Props) {
         };
 
         const programStage = programStageMap[trainingFilter];
-        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json?program=n2iAPy3PGx7&programStage=${programStage}&fields=enrollments[events[*]]`;
+        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/${trackInstanceId}.json?program=n2iAPy3PGx7&programStage=${programStage}&fields=enrollments[events[*]]`;
         console.log('API URL:', url);
 
         try {
@@ -1851,7 +1819,7 @@ export function OrgUnitTable(props: Props) {
                             const expectedId = dataElementMapping[trainingFilter]?.[trackFilter]?.[label]
                                 || dataElementMapping[trainingFilter]?.[label];
 
-                            
+
                             if (expectedId === dataValue.dataElement) {
                                 dataValues[label] = dataValue.value;
                             }
@@ -1879,14 +1847,10 @@ export function OrgUnitTable(props: Props) {
     };
 
     const handleFilterChange = async (newFilter: string) => {
-        
-        console.log('Filter changed to:', newFilter, 'filteredData:', filteredData); 
+
+        console.log('Filter changed to:', newFilter, 'filteredData:', filteredData);
         setTrainingFilter(newFilter); // Update the training filter state
         setSelectedProgramStage(newFilter as ProgramStage); // Update selectedProgramStage
-
-        if (newFilter === 'Nutrition') {
-            setTrackFilter(''); // Clear track selection
-          }
 
         // Update columns immediately when filter changes
         setAdditionalColumns(getAdditionalColumns(newFilter));
@@ -1985,522 +1949,402 @@ export function OrgUnitTable(props: Props) {
     };
 
     const renderTableRows = () => {
-
-        // const groupData = data?.groupActivities;
-        // console.log("data", groupData);
-
+        // No data case
         if (!filteredData || filteredData.length === 0) {
             return (
                 <tr>
-                    <td colSpan={6}>No data available for the selected Entry, Please add new Beneficially</td>
+                    <td colSpan={columnsVis.filter(c => c.visible).length + additionalColumns.length + 1}>
+                        No data available for the selected Entry, Please add new Beneficially
+                    </td>
                 </tr>
             );
         }
 
         return filteredData.map((activity, index) => {
-            // console.log({ activity: activity });
-            const fetchedData: FetchedData = fetchedDates[activity.trackInstanceId] || { reportDate: '', dueDate: '', eventId: '', dataValues: {} };
+            const fetchedData: FetchedData =
+                fetchedDates[activity.trackInstanceId] || {
+                    reportDate: '',
+                    dueDate: '',
+                    eventId: '',
+                    dataValues: {}
+                };
 
             return (
-                <tr key={activity.trackInstanceId || index}
-                    onClick={(e) => {
+                <tr
+                    key={activity.trackInstanceId || index}
+                    onClick={e => {
                         e.stopPropagation();
-                        handleRecordClick(activity)
+                        handleRecordClick(activity);
                     }}
                 >
-                    <td>{index + 1}</td>
-                    <td>{activity.recordDate}</td>
-                    <td>{activity.beneficiaryStage}</td>
-                    <td>{activity.beneficiaryType}</td>
-                    <td>{activity.patientID}</td>
-                    <td>{activity.first_middleName}</td>
-                    <td>{activity.surname}</td>
-                    <td>{activity.sex}</td>
-                    <td>{activity.age}</td>
-                    <td>{activity.dob}</td>
-                    <td>{activity.initialMuac}</td>
-                    <td>{activity.muacClassification}</td>
-                    <td>{activity.ben_facility_RegNo}</td>
-                    <td>{activity.directPatientID}</td>
-                    <td>{activity.track}</td>
+                    {/* 1️⃣ Original columns */}
+                    {columnsVis
+                        .filter(c => c.visible)
+                        .map(c => (
+                            <td key={c.accessor}>{(activity as any)[c.accessor]}</td>
+                        ))}
 
-                    {/* Render additional data cells */}
-                    {additionalColumns.map((col) => (
-                        <td key={col.accessor}>
-                            {(editableRows[activity.trackInstanceId] && col.accessor !== 'addEditEvent') ? (
-                                col.accessor === 'reportDate' ? (
-                                    <input
-                                        type="date"
-                                        value={fetchedDates[activity.trackInstanceId]?.reportDate?.split('T')[0] || ''}
-                                        onChange={(e) =>
-                                            handleDateChangeForFetchedDates(activity.trackInstanceId, e.target.value)
-                                        }
-                                        onKeyDown={(e) =>
-                                            handleReportDateSubmit(e, activity.trackInstanceId)
-                                        }
-                                        onBlur={(e) =>
-                                            handleReportDateSubmit(e, activity.trackInstanceId)
-                                        }
+                    {/* 2️⃣ Additional columns */}
+                    {additionalColumns.map(col => {
+                        const isAction = col.accessor === 'addEditEvent';
+                        const isCheckbox = col.accessor.includes('checkBox');
+                        // Determine class: actions-cell, or your custom className, or numeric-cell
+                        const cellClass = isAction
+                            ? 'actions-cell'
+                            : col.className
+                                ? col.className
+                                : isCheckbox
+                                    ? 'numeric-cell'
+                                    : '';
 
-                                    />
-                                ) : col.accessor.includes('checkBox') ? (
-                                    <input
-                                        type="checkbox"
-                                        disabled={!hasValidDate[activity.trackInstanceId]}
-                                        className="form-check-input"
-                                        checked={
-                                            fetchedDates[activity.trackInstanceId]?.dataValues[
-                                            dataValueMapping[col.accessor]
-                                            ] === true ||
-                                            fetchedDates[activity.trackInstanceId]?.dataValues[
-                                            dataValueMapping[col.accessor]
-                                            ] === 'true'
-                                        }
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                activity.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.checked
-                                            )
-                                        }
-                                    />
-                                ) : col.accessor === 'appliedLessons_dropdown' ? (
-                                    <select
-                                        value={
-                                            String(
-                                                fetchedDates[activity.trackInstanceId]?.dataValues[
-                                                dataValueMapping[col.accessor]
-                                                ] || ''
-                                            )
-                                        }
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                activity.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.value
-                                            )
-                                        }
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                sendDataValueUpdate(activity.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value === 'Yes' ? true : false);// ✅ boolean here
+                        // Apply minWidth inline if provided
+                        const style: React.CSSProperties = col.minWidth
+                            ? { minWidth: col.minWidth }
+                            : {};
+
+                        // Editing mode?
+                        const inEdit = editableRows[activity.trackInstanceId] && !isAction;
+
+                        return (
+                            <td key={col.accessor} className={cellClass} style={style}>
+                                {isAction ? (
+                                    <div className="button-container">
+                                        {editableRows[activity.trackInstanceId] ? (
+                                            <>
+                                                <button
+                                                    className="save-button btn"
+                                                    style={{ backgroundColor: 'green' }}
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        handleSave(
+                                                            activity.trackInstanceId,
+                                                            fetchedDates[activity.trackInstanceId]?.eventId
+                                                        );
+                                                    }}
+                                                >
+                                                    Save
+                                                </button>
+                                                <button
+                                                    className="cancel-button btn"
+                                                    style={{ backgroundColor: 'red' }}
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        handleCancel(activity.trackInstanceId);
+                                                    }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    className="add-button btn"
+                                                    style={{ backgroundColor: 'grey' }}
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        handleAdd(activity.trackInstanceId);
+                                                    }}
+                                                >
+                                                    Add
+                                                </button>
+                                                <button
+                                                    className="edit-button btn"
+                                                    style={{ backgroundColor: 'orange' }}
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        handleEdit(activity.trackInstanceId);
+                                                    }}
+                                                >
+                                                    Edit
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                ) : inEdit ? (
+                                    // In‑row inputs when editing (excluding addEditEvent)
+                                    col.accessor === 'reportDate' ? (
+                                        <input
+                                            type="date"
+                                            value={fetchedData.reportDate.split('T')[0] || ''}
+                                            onChange={e =>
+                                                handleDateChangeForFetchedDates(
+                                                    activity.trackInstanceId,
+                                                    e.target.value
+                                                )
                                             }
-                                        }}
-                                        className="form-select"
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                ) : col.accessor === 'Beneficiary_Category_dropDown' ? (
-                                    <select
-                                        value={
-                                            String(
-                                                fetchedDates[activity.trackInstanceId]?.dataValues[
-                                                dataValueMapping[col.accessor]
-                                                ] || ''
-                                            )
-                                        }
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                activity.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.value
-                                            )
-                                        }
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                sendDataValueUpdate(activity.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value === 'Yes' ? true : false);// ✅ boolean here
+                                            onKeyDown={e =>
+                                                handleReportDateSubmit(e, activity.trackInstanceId)
                                             }
-                                        }}
-                                        className="form-select"
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="Pregnant">Pregnant</option>
-                                        <option value="Lactating">Lactating</option>
-                                        <option value="Care Giver">Care Giver</option>
-                                    </select>
-                                ) : col.accessor.includes('no_input') ? (
-                                    <input
-                                        type="number"
-                                        value={
-                                            Number(
-                                                fetchedDates[activity.trackInstanceId]?.dataValues[
-                                                dataValueMapping[col.accessor]
-                                                ] || ''
-                                            )
-                                        }
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                sendDataValueUpdate(activity.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value);
+                                            onBlur={e =>
+                                                handleReportDateSubmit(e, activity.trackInstanceId)
                                             }
-                                        }}
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                activity.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                ) : (
-                                    <input
-                                        type="text"
-                                        value={
-                                            String(
-                                                fetchedDates[activity.trackInstanceId]?.dataValues[
-                                                dataValueMapping[col.accessor]
-                                                ] || ''
-                                            )
-                                        }
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                sendDataValueUpdate(activity.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value);
+                                        />
+                                    ) : isCheckbox ? (
+                                        <input
+                                            type="checkbox"
+                                            disabled={!hasValidDate[activity.trackInstanceId]}
+                                            className="form-check-input"
+                                            checked={
+                                                fetchedData.dataValues[dataValueMapping[col.accessor]] ===
+                                                true ||
+                                                fetchedData.dataValues[dataValueMapping[col.accessor]] ===
+                                                'true'
                                             }
-                                        }}
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                activity.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                )
-                            ) : (
-                                col.accessor === 'reportDate' ? (
-                                    fetchedDates[activity.trackInstanceId]?.reportDate?.split('T')[0] || 'N/A'
-                                ) : col.accessor === 'dueDate' ? (
-                                    fetchedDates[activity.trackInstanceId]?.dueDate?.split('T')[0] || 'N/A'
-                                ) : col.accessor === 'addEditEvent' ? null : (
-                                    col.accessor in dataValueMapping ? (
-                                        fetchedDates[activity.trackInstanceId]?.dataValues[
-                                        dataValueMapping[col.accessor]
-                                        ] || 'N/A'
+                                            onChange={e =>
+                                                handleDataValueChange(
+                                                    activity.trackInstanceId,
+                                                    dataValueMapping[col.accessor],
+                                                    e.target.checked
+                                                )
+                                            }
+                                        />
                                     ) : (
-                                        activity[col.accessor] || ''
+                                        // all other non-checkbox editors: selects / text inputs
+                                        (() => {
+                                            // dropdown for appliedLessons
+                                            if (col.accessor === 'appliedLessons_dropdown') {
+                                                return (
+                                                    <select
+                                                        className="form-select"
+                                                        value={String(
+                                                            fetchedData.dataValues[
+                                                            dataValueMapping[col.accessor]
+                                                            ] || ''
+                                                        )}
+                                                        onChange={e =>
+                                                            handleDataValueChange(
+                                                                activity.trackInstanceId,
+                                                                dataValueMapping[col.accessor],
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        onKeyDown={e => {
+                                                            if (e.key === 'Enter') {
+                                                                sendDataValueUpdate(
+                                                                    activity.trackInstanceId,
+                                                                    dataValueMapping[col.accessor],
+                                                                    e.currentTarget.value === 'Yes'
+                                                                );
+                                                            }
+                                                        }}
+                                                    >
+                                                        <option value="">Select</option>
+                                                        <option value="Yes">Yes</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                );
+                                            }
+                                            // dropdown for beneficiary category
+                                            if (col.accessor === 'Beneficiary_Category_dropDown') {
+                                                return (
+                                                    <select
+                                                        className="form-select"
+                                                        value={String(
+                                                            fetchedData.dataValues[
+                                                            dataValueMapping[col.accessor]
+                                                            ] || ''
+                                                        )}
+                                                        onChange={e =>
+                                                            handleDataValueChange(
+                                                                activity.trackInstanceId,
+                                                                dataValueMapping[col.accessor],
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        onKeyDown={e => {
+                                                            if (e.key === 'Enter') {
+                                                                sendDataValueUpdate(
+                                                                    activity.trackInstanceId,
+                                                                    dataValueMapping[col.accessor],
+                                                                    e.currentTarget.value === 'Yes'
+                                                                );
+                                                            }
+                                                        }}
+                                                    >
+                                                        <option value="">Select</option>
+                                                        <option value="Pregnant">Pregnant</option>
+                                                        <option value="Lactating">Lactating</option>
+                                                        <option value="Care Giver">Care Giver</option>
+                                                    </select>
+                                                );
+                                            }
+                                            // numeric text inputs (e.g. others_text)
+                                            if (col.accessor.includes('no_input')) {
+                                                return (
+                                                    <input
+                                                        type="number"
+                                                        value={Number(
+                                                            fetchedData.dataValues[
+                                                            dataValueMapping[col.accessor]
+                                                            ] || ''
+                                                        )}
+                                                        onKeyDown={e => {
+                                                            if (e.key === 'Enter') {
+                                                                sendDataValueUpdate(
+                                                                    activity.trackInstanceId,
+                                                                    dataValueMapping[col.accessor],
+                                                                    e.currentTarget.value
+                                                                );
+                                                            }
+                                                        }}
+                                                        onChange={e =>
+                                                            handleDataValueChange(
+                                                                activity.trackInstanceId,
+                                                                dataValueMapping[col.accessor],
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                );
+                                            }
+                                            // fallback text input
+                                            return (
+                                                <input
+                                                    type="text"
+                                                    value={String(
+                                                        fetchedData.dataValues[
+                                                        dataValueMapping[col.accessor]
+                                                        ] || ''
+                                                    )}
+                                                    onKeyDown={e => {
+                                                        if (e.key === 'Enter') {
+                                                            sendDataValueUpdate(
+                                                                activity.trackInstanceId,
+                                                                dataValueMapping[col.accessor],
+                                                                e.currentTarget.value
+                                                            );
+                                                        }
+                                                    }}
+                                                    onChange={e =>
+                                                        handleDataValueChange(
+                                                            activity.trackInstanceId,
+                                                            dataValueMapping[col.accessor],
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            );
+                                        })()
                                     )
-                                )
-                            )}
-
-                            {/* Add/Edit Buttons */}
-                            {col.accessor === 'addEditEvent' && (
-                                <div className="button-container">
-                                    {editableRows[activity.trackInstanceId] ? (
-                                        <>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleSave(
-                                                        activity.trackInstanceId,
-                                                        fetchedDates[activity.trackInstanceId]?.eventId
-                                                    )
-                                                }}
-                                                style={{ backgroundColor: 'green' }}
-                                                className="save-button btn"
-                                            >
-                                                Save
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleCancel(activity.trackInstanceId)
-                                                }}
-                                                style={{ backgroundColor: 'red' }}
-                                                className="cancel-button btn"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </>
+                                ) : (
+                                    // 3️⃣ static display when not editing
+                                    col.accessor === 'reportDate' ? (
+                                        fetchedData.reportDate.split('T')[0] || 'N/A'
+                                    ) : col.accessor === 'dueDate' ? (
+                                        fetchedData.dueDate.split('T')[0] || 'N/A'
+                                    ) : col.accessor in dataValueMapping ? (
+                                        // fetchedData.dataValues[dataValueMapping[col.accessor]] || 'N/A'
+                                        renderCheckCell(
+                                            Boolean(
+                                                fetchedData.dataValues[dataValueMapping[col.accessor]]
+                                            )
+                                        )
                                     ) : (
-                                        <>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleAdd(activity.trackInstanceId)
-                                                }}
-                                                style={{ backgroundColor: 'grey' }}
-                                                className="add-button btn"
-                                            >
-                                                Add
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleEdit(activity.trackInstanceId)
-                                                }}
-                                                style={{ backgroundColor: 'orange' }}
-                                                className="edit-button btn"
-                                            >
-                                                Edit
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            )}
-                        </td>
-                    ))}
-
-
+                                        (activity as any)[col.accessor] || ''
+                                    )
+                                )}
+                            </td>
+                        );
+                    })}
                 </tr>
             );
         });
     };
 
     const renderIndirectRows = () => {
-        if (!indirectBeneficiaries || indirectBeneficiaries.length === 0) {
+        const inheritedCols = additionalColumns.filter(c => c.accessor !== 'addEditEvent');
+        if (!indirectBeneficiaries.length) {
             return (
                 <tr>
-                    <td colSpan={14} className="text-center">
+                    <td
+                        colSpan={
+                            columnsVis.filter(c => c.visible).length +
+                            inheritedCols.length +
+                            1
+                        }
+                        className="text-center"
+                    >
                         No indirect beneficiaries found for this record
                     </td>
                 </tr>
             );
         }
 
-        return indirectBeneficiaries.map((beneficiary, index) => {
-            const fetchedData: FetchedData = fetchedDates[beneficiary.trackInstanceId] || {
-                reportDate: '',
-                dueDate: '',
-                eventId: '',
-                dataValues: {}
-            };
+        // grab the parent’s fetched record so we can inherit its dates & dataValues
+        const parentId = selectedBeneficiary?.trackInstanceId!;
+        const parentData = fetchedDates[parentId] || {
+            reportDate: '',
+            dueDate: '',
+            eventId: '',
+            dataValues: {}
+        };
 
-            return (
-                <tr key={beneficiary.trackInstanceId || index}
+        return indirectBeneficiaries.map(ben => (
+            <tr key={ben.trackInstanceId}>
+                {/* Present/Absent checkbox */}
+                <td>
+                    <input
+                        type="checkbox"
+                        // checked={!!indirectPresent[ben.trackInstanceId]}
+                        checked={Boolean(fetchedDates[ben.trackInstanceId]?.eventId)} // derive check status from backend
+                        onChange={e =>
+                            handleIndirectPresentChange(
+                                ben.trackInstanceId,
+                                e.target.checked
+                            )
+                        }
+                    />
+                </td>
 
-                    style={{ cursor: 'pointer' }}
-                >
-                    {/* Main columns */}
-                    <td>{index + 1}</td>
-                    <td>{beneficiary.recordDate}</td>
-                    <td>{beneficiary.beneficiaryStage}</td>
-                    <td>{beneficiary.patientID}</td>
-                    <td>{beneficiary.first_middleName}</td>
-                    <td>{beneficiary.surname}</td>
-                    <td>{beneficiary.sex}</td>
-                    <td>{beneficiary.age}</td>
-                    <td>{beneficiary.dob}</td>
-                    <td>{beneficiary.initialMuac}</td>
-                    <td>{beneficiary.muacClassification}</td>
-                    <td>{beneficiary.ben_facility_RegNo}</td>
-                    <td>{beneficiary.directPatientID}</td>
-                    <td>{beneficiary.track}</td>
-
-                    {/* Additional columns - same as main table */}
-                    {additionalColumns.map((col) => (
-                        <td key={col.accessor}>
-                            {(editableRows[beneficiary.trackInstanceId] && col.accessor !== 'addEditEvent') ? (
-                                col.accessor === 'reportDate' ? (
-                                    <input
-                                        type="date"
-                                        value={fetchedDates[beneficiary.trackInstanceId]?.reportDate?.split('T')[0] || ''}
-                                        onChange={(e) =>
-                                            handleDateChangeForFetchedDates(beneficiary.trackInstanceId, e.target.value)
-                                        }
-                                        onKeyDown={(e) =>
-                                            handleReportDateSubmit(e, beneficiary.trackInstanceId)
-                                        }
-                                    />
-                                ) : col.accessor.includes('checkBox') ? (
-                                    <input
-                                        type="checkbox"
-                                        checked={
-                                            fetchedDates[beneficiary.trackInstanceId]?.dataValues[
-                                            dataValueMapping[col.accessor]
-                                            ] === true ||
-                                            fetchedDates[beneficiary.trackInstanceId]?.dataValues[
-                                            dataValueMapping[col.accessor]
-                                            ] === 'true'
-                                        }
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                beneficiary.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.checked
-                                            )
-                                        }
-                                    />
-                                ) : col.accessor === 'appliedLessons_dropdown' ? (
-                                    <select
-                                        value={
-                                            String(
-                                                fetchedDates[beneficiary.trackInstanceId]?.dataValues[
-                                                dataValueMapping[col.accessor]
-                                                ] || ''
-                                            )
-                                        }
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                beneficiary.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.value
-                                            )
-                                        }
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                sendDataValueUpdate(beneficiary.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value === 'Yes' ? true : false);// ✅ boolean here
-                                            }
-                                        }}
-                                        className="form-select"
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                ) : col.accessor === 'Beneficiary_Category_dropDown' ? (
-                                    <select
-                                        value={
-                                            String(
-                                                fetchedDates[beneficiary.trackInstanceId]?.dataValues[
-                                                dataValueMapping[col.accessor]
-                                                ] || ''
-                                            )
-                                        }
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                beneficiary.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.value
-                                            )
-                                        }
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                sendDataValueUpdate(beneficiary.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value === 'Yes' ? true : false);// ✅ boolean here
-                                            }
-                                        }}
-                                        className="form-select"
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="Pregnant">Pregnant</option>
-                                        <option value="Lactating">Lactating</option>
-                                        <option value="Care Giver">Care Giver</option>
-                                    </select>
-                                ) : col.accessor.includes('no_input') ? (
-                                    <input
-                                        type="number"
-                                        value={
-                                            Number(
-                                                fetchedDates[beneficiary.trackInstanceId]?.dataValues[
-                                                dataValueMapping[col.accessor]
-                                                ] || ''
-                                            )
-                                        }
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                sendDataValueUpdate(beneficiary.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value);
-                                            }
-                                        }}
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                beneficiary.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                ) : (
-                                    <input
-                                        type="text"
-                                        value={
-                                            String(
-                                                fetchedDates[beneficiary.trackInstanceId]?.dataValues[
-                                                dataValueMapping[col.accessor]
-                                                ] || ''
-                                            )
-                                        }
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                sendDataValueUpdate(beneficiary.trackInstanceId, dataValueMapping[col.accessor], e.currentTarget.value);
-                                            }
-                                        }}
-                                        onChange={(e) =>
-                                            handleDataValueChange(
-                                                beneficiary.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                )
-                            ) : (
-                                col.accessor === 'reportDate' ? (
-                                    fetchedDates[beneficiary.trackInstanceId]?.reportDate?.split('T')[0] || 'N/A'
-                                ) : col.accessor === 'dueDate' ? (
-                                    fetchedDates[beneficiary.trackInstanceId]?.dueDate?.split('T')[0] || 'N/A'
-                                ) : col.accessor === 'addEditEvent' ? null : (
-                                    col.accessor in dataValueMapping ? (
-                                        fetchedDates[beneficiary.trackInstanceId]?.dataValues[
-                                        dataValueMapping[col.accessor]
-                                        ] || 'N/A'
-                                    ) : (
-                                        beneficiary[col.accessor] || ''
-                                    )
-                                )
-                            )}
-
-                            {/* Add/Edit Buttons */}
-                            {col.accessor === 'addEditEvent' && (
-                                <div className="button-container">
-                                    {editableRows[beneficiary.trackInstanceId] ? (
-                                        <>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleSave(
-                                                        beneficiary.trackInstanceId,
-                                                        fetchedDates[beneficiary.trackInstanceId]?.eventId
-                                                    )
-                                                }}
-                                                style={{ backgroundColor: 'green' }}
-                                                className="save-button btn"
-                                            >
-                                                Save
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleCancel(beneficiary.trackInstanceId)
-                                                }}
-                                                style={{ backgroundColor: 'red' }}
-                                                className="cancel-button btn"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleAdd(beneficiary.trackInstanceId)
-                                                }}
-                                                style={{ backgroundColor: 'grey' }}
-                                                className="add-button btn"
-                                            >
-                                                Add
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleEdit(beneficiary.trackInstanceId)
-                                                }}
-                                                style={{ backgroundColor: 'orange' }}
-                                                className="edit-button btn"
-                                            >
-                                                Edit
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            )}
-                        </td>
+                {/* 1️⃣ Original columns */}
+                {columnsVis
+                    .filter(c => c.visible)
+                    .map(c => (
+                        <td key={c.accessor}>{(ben as any)[c.accessor]}</td>
                     ))}
-                </tr>
-            );
-        });
+
+                {/* 2️⃣ Additional columns (read‑only, inherited) */}
+                {inheritedCols.map(col => {
+                    // reuse the same cellClass + style logic you have for direct rows
+                    const isAction = col.accessor === 'addEditEvent';
+                    const isCheckbox = col.accessor.includes('checkBox');
+                    const cellClass = isAction
+                        ? 'actions-cell'
+                        : col.className
+                            ? col.className
+                            : isCheckbox
+                                ? 'numeric-cell'
+                                : '';
+                    const style: React.CSSProperties = col.minWidth
+                        ? { minWidth: col.minWidth }
+                        : {};
+
+                    // now pick content based on accessor
+                    let content: React.ReactNode;
+                    if (col.accessor === 'reportDate') {
+                        // show the parent’s date
+                        content = parentData.reportDate?.split('T')[0] || '—';
+                    } else if (col.accessor === 'dueDate') {
+                        content = parentData.dueDate?.split('T')[0] || '—';
+                    } else {
+                        // everything else is a ✓/✗
+                        const label = dataValueMapping[col.accessor];
+                        // for a present indirect, we copied parentData into fetchedDates[ben] already
+                        const raw = fetchedDates[ben.trackInstanceId]?.dataValues[label];
+                        const flag = raw === true || raw === 'true';
+                        content = renderCheckCell(flag);
+                    }
+
+                    return (
+                        <td key={col.accessor} className={cellClass} style={style}>
+                            {content}
+                        </td>
+                    );
+                })}
+            </tr>
+        ));
     };
 
-    // Modified handleFilterChange function
     const handleProgramStageChange = async (newFilter: ProgramStage) => {
         setSelectedProgramStage(newFilter);
         setTrainingFilter(newFilter);
@@ -2531,7 +2375,7 @@ export function OrgUnitTable(props: Props) {
     const fetchProgramStageData = async (programStageId: string) => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/pending?programStage=${programStageId}`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/pending?programStage=${programStageId}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -2643,6 +2487,48 @@ export function OrgUnitTable(props: Props) {
                         Nutrition
                     </label>
                 </div>
+
+                {/* Column Selector */}
+                <div ref={dropdownRef} style={{ position: 'relative' }} className="relative column-filter-dropdown">
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => setShowColumns(v => !v)}
+                        style={{ zIndex: 1000 }}
+                    >
+                        Columns ▼
+                    </button>
+                    {showColumns && (
+                        <div
+                            className="absolute mt-1 p-2 bg-white border rounded shadow-lg z-10"
+                            style={{ minWidth: '180px', zIndex: 999 }}
+                        >
+                            {columnsVis.map(col => (
+                                <label
+                                    key={col.accessor}
+                                    className="flex items-start py-1"
+
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={col.visible}
+                                        onChange={() =>
+                                            setColumnsVis(cols =>
+                                                cols.map(c =>
+                                                    c.accessor === col.accessor
+                                                        ? { ...c, visible: !c.visible }
+                                                        : c
+                                                )
+                                            )
+                                        }
+                                    />
+                                    <span
+                                    >{col.Header}</span>
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
             </div>
 
             {/* Second div block - Search, New Beneficiary, and Date */}
@@ -3041,43 +2927,34 @@ export function OrgUnitTable(props: Props) {
                 <>
                     <div className="table-responsive">
                         <table className="table table-striped table-bordered table-hover table-dark-header">
-                            <thead className="text-nowrap">
+                            <thead>
                                 <tr>
-                                    <th>No.</th>
-                                    <th>Registration Date</th>
-                                    <th>Is Beneficiary Adult / Child</th>
-                                    <th>Beneficiary Type</th>
-                                    <th>Patient ID</th>
-                                    <th>First Name & Middle Name</th>
-                                    <th>Surname</th>
-                                    <th>Sex</th>
-                                    <th>Age</th>
-                                    <th>Date of Birth</th>
-                                    <th>Initial Muac</th>
-                                    <th>Muac Classification</th>
-                                    <th>Beneficiary Facility Registration Number</th>
-                                    <th>Direct Patient ID</th>
-                                    <th>Beneficiary Track</th>
-
-                                    {/* Render additional headers */}
-                                    {additionalColumns.map((col) => (
-                                        <th key={col.accessor}
-                                            className={col.headerClassName}
-                                        >{col.Header}</th>
+                                    {columnsVis
+                                        .filter(c => c.visible)
+                                        .map(c => (
+                                            <th key={c.accessor}>{c.Header}</th>
+                                        ))
+                                    }
+                                    {/* then your numbered additional‑columns… */}
+                                    {additionalColumns.map((col, i) => (
+                                        <th
+                                            key={col.accessor}
+                                            className={`${col.headerClassName} numeric-header`}
+                                            title={col.Header}           // keep full title on hover
+                                        >
+                                            {/* {i + 1} */}
+                                            {col.accessor === 'addEditEvent' ? 'Action' : i + 1}
+                                        </th>
                                     ))}
                                 </tr>
-                                {/* <tr>
-                                    {table.columns.map((column) => (
-                                        <th key={column.accessor || column.Header}>{column.Header}</th>
-                                    ))}
-                                </tr> */}
                             </thead>
+
                             <tbody>
                                 {renderTableRows()}
                                 {/* New row form as part of the table */}
                                 {isAddingNewRow && (
                                     <tr>
-                                        <td>
+                                        {/* <td className="min-w-[120px]">
                                             <input
                                                 type="text"
                                                 className="table-input"
@@ -3087,21 +2964,22 @@ export function OrgUnitTable(props: Props) {
                                                 onChange={(e) => setNewRowData({ ...newRowData, id: e.target.value })}
                                                 placeholder="Row No."
                                             />
-                                        </td>
+                                        </td> */}
+                                        <td>NEW</td>
 
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="date"
                                                 name="recordDate"
                                                 value={newRowData.recordDate}
                                                 // onChange={handleNewRowInputChange}
                                                 onChange={(e) => setNewRowData({ ...newRowData, recordDate: e.target.value })}
-
+                                                className="w-full p-2 mb-2"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <select
-                                                className="table-select"
+                                                className="table-select w-full p-2 mb-2"
                                                 name="beneficiaryStage"
                                                 value={newRowData.beneficiaryStage}
                                                 // onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
@@ -3122,9 +3000,9 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Child">Child</option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <select
-                                                className="table-select"
+                                                className="table-select w-full p-2 mb-2"
                                                 name="beneficiaryType"
                                                 value={newRowData.beneficiaryType}
                                                 onChange={(e) =>
@@ -3136,10 +3014,10 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Indirect Beneficiary">Indirect Beneficiary</option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="patientID"
                                                 value={newRowData.patientID}
                                                 // onChange={handleNewRowInputChange}
@@ -3148,10 +3026,10 @@ export function OrgUnitTable(props: Props) {
                                                 readOnly
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="first_middleName"
                                                 value={newRowData.first_middleName}
                                                 // onChange={handleNewRowInputChange}
@@ -3159,10 +3037,10 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="First Name and Middle Name"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="surname"
                                                 value={newRowData.surname}
                                                 // onChange={handleNewRowInputChange}
@@ -3170,9 +3048,9 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Surname"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <select
-                                                className="table-select"
+                                                className="table-select w-full p-2 mb-2"
                                                 name="sex"
                                                 value={newRowData.sex}
                                                 onChange={(e) => setNewRowData({ ...newRowData, sex: e.target.value })}
@@ -3182,31 +3060,51 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Female">Female</option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
-                                                type="number"
-                                                className="table-input"
+                                                type="text"
+                                                inputMode="numeric"
+                                                pattern="[0-9]*"
                                                 name="age"
                                                 value={newRowData.age}
                                                 // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, age: e.target.value })}
+                                                onChange={e => {
+                                                    // strip out anything that isn’t a digit
+                                                    const onlyDigits = e.target.value.replace(/\D/g, '')
+                                                    setNewRowData({ ...newRowData, age: onlyDigits })
+                                                }}
+                                                onKeyDown={e => {
+                                                    // allow only digits, Backspace, Delete, arrows, Tab
+                                                    if (
+                                                        !/[0-9]/.test(e.key) &&
+                                                        e.key !== 'Backspace' &&
+                                                        e.key !== 'Delete' &&
+                                                        e.key !== 'ArrowLeft' &&
+                                                        e.key !== 'ArrowRight' &&
+                                                        e.key !== 'Tab'
+                                                    ) {
+                                                        e.preventDefault()
+                                                    }
+                                                }}
+                                                // style={{ width: '100%' /* keep full‐width even if table cols shrink */ }}
                                                 placeholder="Age"
+                                                className="w-full p-2 mb-2"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="date"
                                                 name="dob"
                                                 value={newRowData.dob}
                                                 // onChange={handleNewRowInputChange}
                                                 onChange={(e) => setNewRowData({ ...newRowData, dob: e.target.value })}
-
+                                                className="w-full p-2 mb-2"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="initialMuac"
                                                 value={newRowData.initialMuac}
                                                 // onChange={handleNewRowInputChange}
@@ -3226,10 +3124,10 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Initial Muac"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="muacClassification"
                                                 value={newRowData.muacClassification}
 
@@ -3237,10 +3135,10 @@ export function OrgUnitTable(props: Props) {
                                                 readOnly
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="ben_facility_RegNo"
                                                 value={newRowData.ben_facility_RegNo}
                                                 // onChange={handleNewRowInputChange}
@@ -3248,10 +3146,10 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Beneficiary Facility Registration Number"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="directPatientID"
                                                 value={newRowData.directPatientID}
                                                 // onChange={handleNewRowInputChange}
@@ -3259,10 +3157,10 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Direct Patient ID"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="track"
                                                 value={newRowData.track}
                                                 // onChange={handleNewRowInputChange}
@@ -3277,8 +3175,19 @@ export function OrgUnitTable(props: Props) {
                                             <button onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleFormSubmit(e);
-                                            }}
-                                                className="submit-button">Save</button>
+                                                }}
+                                                className="submit-button"
+                                            >Save</button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setIsAddingNewRow(false)
+                                                }}
+                                                style={{ marginLeft: '5px'}}
+                                                className="cancel-button"
+                                            >
+                                                Cancel
+                                            </button>
                                         </td>
                                     </tr>
                                 )}
@@ -3315,31 +3224,32 @@ export function OrgUnitTable(props: Props) {
                         <table className="table table-striped table-bordered table-hover table-dark-header">
                             <thead>
                                 <tr>
-                                    {/* Same headers as main table */}
-                                    <th>No.</th>
-                                    <th>Registration Date</th>
-                                    <th>Is Beneficiary Adult / Child</th>
+                                    {/* 3 New Present / Absent header */}
+                                    <th>Present / Absent</th>
 
-                                    <th>Patient ID</th>
-                                    <th>First Name & Middle Name</th>
-                                    <th>Surname</th>
-                                    <th>Sex</th>
-                                    <th>Age</th>
-                                    <th>Date of Birth</th>
-                                    <th>Initial Muac</th>
-                                    <th>Muac Classification</th>
-                                    <th>Beneficiary Facility Registration Number</th>
-                                    <th>Direct Patient ID</th>
-                                    <th>Beneficiary Track</th>
+                                    {/* 1 Original columns – exactly the same visibile set you chose in part 1 */}
+                                    {columnsVis
+                                        .filter(c => c.visible)
+                                        .map(c => (
+                                            <th key={c.accessor}>{c.Header}</th>
+                                        ))
+                                    }
 
-                                    {/* Additional columns header */}
-                                    {additionalColumns.map((col) => (
-                                        <th key={col.accessor}
-                                            className={col.headerClassName}
-                                        >{col.Header}</th>
+                                    {/* 2 Numbered additional columns */}
+                                    {additionalColumns.filter(col => col.accessor !== 'addEditEvent').map((col, i) => (
+                                        <th
+                                            key={col.accessor}
+                                            className={`${col.headerClassName} numeric-header`}
+                                            title={col.Header}           // keep full title on hover
+                                        >
+                                            {i + 1}                       {/* show only the number*} */}
+                                        </th>
                                     ))}
+
+
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {indirectBeneficiaries.length === 0 ? (
                                     <tr>
@@ -3357,16 +3267,17 @@ export function OrgUnitTable(props: Props) {
                                 {isAddingIndirect && (
                                     <tr>
                                         <td>NEW</td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="date"
                                                 value={newIndirectData.recordDate}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, recordDate: e.target.value })}
+                                                className="w-full p-2 mb-2"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <select
-                                                className="table-select"
+                                                className="table-select w-full p-2 mb-2"
                                                 name="beneficiaryStage"
                                                 value={newIndirectData.beneficiaryStage}
                                                 // onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
@@ -3387,33 +3298,42 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Child">Child</option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
+                                            <input
+                                                className="table-select w-full p-2 mb-2"
+                                                name="beneficiaryType"
+                                                value='Indirect Beneficiary'
+                                                readOnly
+                                            />
+                                        </td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 value={newIndirectData.patientID}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, patientID: e.target.value })}
                                                 readOnly
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
                                                 value={newIndirectData.first_middleName}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, first_middleName: e.target.value })}
+                                                className="w-full p-2 mb-2"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 value={newIndirectData.surname}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, surname: e.target.value })}
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <select
-                                                className="table-select"
+                                                className="table-select w-full p-2 mb-2"
                                                 value={newIndirectData.sex}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, sex: e.target.value })}
                                             >
@@ -3421,31 +3341,51 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Female">Female</option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
-                                                type="number"
-                                                className="table-input"
+                                                type="text"
+                                                inputMode="numeric"
+                                                pattern="[0-9]*"
                                                 name="age"
                                                 value={newIndirectData.age}
                                                 // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, age: e.target.value })}
+                                                onChange={e => {
+                                                    // strip out anything that isn’t a digit
+                                                    const onlyDigits = e.target.value.replace(/\D/g, '')
+                                                    setNewIndirectData({ ...newIndirectData, age: onlyDigits })
+                                                }}
+                                                onKeyDown={e => {
+                                                    // allow only digits, Backspace, Delete, arrows, Tab
+                                                    if (
+                                                        !/[0-9]/.test(e.key) &&
+                                                        e.key !== 'Backspace' &&
+                                                        e.key !== 'Delete' &&
+                                                        e.key !== 'ArrowLeft' &&
+                                                        e.key !== 'ArrowRight' &&
+                                                        e.key !== 'Tab'
+                                                    ) {
+                                                        e.preventDefault()
+                                                    }
+                                                }}
+                                                style={{ width: '100%' /* keep full‐width even if table cols shrink */ }}
                                                 placeholder="Age"
+                                                className="w-full p-2 mb-2"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="date"
                                                 name="dob"
                                                 value={newIndirectData.dob}
                                                 // onChange={handleNewRowInputChange}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, dob: e.target.value })}
-
+                                                className="w-full p-2 mb-2"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="initialMuac"
                                                 value={newIndirectData.initialMuac}
                                                 // onChange={handleNewRowInputChange}
@@ -3464,10 +3404,10 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Initial Muac"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="muacClassification"
                                                 value={newIndirectData.muacClassification}
 
@@ -3475,10 +3415,10 @@ export function OrgUnitTable(props: Props) {
                                                 readOnly
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="ben_facility_RegNo"
                                                 value={newIndirectData.ben_facility_RegNo}
                                                 // onChange={handleNewRowInputChange}
@@ -3486,10 +3426,10 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Beneficiary Facility Registration Number"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="directPatientID"
                                                 value={newIndirectData.directPatientID}
                                                 // onChange={handleNewRowInputChange}
@@ -3498,10 +3438,10 @@ export function OrgUnitTable(props: Props) {
                                                 readOnly
                                             />
                                         </td>
-                                        <td>
+                                        <td className="min-w-[120px]">
                                             <input
                                                 type="text"
-                                                className="table-input"
+                                                className="table-input w-full p-2 mb-2"
                                                 name="track"
                                                 value={newIndirectData.track}
                                                 // onChange={handleNewRowInputChange}
@@ -3517,7 +3457,7 @@ export function OrgUnitTable(props: Props) {
                                                     handleSaveIndirect()
                                                 }
                                                 }
-                                                className="bg-green-500 text-white px-3 py-1 rounded mr-2"
+                                                className="submit-button"
                                             >
                                                 Save
                                             </button>
@@ -3526,7 +3466,8 @@ export function OrgUnitTable(props: Props) {
                                                     e.stopPropagation();
                                                     setIsAddingIndirect(false)
                                                 }}
-                                                className="bg-red-500 text-white px-3 py-1 rounded"
+                                                style={{ marginLeft: '5px' }}
+                                                className="cancel-button"
                                             >
                                                 Cancel
                                             </button>

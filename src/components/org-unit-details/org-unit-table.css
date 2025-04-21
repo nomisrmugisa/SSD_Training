@@ -13,6 +13,7 @@
     box-sizing: border-box;
     /* Include padding in width calculation */
     margin-bottom: 1rem;
+    display: inline-block;
 }
 
 /* For modern browsers you might want */
@@ -81,7 +82,7 @@
 
 /* Add horizontal scroll to tables */
 .table {
-    width: 100%;
+    width: auto !important;
     margin-bottom: 1rem;
     color: #212529;
     border-collapse: collapse;
@@ -232,4 +233,130 @@
   display: flex;
   gap: 4px;
   justify-content: center;
+}
+
+/* container holds button and menu */
+.column-selector {
+  display: inline-block;
+}
+
+/* the floating menu */
+.column-selector .dropdown-menu {
+  top: 100%;              /* directly under the button */
+  left: 0;
+  margin-top: 4px;
+  padding: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 9999;          /* above everything */
+}
+
+/* each item in the menu */
+.column-selector .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;               /* space between checkbox & text */
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* remove border on last item */
+.column-selector .dropdown-item:last-child {
+  border-bottom: none;
+}
+
+/* larger hit‑area on the label */
+.column-selector .dropdown-item label {
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+/* Numeric headers for additionalColumns (step 3) */
+.additional-header-cell.numeric-header {
+  width: 40px !important;      /* narrow fixed width */
+  min-width: 40px !important;
+  max-width: 40px !important;
+  text-align: center;          /* center the “1, 2, 3…” */
+  padding: 0.25rem;            /* small padding */
+}
+
+/* Numeric cells for additionalColumns values */
+.numeric-cell {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  text-align: center;          /* center checkboxes/text */
+  padding: 0.25rem;
+}
+
+/* in org-unit-table.css */
+.column-filter-dropdown label span {
+  white-space: normal !important;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* Regular additional columns */
+.additional-header-cell:not(.actions-header) {
+  min-width: 120px; /* Wider default for non-checkbox columns */
+  white-space: normal !important; /* Allow header text wrapping */
+}
+
+/* Date columns specifically */
+[headerClassName*="date"] {
+  min-width: 140px !important;
+}
+
+/* Action column */
+.actions-header {
+  min-width: 100px !important; /* Fixed width for action column */
+  width: 100px !important;
+  text-align: center;
+}
+
+.actions-cell {
+  padding: 4px !important;
+  text-align: center;
+  background: #f8f9fa; /* Visual separation */
+}
+
+/* Checkbox columns keep narrow width */
+.numeric-header, .numeric-cell {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+}
+
+/* keep checkboxes narrow */
+.numeric-cell {
+  width: 40px !important;
+  min-width: 40px !important;
+  text-align: center;
+}
+
+/* Add/Edit column */
+.actions-cell {
+  min-width: 180px;
+  /* any padding you need */
+}
+
+/* make date inputs a bit wider */
+.date-column,
+.date-column .form-control, /* if using bootstrap class */
+.date-column input[type="date"] {
+  min-width: 120px;
+}
+
+/* dropdowns get some space */
+.dropdown-column,
+.dropdown-column select {
+  min-width: 120px;
+}
+
+/* text inputs (e.g. “Others”) */
+.text-column,
+.text-column input[type="text"],
+.text-column input[type="number"],
+.text-column input {
+  min-width: 120px;
 }
