@@ -3027,15 +3027,23 @@ export function OrgUnitTable(props: Props) {
                                     {additionalColumns
                                         .filter(col => topicsVis[col.accessor])
                                         .map((col) => {
-                                            const fullIndex = additionalColumns.findIndex(c => c.accessor === col.accessor);
-
                                             let label = '';
+
                                             if (col.accessor === 'reportDate') {
                                                 label = 'Date of Training';
                                             } else if (col.accessor === 'addEditEvent') {
                                                 label = 'Action';
                                             } else {
-                                                label = (fullIndex + 1).toString();
+                                                // count how many visible non-date, non-action columns come before this one
+                                                const visibleIndex = additionalColumns
+                                                    .filter(c =>
+                                                        c.accessor !== 'reportDate' &&
+                                                        c.accessor !== 'addEditEvent' &&
+                                                        topicsVis[c.accessor]
+                                                    )
+                                                    .findIndex(c => c.accessor === col.accessor);
+
+                                                label = String(visibleIndex + 1);
                                             }
 
                                             return (
@@ -3048,6 +3056,7 @@ export function OrgUnitTable(props: Props) {
                                                 </th>
                                             );
                                         })}
+
                                 </tr>
                             </thead>
 
@@ -3343,23 +3352,32 @@ export function OrgUnitTable(props: Props) {
                                         .map((col) => {
                                             const fullIndex = additionalColumns.findIndex(c => c.accessor === col.accessor);
 
-                                            let label = '';
+                                            let label: string;
                                             if (col.accessor === 'reportDate') {
                                                 label = 'Date of Training';
                                             } else {
-                                                label = (fullIndex + 1).toString();
+                                                // count how many visible topic columns come *before* this one (excluding reportDate)
+                                                const visibleBefore = additionalColumns
+                                                    .filter(c =>
+                                                        c.accessor !== 'addEditEvent' &&
+                                                        c.accessor !== 'reportDate' &&
+                                                        topicsVis[c.accessor]
+                                                    )
+                                                    .findIndex(c => c.accessor === col.accessor);
+                                                label = String(visibleBefore + 1);
                                             }
 
                                             return (
                                                 <th
                                                     key={col.accessor}
                                                     className={`${col.headerClassName} numeric-header`}
-                                                    title={col.Header} // Show full name on hover
+                                                    title={col.Header}
                                                 >
                                                     {label}
                                                 </th>
                                             );
                                         })}
+
 
 
 
