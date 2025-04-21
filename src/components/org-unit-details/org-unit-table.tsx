@@ -445,21 +445,66 @@ export function OrgUnitTable(props: Props) {
     // for additional colms returning data
     const renderCheckCell = (val?: boolean) => val === true ? '✓' : '✗';
 
+    // number of original (visible) columns
+    const originalCount = columnsVis.filter(c => c.visible).length;
+    // number of extra data columns (including the “Action” col)
+    const extraCount = additionalColumns.length;
+    // total columns to span:
+    const totalCols = originalCount + extraCount;
+
+
+    const [showTopics, setShowTopics] = useState(false);
+
+    const topicsRef = useRef<HTMLDivElement>(null);
+
+
+
+    // which of the “topics” (additional columns) are visible
+    const [topicsVis, setTopicsVis] = useState<Record<string, boolean>>(() =>
+        additionalColumns.reduce((acc, col) => {
+            acc[col.accessor] = true;  // default: all on
+            return acc;
+        }, {} as Record<string, boolean>)
+    );
+
+    // re-initialize additional cols arrays for Topics filter
+    useEffect(() => {
+        const vis: Record<string, boolean> = {};
+        additionalColumns.forEach(col => {
+            vis[col.accessor] = topicsVis[col.accessor] ?? true;
+        });
+        setTopicsVis(vis);
+    }, [additionalColumns]);
 
     useEffect(() => {
         const onClick = (e: MouseEvent) => {
             if (
-                showColumns &&
+                showTopics &&
                 dropdownRef.current &&
                 !dropdownRef.current.contains(e.target as Node)
             ) {
-                setShowColumns(false);
+                setShowTopics(false);
             }
         };
         document.addEventListener('mousedown', onClick);
         return () => document.removeEventListener('mousedown', onClick);
-    }, [showColumns]);
+    }, [showTopics]);
 
+
+    // columns filter useEffect
+    // useEffect(() => {
+    //     const onClick = (e: MouseEvent) => {
+    //         if (
+    //             showColumns &&
+    //             dropdownRef.current &&
+    //             !dropdownRef.current.contains(e.target as Node)
+    //         ) {
+    //             setShowColumns(false);
+    //         }
+    //     };
+    //     document.addEventListener('mousedown', onClick);
+    //     return () => document.removeEventListener('mousedown', onClick);
+    // }, [showColumns]);
 
     // 3 Keep localStorage in sync
     useEffect(() => {
@@ -590,23 +635,23 @@ export function OrgUnitTable(props: Props) {
                             className: 'date-column',
                             minWidth: 100
                         },
-                        // { Header: 'Due Date', accessor: 'dueDate' },
-                        {
-                            Header: 'Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox',
-                            headerClassName: 'additional-header-cell'
-                        },
-                        {
-                            Header: 'Fishing Marketing', accessor: 'fishingMarketing_checkBox',
-                            headerClassName: 'additional-header-cell'
-                        },
+                        // { Header: 'Due Date', accessor: 'dueDate' },                                                
                         {
                             Header: 'Fishing Methods', accessor: 'fishingMethods_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Post Handling Methods', accessor: 'postHandlingMethods_checkBox',
+                            Header: 'Post Handling and Hygiene', accessor: 'postHandlingMethods_checkBox',
                             headerClassName: 'additional-header-cell'
                         }, // Added
+                        {
+                            Header: 'Fishing Marketing and Record Keeping', accessor: 'fishingMarketing_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
                         {
                             Header: 'Did you apply the lessons from fishery training in your life',
                             accessor: 'appliedLessons_dropdown',
@@ -627,6 +672,20 @@ export function OrgUnitTable(props: Props) {
                             minWidth: 100
                         },
                         // { Header: 'Due Date', accessor: 'dueDate' },
+
+
+                        {
+                            Header: 'Land Preparation and Sowing', accessor: 'landPreparation_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Nursery bed Preparation and Transplanting', accessor: 'nurseryPreparation_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
+                        {
+                            Header: 'Weeding and Pest Control', accessor: 'weeding_checkBox',
+                            headerClassName: 'additional-header-cell'
+                        },
                         {
                             Header: 'Harvesting', accessor: 'harvesting_checkBox',
                             headerClassName: 'additional-header-cell'
@@ -636,29 +695,18 @@ export function OrgUnitTable(props: Props) {
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Land Preparation', accessor: 'landPreparation_checkBox',
+                            Header: 'Storage', accessor: 'storage_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Nursery Preparation', accessor: 'nurseryPreparation_checkBox',
-                            headerClassName: 'additional-header-cell'
-                        },
-                        {
-                            Header: 'Post Harvest Hygiene', accessor: 'postHarvestHygiene_checkBox',
+                            Header: 'Post Harvest Losses', accessor: 'postHarvestHygiene_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: 'Losses Marking', accessor: 'lossesMarking_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
-                        {
-                            Header: 'Weeding', accessor: 'weeding_checkBox',
-                            headerClassName: 'additional-header-cell'
-                        },
-                        {
-                            Header: 'Storage', accessor: 'storage_checkBox',
-                            headerClassName: 'additional-header-cell'
-                        },
+
                         {
                             Header: 'Did you apply the lessons from the farming trainings in your life', accessor: 'appliedLessons_dropdown',
                             headerClassName: 'additional-header-cell'
@@ -711,7 +759,7 @@ export function OrgUnitTable(props: Props) {
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Promoters Attendance :1. CLTS', accessor: 'promotersAttendance_checkBox',
+                        Header: 'CLTS (Community Lead Total Sanitation)', accessor: 'promotersAttendance_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
@@ -757,16 +805,13 @@ export function OrgUnitTable(props: Props) {
                         Header: 'Exclusive breastfeeding during the first 6 months', accessor: 'exclusiveBreastfeeding_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
-                    {
-                        Header: 'Good hygiene practices', accessor: 'goodHygiene_checkBox',
-                        headerClassName: 'additional-header-cell'
-                    },
+
                     {
                         Header: 'Complementary feeding', accessor: 'complementaryFeeding_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Health seeking behavior', accessor: 'healthSeekingBehavior_checkBox',
+                        Header: 'Good hygiene practices', accessor: 'goodHygiene_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
@@ -774,7 +819,12 @@ export function OrgUnitTable(props: Props) {
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Kitchen gardens and fruit trees', accessor: 'kitchenGardens_checkBox',
+                        Header: 'Health seeking behavior', accessor: 'healthSeekingBehavior_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+
+                    {
+                        Header: 'Kitchen gardening and fruit trees', accessor: 'kitchenGardens_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
@@ -819,7 +869,6 @@ export function OrgUnitTable(props: Props) {
 
         return columns;
     };
-
 
     const table = useTable({
         data: props.orgUnitDetails,
@@ -1985,7 +2034,7 @@ export function OrgUnitTable(props: Props) {
                         ))}
 
                     {/* 2️⃣ Additional columns */}
-                    {additionalColumns.map(col => {
+                    {additionalColumns.filter(col => topicsVis[col.accessor]).map(col => {
                         const isAction = col.accessor === 'addEditEvent';
                         const isCheckbox = col.accessor.includes('checkBox');
                         // Determine class: actions-cell, or your custom className, or numeric-cell
@@ -2252,7 +2301,7 @@ export function OrgUnitTable(props: Props) {
     };
 
     const renderIndirectRows = () => {
-        const inheritedCols = additionalColumns.filter(c => c.accessor !== 'addEditEvent');
+        const inheritedCols = additionalColumns.filter(c => c.accessor !== 'addEditEvent' && topicsVis[c.accessor]);
         if (!indirectBeneficiaries.length) {
             return (
                 <tr>
@@ -2453,6 +2502,21 @@ export function OrgUnitTable(props: Props) {
                     <option value="Farmer">Farmer</option>
                 </select>
 
+                <input
+                    type="text"
+                    placeholder="Search Beneficiary"
+                    value={beneficiarySearch}
+                    // onChange={(e) => setBeneficiarySearch(e.target.value)}
+                    onChange={handleBeneficiarySearch1}
+                    className="border border-gray-300 rounded-md"
+                    style={{
+                        borderRadius: '5px',
+                        width: '200px',
+                        height: '40px',
+                        padding: '5px 10px'
+                    }}
+                />
+
                 {/* Program Stage Radio Buttons */}
                 <div style={{
                     display: 'flex',
@@ -2489,7 +2553,7 @@ export function OrgUnitTable(props: Props) {
                 </div>
 
                 {/* Column Selector */}
-                <div ref={dropdownRef} style={{ position: 'relative' }} className="relative column-filter-dropdown">
+                {/* <div ref={dropdownRef} style={{ position: 'relative' }} className="relative column-filter-dropdown">
                     <button
                         className="btn btn-secondary"
                         onClick={() => setShowColumns(v => !v)}
@@ -2527,6 +2591,43 @@ export function OrgUnitTable(props: Props) {
                             ))}
                         </div>
                     )}
+                </div> */}
+
+                {/* Topivs Selector */}
+                <div className="relative column-filter-dropdown" ref={dropdownRef} style={{ position: 'relative' }}>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => setShowTopics(!showTopics)}
+                        style={{ zIndex: 1000 }}
+                    >
+                        Topics ▼
+                    </button>
+                    {showTopics && (
+                        <div
+                            className="filter-menu absolute mt-1 p-2 bg-white border rounded shadow-lg z-10"
+                            style={{ minWidth: '180px', zIndex: 999 }}
+                        >
+                            {additionalColumns.map(col => (
+                                <label
+                                    key={col.accessor}
+                                    className="flex items-start py-1"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={topicsVis[col.accessor]}
+                                        onChange={e => {
+                                            const isChecked = e.target.checked     // grab it now
+                                            setTopicsVis(prev => ({
+                                                ...prev,
+                                                [col.accessor]: isChecked
+                                            }))
+                                        }}
+                                    />
+                                    {col.Header}
+                                </label>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
             </div>
@@ -2539,20 +2640,7 @@ export function OrgUnitTable(props: Props) {
                 gap: '15px',
                 marginTop: '-5px'
             }}>
-                <input
-                    type="text"
-                    placeholder="Search Beneficiary"
-                    value={beneficiarySearch}
-                    // onChange={(e) => setBeneficiarySearch(e.target.value)}
-                    onChange={handleBeneficiarySearch1}
-                    className="border border-gray-300 rounded-md"
-                    style={{
-                        borderRadius: '5px',
-                        width: '200px',
-                        height: '40px',
-                        padding: '5px 10px'
-                    }}
-                />
+
 
                 {selectedProgramStage && (
                     <button
@@ -2936,16 +3024,30 @@ export function OrgUnitTable(props: Props) {
                                         ))
                                     }
                                     {/* then your numbered additional‑columns… */}
-                                    {additionalColumns.map((col, i) => (
-                                        <th
-                                            key={col.accessor}
-                                            className={`${col.headerClassName} numeric-header`}
-                                            title={col.Header}           // keep full title on hover
-                                        >
-                                            {/* {i + 1} */}
-                                            {col.accessor === 'addEditEvent' ? 'Action' : i + 1}
-                                        </th>
-                                    ))}
+                                    {additionalColumns
+                                        .filter(col => topicsVis[col.accessor])
+                                        .map((col) => {
+                                            const fullIndex = additionalColumns.findIndex(c => c.accessor === col.accessor);
+
+                                            let label = '';
+                                            if (col.accessor === 'reportDate') {
+                                                label = 'Date of Training';
+                                            } else if (col.accessor === 'addEditEvent') {
+                                                label = 'Action';
+                                            } else {
+                                                label = (fullIndex + 1).toString();
+                                            }
+
+                                            return (
+                                                <th
+                                                    key={col.accessor}
+                                                    className={`${col.headerClassName} numeric-header`}
+                                                    title={col.Header}
+                                                >
+                                                    {label}
+                                                </th>
+                                            );
+                                        })}
                                 </tr>
                             </thead>
 
@@ -3175,7 +3277,7 @@ export function OrgUnitTable(props: Props) {
                                             <button onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleFormSubmit(e);
-                                                }}
+                                            }}
                                                 className="submit-button"
                                             >Save</button>
                                             <button
@@ -3183,7 +3285,7 @@ export function OrgUnitTable(props: Props) {
                                                     e.stopPropagation();
                                                     setIsAddingNewRow(false)
                                                 }}
-                                                style={{ marginLeft: '5px'}}
+                                                style={{ marginLeft: '5px' }}
                                                 className="cancel-button"
                                             >
                                                 Cancel
@@ -3236,15 +3338,29 @@ export function OrgUnitTable(props: Props) {
                                     }
 
                                     {/* 2 Numbered additional columns */}
-                                    {additionalColumns.filter(col => col.accessor !== 'addEditEvent').map((col, i) => (
-                                        <th
-                                            key={col.accessor}
-                                            className={`${col.headerClassName} numeric-header`}
-                                            title={col.Header}           // keep full title on hover
-                                        >
-                                            {i + 1}                       {/* show only the number*} */}
-                                        </th>
-                                    ))}
+                                    {additionalColumns
+                                        .filter(col => col.accessor !== 'addEditEvent' && topicsVis[col.accessor])
+                                        .map((col) => {
+                                            const fullIndex = additionalColumns.findIndex(c => c.accessor === col.accessor);
+
+                                            let label = '';
+                                            if (col.accessor === 'reportDate') {
+                                                label = 'Date of Training';
+                                            } else {
+                                                label = (fullIndex + 1).toString();
+                                            }
+
+                                            return (
+                                                <th
+                                                    key={col.accessor}
+                                                    className={`${col.headerClassName} numeric-header`}
+                                                    title={col.Header} // Show full name on hover
+                                                >
+                                                    {label}
+                                                </th>
+                                            );
+                                        })}
+
 
 
                                 </tr>
