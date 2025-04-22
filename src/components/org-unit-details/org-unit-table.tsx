@@ -205,7 +205,7 @@ export function OrgUnitTable(props: Props) {
 
     // list out every “original” column you currently render by header/accessor
     const originalColumnOptions = [
-        { Header: '#', accessor: 'index', visible: true },
+        // { Header: '#', accessor: 'index', visible: true },
         { Header: 'Registration Date', accessor: 'recordDate', visible: true },
         { Header: 'Is Beneficiary Adult / Child', accessor: 'beneficiaryStage', visible: true },
         { Header: 'Beneficiary Type', accessor: 'beneficiaryType', visible: true },
@@ -221,6 +221,7 @@ export function OrgUnitTable(props: Props) {
         { Header: 'Direct Patient ID', accessor: 'directPatientID', visible: true },
         { Header: 'Beneficiary Track', accessor: 'track', visible: true },
     ];
+
     const [columnsVis, setColumnsVis] = useState(() => {
         const saved = localStorage.getItem('columnsVis');
         return saved
@@ -452,12 +453,9 @@ export function OrgUnitTable(props: Props) {
     // total columns to span:
     const totalCols = originalCount + extraCount;
 
-
     const [showTopics, setShowTopics] = useState(false);
 
     const topicsRef = useRef<HTMLDivElement>(null);
-
-
 
     // which of the “topics” (additional columns) are visible
     const [topicsVis, setTopicsVis] = useState<Record<string, boolean>>(() =>
@@ -471,7 +469,7 @@ export function OrgUnitTable(props: Props) {
     useEffect(() => {
         const vis: Record<string, boolean> = {};
         additionalColumns.forEach(col => {
-            vis[col.accessor] = topicsVis[col.accessor] ?? true;
+            vis[col.accessor] = topicsVis[col.accessor] ?? false;
         });
         setTopicsVis(vis);
     }, [additionalColumns]);
@@ -607,6 +605,7 @@ export function OrgUnitTable(props: Props) {
         }
     }, [trackFilter, trainingFilter]);
 
+
     useEffect(() => {
         if (!indirectBeneficiaries.length) return;
         const loadIndirects = async () => {
@@ -621,6 +620,74 @@ export function OrgUnitTable(props: Props) {
         loadIndirects();
     }, [indirectBeneficiaries, trainingFilter, trackFilter]);
 
+    // ensure hasValidDate is set to true if a valid reportDate exists in fetchedDates even without triggering handleReportDateSubmit
+    useEffect(() => {
+        if (filteredData) {
+            const initialValidDates: Record<string, boolean> = {};
+            filteredData.forEach(item => {
+                const date = fetchedDates[item.trackInstanceId]?.reportDate;
+                if (date) {
+                    initialValidDates[item.trackInstanceId] = true;
+                }
+            });
+            setHasValidDate(prev => ({ ...prev, ...initialValidDates }));
+        }
+    }, [filteredData, fetchedDates]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+
+            try {
+                // First request: Fetch the organization unit code
+                const orgUnitCodeResponse = await fetch(
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/organisationUnits/${props.orgUnitId}`,
+                    // `api/organisationUnits/${props.orgUnitId}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // 'Authorization': `Basic ${credentials}`,
+                        },
+                    }
+                );
+                const orgUnitCodeData = await orgUnitCodeResponse.json();
+                const orgUnitCode = orgUnitCodeData.code;
+                setOrgUnitcode(orgUnitCode);
+
+                // Wait for the orgUnitCode to be set before making the second request
+                if (orgUnitCode) {
+                    // Second request: Fetch the generated code using the organization unit code
+                    const codeResponse = await fetch(
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                // 'Authorization': `Basic ${credentials}`,
+                            },
+                        }
+                    );
+                    const codeData = await codeResponse.json();
+
+                    // If the response contains a value, update the formData
+                    if (codeData && codeData.value) {
+                        setFormData((prevFormData) => ({
+                            ...prevFormData,
+                            code: codeData.value,
+                        }));
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [trigger]);
 
     // Function to determine additional columns based on the training filter
     const getAdditionalColumns = (filter: string) => {
@@ -974,61 +1041,6 @@ export function OrgUnitTable(props: Props) {
         setIsAddingIndirect(true);
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-
-            try {
-                // First request: Fetch the organization unit code
-                const orgUnitCodeResponse = await fetch(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/organisationUnits/${props.orgUnitId}`,
-                    // `api/organisationUnits/${props.orgUnitId}`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            // 'Authorization': `Basic ${credentials}`,
-                        },
-                    }
-                );
-                const orgUnitCodeData = await orgUnitCodeResponse.json();
-                const orgUnitCode = orgUnitCodeData.code;
-                setOrgUnitcode(orgUnitCode);
-
-                // Wait for the orgUnitCode to be set before making the second request
-                if (orgUnitCode) {
-                    // Second request: Fetch the generated code using the organization unit code
-                    const codeResponse = await fetch(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
-                        // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
-                        {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                // 'Authorization': `Basic ${credentials}`,
-                            },
-                        }
-                    );
-                    const codeData = await codeResponse.json();
-
-                    // If the response contains a value, update the formData
-                    if (codeData && codeData.value) {
-                        setFormData((prevFormData) => ({
-                            ...prevFormData,
-                            code: codeData.value,
-                        }));
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [trigger]);
-
     // Function to fetch user
     const fetchUser = async () => {
         try {
@@ -1219,7 +1231,7 @@ export function OrgUnitTable(props: Props) {
             setDateFilter('');
 
             // await indexedDBManager.markBeneficiaryAsSynced(beneficiaryId); // change savedOnline flag to true
-            setMessage('Beneficiary successfully created and saved online!');
+            setMessage('Beneficiary successfully saved!');
             setIsError(false);
             setIsAddingNewRow(false); // Close the new row form
 
@@ -1577,63 +1589,68 @@ export function OrgUnitTable(props: Props) {
     // POST Date - create event 
 
     const handleReportDateSubmit = async (
-        e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
-        trackInstanceId: string
-    ) => {
-        // Handle both Enter key and blur events
-        if (e.type === 'keydown') {
-            const keyboardEvent = e as React.KeyboardEvent<HTMLInputElement>;
-            if (keyboardEvent.key !== 'Enter') return;
-        }
+            e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
+            trackInstanceId: string
+        ) => {
+            // Handle both Enter key and blur events
+            if (e.type === 'keydown') {
+                const keyboardEvent = e as React.KeyboardEvent<HTMLInputElement>;
+                if (keyboardEvent.key !== 'Enter') return;
+            }
 
-        const reportDate = fetchedDates[trackInstanceId]?.reportDate;
+            const reportDate = fetchedDates[trackInstanceId]?.reportDate;
 
-        if (!reportDate) {
-            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
-            setMessage('Date of training is required');
-            setIsError(true);
-            return;
-        }
+            if (!reportDate) {
+                setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
+                setMessage('Date of training is required');
+                setIsError(true);
+                return;
+            } else {
+                setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
+                setMessage('');  // Clear the message if valid
+                setIsError(false);
+            }
 
-        try {
-            const payload = {
-                events: [{
-                    trackedEntityInstance: trackInstanceId,
-                    program: 'n2iAPy3PGx7',
-                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
-                    enrollment: '',
-                    orgUnit: props.orgUnitId,
-                    notes: [],
-                    dataValues: [],
-                    status: 'ACTIVE',
-                    eventDate: reportDate,
-                }]
-            };
+            try {
+                const payload = {
+                    events: [{
+                        trackedEntityInstance: trackInstanceId,
+                        program: 'n2iAPy3PGx7',
+                        programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+                        enrollment: '',
+                        orgUnit: props.orgUnitId,
+                        notes: [],
+                        dataValues: [],
+                        status: 'ACTIVE',
+                        eventDate: reportDate,
+                    }]
+                };
 
-            const response = await axios.post(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
-                payload
-            );
+                const response = await axios.post(
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
+                    payload
+                );
 
-            const createdEventId = response.data.response.importSummaries[0].reference;
+                const createdEventId = response.data.response.importSummaries[0].reference;
 
-            setFetchedDates(prev => ({
-                ...prev,
-                [trackInstanceId]: {
-                    ...prev[trackInstanceId],
-                    eventId: createdEventId
-                }
-            }));
+                setFetchedDates(prev => ({
+                    ...prev,
+                    [trackInstanceId]: {
+                        ...prev[trackInstanceId],
+                        eventId: createdEventId
+                    }
+                }));
 
-            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
-            console.log(`✅ Event created: ${createdEventId}`);
+                setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
+                console.log(`✅ Event created: ${createdEventId}`);
+                setMessage('Date of Training Successfully Saved');
 
-        } catch (error) {
-            console.error('❌ Error creating event:', error);
-            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
-            setMessage('Failed to save training date');
-            setIsError(true);
-        }
+            } catch (error) {
+                console.error('❌ Error creating event:', error);
+                setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
+                setMessage('Failed to save training date');
+                setIsError(true);
+            }
     };
 
     // PUT remaining data elements 
@@ -1678,8 +1695,10 @@ export function OrgUnitTable(props: Props) {
         try {
             await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}/${dataElementId}`, payload);
             console.log(`✅ PUT: ${dataElementName} = ${value}`);
+            setMessage(`Data Element - ${dataElementId} successfully updated.`);
         } catch (error) {
             console.error('❌ Failed to send data value update:', error);
+            setMessage(`Data Element - ${dataElementId} update failed.`);
         }
     };
 
@@ -3159,7 +3178,7 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Surname"
                                             />
                                         </td>
-                                        <td className="min-w-[120px]" style={{ minWidth: '120px'}}>
+                                        <td className="min-w-[120px]" style={{ minWidth: '120px' }}>
                                             <select
                                                 className="table-select w-full p-2 mb-2"
                                                 name="sex"
@@ -3171,7 +3190,7 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Female">Female</option>
                                             </select>
                                         </td>
-                                        <td className="min-w-[120px]" style={{ minWidth: '120px'}}>
+                                        <td className="min-w-[120px]" style={{ minWidth: '120px' }}>
                                             <input
                                                 type="text"
                                                 inputMode="numeric"
@@ -3406,6 +3425,7 @@ export function OrgUnitTable(props: Props) {
                                                 type="date"
                                                 value={newIndirectData.recordDate}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, recordDate: e.target.value })}
+                                                
                                                 className="w-full p-2 mb-2"
                                             />
                                         </td>
@@ -3467,7 +3487,7 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Surname"
                                             />
                                         </td>
-                                        <td className="min-w-[120px]" style={{ minWidth: '120px'}}>
+                                        <td className="min-w-[120px]" style={{ minWidth: '120px' }}>
                                             <select
                                                 className="table-select w-full p-2 mb-2"
                                                 value={newIndirectData.sex}
@@ -3478,7 +3498,7 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Female">Female</option>
                                             </select>
                                         </td>
-                                        <td className="min-w-[120px]" style={{ minWidth: '120px'}}>
+                                        <td className="min-w-[120px]" style={{ minWidth: '120px' }}>
                                             <input
                                                 type="text"
                                                 inputMode="numeric"
