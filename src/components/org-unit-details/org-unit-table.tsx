@@ -3076,7 +3076,7 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Row No."
                                             />
                                         </td> */}
-                                        <td>NEW</td>
+                                        {/* <td>NEW</td> */}
 
                                         <td className="min-w-[120px]">
                                             <input
@@ -3159,7 +3159,7 @@ export function OrgUnitTable(props: Props) {
                                                 placeholder="Surname"
                                             />
                                         </td>
-                                        <td className="min-w-[120px]">
+                                        <td className="min-w-[120px]" style={{ minWidth: '120px'}}>
                                             <select
                                                 className="table-select w-full p-2 mb-2"
                                                 name="sex"
@@ -3171,7 +3171,7 @@ export function OrgUnitTable(props: Props) {
                                                 <option value="Female">Female</option>
                                             </select>
                                         </td>
-                                        <td className="min-w-[120px]">
+                                        <td className="min-w-[120px]" style={{ minWidth: '120px'}}>
                                             <input
                                                 type="text"
                                                 inputMode="numeric"
@@ -3455,6 +3455,7 @@ export function OrgUnitTable(props: Props) {
                                                 value={newIndirectData.first_middleName}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, first_middleName: e.target.value })}
                                                 className="w-full p-2 mb-2"
+                                                placeholder="First Name and Middle Name"
                                             />
                                         </td>
                                         <td className="min-w-[120px]">
@@ -3463,19 +3464,21 @@ export function OrgUnitTable(props: Props) {
                                                 className="table-input w-full p-2 mb-2"
                                                 value={newIndirectData.surname}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, surname: e.target.value })}
+                                                placeholder="Surname"
                                             />
                                         </td>
-                                        <td className="min-w-[120px]">
+                                        <td className="min-w-[120px]" style={{ minWidth: '120px'}}>
                                             <select
                                                 className="table-select w-full p-2 mb-2"
                                                 value={newIndirectData.sex}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, sex: e.target.value })}
                                             >
+                                                <option value="">Select Gender</option>
                                                 <option value="Male">Male</option>
                                                 <option value="Female">Female</option>
                                             </select>
                                         </td>
-                                        <td className="min-w-[120px]">
+                                        <td className="min-w-[120px]" style={{ minWidth: '120px'}}>
                                             <input
                                                 type="text"
                                                 inputMode="numeric"
