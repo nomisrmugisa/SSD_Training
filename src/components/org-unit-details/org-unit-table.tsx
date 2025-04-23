@@ -74,6 +74,8 @@ export function OrgUnitTable(props: Props) {
             'Importance of early initiation of breastfeeding': 'URD2xr6Enhc',
             'Breastfeeding in the first 6 months': 'LzFFXJl5Iqu',
             'Exclusive breastfeeding during the first 6 months': 'ecFLn0i8QrL',
+            'Dangers of mixed feeding in the first 6 months': 'tcriRRaX8Vb',
+            'Breastfeeding on demand, both day and night': 'HVXgSsvtrY3',
             'Good hygiene practices': 'ijTViGLk6hP',
             'Complementary feeding': 'LzGN50sTSh3',
             'Health seeking behavior': 'C2GoFXyTUj2',
@@ -129,6 +131,8 @@ export function OrgUnitTable(props: Props) {
             'Importance of early initiation of breastfeeding': 'URD2xr6Enhc',
             'Breastfeeding in the first 6 months': 'LzFFXJl5Iqu',
             'Exclusive breastfeeding during the first 6 months': 'ecFLn0i8QrL',
+            'Dangers of mixed feeding in the first 6 months': 'tcriRRaX8Vb',
+            'Breastfeeding on demand, both day and night': 'HVXgSsvtrY3',
             'Good hygiene practices': 'ijTViGLk6hP',
             'Complementary feeding': 'LzGN50sTSh3',
             'Health seeking behavior': 'C2GoFXyTUj2',
@@ -186,6 +190,8 @@ export function OrgUnitTable(props: Props) {
         'earlyInitiation_checkBox': 'Importance of early initiation of breastfeeding',
         'breastfeedingFirst6Months_checkBox': 'Breastfeeding in the first 6 months',
         'exclusiveBreastfeeding_checkBox': 'Exclusive breastfeeding during the first 6 months',
+        'dangersOfMixedFeeding_checkBox':'Dangers of mixed feeding in the first 6 months',
+        'breastFeedingOnDemand_checkBox':'Breastfeeding on demand, both day and night',
         'goodHygiene_checkBox': 'Good hygiene practices',
         'complementaryFeeding_checkBox': 'Complementary feeding',
         'healthSeekingBehavior_checkBox': 'Health seeking behavior',
@@ -697,30 +703,30 @@ export function OrgUnitTable(props: Props) {
                 if (trackFilter === 'Fisher') {
                     columns.push(
                         {
-                            Header: 'Date of Training', accessor: 'reportDate',
+                            Header: ' Date of Training', accessor: 'reportDate',
                             headerClassName: 'additional-header-cell date-column', // Add class
                             className: 'date-column',
                             minWidth: 100
                         },
                         // { Header: 'Due Date', accessor: 'dueDate' },                                                
                         {
-                            Header: 'Fishing Methods', accessor: 'fishingMethods_checkBox',
+                            Header: ' 1. Fishing Methods', accessor: 'fishingMethods_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Post Handling and Hygiene', accessor: 'postHandlingMethods_checkBox',
+                            Header: ' 2. Post Handling and Hygiene', accessor: 'postHandlingMethods_checkBox',
                             headerClassName: 'additional-header-cell'
                         }, // Added
                         {
-                            Header: 'Fishing Marketing and Record Keeping', accessor: 'fishingMarketing_checkBox',
+                            Header: ' 3. Fishing Marketing and Record Keeping', accessor: 'fishingMarketing_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox',
+                            Header: ' 4. Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Did you apply the lessons from fishery training in your life',
+                            Header: ' 5. Did you apply the lessons from fishery training in your life',
                             accessor: 'appliedLessons_dropdown',
                             headerClassName: 'additional-header-cell dropdown-column',
                             className: 'dropdown-column',
@@ -733,7 +739,7 @@ export function OrgUnitTable(props: Props) {
                 } else if (trackFilter === 'Farmer') {
                     columns.push(
                         {
-                            Header: 'Date of Training', accessor: 'reportDate',
+                            Header: ' Date of Training', accessor: 'reportDate',
                             headerClassName: 'additional-header-cell date-column', // Add class
                             className: 'date-column',
                             minWidth: 100
@@ -742,64 +748,64 @@ export function OrgUnitTable(props: Props) {
 
 
                         {
-                            Header: 'Land Preparation and Sowing', accessor: 'landPreparation_checkBox',
+                            Header: ' 1. Land Preparation and Sowing', accessor: 'landPreparation_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Nursery bed Preparation and Transplanting', accessor: 'nurseryPreparation_checkBox',
+                            Header: ' 2. Nursery bed Preparation and Transplanting', accessor: 'nurseryPreparation_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Weeding and Pest Control', accessor: 'weeding_checkBox',
+                            Header: ' 3. Weeding and Pest Control', accessor: 'weeding_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Harvesting', accessor: 'harvesting_checkBox',
+                            Header: ' 4. Harvesting', accessor: 'harvesting_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Post Harvest Handling', accessor: 'postHarvestHandling_checkBox',
+                            Header: ' 5. Post Harvest Handling', accessor: 'postHarvestHandling_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Storage', accessor: 'storage_checkBox',
+                            Header: ' 6. Storage', accessor: 'storage_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Post Harvest Losses', accessor: 'postHarvestHygiene_checkBox',
+                            Header: ' 7. Post Harvest Handling and Hygiene', accessor: 'postHarvestHygiene_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Losses Marking', accessor: 'lossesMarking_checkBox',
+                            Header: ' 8. Losses Marking and Record Keeping', accessor: 'lossesMarking_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
 
                         {
-                            Header: 'Did you apply the lessons from the farming trainings in your life', accessor: 'appliedLessons_dropdown',
+                            Header: ' 9. Did you apply the lessons from the farming trainings in your life', accessor: 'appliedLessons_dropdown',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Increased income', accessor: 'increasedIncome_checkBox',
+                            Header: ' 10. Increased income', accessor: 'increasedIncome_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Increased agricultural production', accessor: 'increasedProduction_checkBox',
+                            Header: ' 11. Increased agricultural production', accessor: 'increasedProduction_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Started a new livelihood activity', accessor: 'newLivelihood_checkBox',
+                            Header: ' 12. Started a new livelihood activity', accessor: 'newLivelihood_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Increased my skills/knowledge', accessor: 'increasedSkills_checkBox',
+                            Header: ' 13. Increased my skills/knowledge', accessor: 'increasedSkills_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Increased my family\'s resilience to shocks', accessor: 'increasedResilience_checkBox',
+                            Header: ' 14. Increased my family\'s resilience to shocks', accessor: 'increasedResilience_checkBox',
                             headerClassName: 'additional-header-cell'
                         },
                         {
-                            Header: 'Others (specify)', accessor: 'others_text',
+                            Header: ' 15. Others (specify)', accessor: 'others_text',
                             headerClassName: 'additional-header-cell text-column', // Add class
                             className: 'text-column',
                             minWidth: 100
@@ -815,34 +821,34 @@ export function OrgUnitTable(props: Props) {
             case 'Water Sanitation & Hygiene':
                 columns.push(
                     {
-                        Header: 'Date of Training', accessor: 'reportDate',
+                        Header: ' Date of Training', accessor: 'reportDate',
                         headerClassName: 'additional-header-cell date-column', // Add class
                         className: 'date-column',
                         minWidth: 100
                     },
                     // { Header: 'Due Date', accessor: 'dueDate' },
                     {
-                        Header: 'Food Safety', accessor: 'foodSafety_checkBox',
+                        Header: ' 1. Food Safety', accessor: 'foodSafety_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'CLTS (Community Lead Total Sanitation)', accessor: 'promotersAttendance_checkBox',
+                        Header: ' 2. CLTS (Community Lead Total Sanitation)', accessor: 'promotersAttendance_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Personal Hygiene', accessor: 'personalHygiene_checkBox',
+                        Header: ' 3. Personal Hygiene', accessor: 'personalHygiene_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Household Hygene', accessor: 'householdHygiene_checkBox',
+                        Header: ' 4. Household Hygene', accessor: 'householdHygiene_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Clean and Safe Water', accessor: 'cleanSafeWater_checkBox',
+                        Header: ' 5. Clean and Safe Water', accessor: 'cleanSafeWater_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Use of Latrine and Excreta Disposal', accessor: 'latrineDisposal_checkBox',
+                        Header: ' 6. Use of Latrine and Excreta Disposal', accessor: 'latrineDisposal_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                 );
@@ -850,68 +856,75 @@ export function OrgUnitTable(props: Props) {
             case 'Nutrition':
                 columns.push(
                     {
-                        Header: 'Date of Training', accessor: 'reportDate',
+                        Header: ' Date of Training', accessor: 'reportDate',
                         headerClassName: 'additional-header-cell date-column', // Add class
                         className: 'date-column',
                         minWidth: 100
                     },
                     // { Header: 'Due Date', accessor: 'dueDate' },
                     {
-                        Header: 'Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox',
+                        Header: ' 1. Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Importance of early initiation of breastfeeding', accessor: 'earlyInitiation_checkBox',
+                        Header: ' 2. Importance of early initiation of breastfeeding', accessor: 'earlyInitiation_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Breastfeeding in the first 6 months', accessor: 'breastfeedingFirst6Months_checkBox',
+                        Header: ' 3. Breastfeeding in the first 6 months', accessor: 'breastfeedingFirst6Months_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Exclusive breastfeeding during the first 6 months', accessor: 'exclusiveBreastfeeding_checkBox',
+                        Header: ' 4. Exclusive breastfeeding during the first 6 months', accessor: 'exclusiveBreastfeeding_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: ' 5. Dangers of mixed feeding in the first 6 monthsExclusive breastfeeding during the first 6 months', accessor: 'dangersOfMixedFeeding_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: ' 6. Breastfeeding on demand, both day and night', accessor: 'breastFeedingOnDemand_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: ' 7. Complementary feeding', accessor: 'complementaryFeeding_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: ' 8. Good hygiene practices', accessor: 'goodHygiene_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: ' 9. Growth monitoring', accessor: 'growthMonitoring_checkBox',
+                        headerClassName: 'additional-header-cell'
+                    },
+                    {
+                        Header: ' 10. Health seeking behavior', accessor: 'healthSeekingBehavior_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
 
                     {
-                        Header: 'Complementary feeding', accessor: 'complementaryFeeding_checkBox',
+                        Header: ' 11. Kitchen gardening and fruit trees', accessor: 'kitchenGardens_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Good hygiene practices', accessor: 'goodHygiene_checkBox',
+                        Header: ' 12. Cooking Demonstration', accessor: 'cookingDemonstration_checkBox',
                         headerClassName: 'additional-header-cell'
                     },
                     {
-                        Header: 'Growth monitoring', accessor: 'growthMonitoring_checkBox',
-                        headerClassName: 'additional-header-cell'
-                    },
-                    {
-                        Header: 'Health seeking behavior', accessor: 'healthSeekingBehavior_checkBox',
-                        headerClassName: 'additional-header-cell'
-                    },
-
-                    {
-                        Header: 'Kitchen gardening and fruit trees', accessor: 'kitchenGardens_checkBox',
-                        headerClassName: 'additional-header-cell'
-                    },
-                    {
-                        Header: 'Cooking Demonstration', accessor: 'cookingDemonstration_checkBox',
-                        headerClassName: 'additional-header-cell'
-                    },
-                    {
-                        Header: 'Beneficiary Category', accessor: 'Beneficiary_Category_dropDown',
+                        Header: ' 13. Beneficiary Category', accessor: 'Beneficiary_Category_dropDown',
                         headerClassName: 'additional-header-cell dropdown-column',
                         className: 'dropdown-column',
                         minWidth: 100
                     },
                     {
-                        Header: 'Other Male', accessor: 'Other_Male_no_input',
+                        Header: ' 14. Other Male', accessor: 'Other_Male_no_input',
                         headerClassName: 'additional-header-cell text-column', // Add class
                         className: 'text-column',
                         minWidth: 100
                     },
                     {
-                        Header: 'Other Female', accessor: 'Other_Female_no_input',
+                        Header: ' 15. Other Female', accessor: 'Other_Female_no_input',
                         headerClassName: 'additional-header-cell text-column', // Add class
                         className: 'text-column',
                         minWidth: 100
@@ -925,7 +938,7 @@ export function OrgUnitTable(props: Props) {
         // Add the "Add / Edit Event" column
         if (filter) {
             columns.push({
-                Header: 'Add / Edit Event',
+                Header: ' Add / Edit Event',
                 accessor: 'addEditEvent',
                 headerClassName: 'additional-header-cell actions-header',
                 className: 'actions-cell',
@@ -3047,6 +3060,7 @@ export function OrgUnitTable(props: Props) {
                                         .filter(col => topicsVis[col.accessor])
                                         .map((col) => {
                                             let label = '';
+                                            const fullIndex = additionalColumns.findIndex(c => c.accessor === col.accessor);
 
                                             if (col.accessor === 'reportDate') {
                                                 label = 'Date of Training';
@@ -3062,7 +3076,7 @@ export function OrgUnitTable(props: Props) {
                                                     )
                                                     .findIndex(c => c.accessor === col.accessor);
 
-                                                label = String(visibleIndex + 1);
+                                                label = String(fullIndex + 0);
                                             }
 
                                             return (
@@ -3383,7 +3397,7 @@ export function OrgUnitTable(props: Props) {
                                                         topicsVis[c.accessor]
                                                     )
                                                     .findIndex(c => c.accessor === col.accessor);
-                                                label = String(visibleBefore + 1);
+                                                label = String(fullIndex + 0);
                                             }
 
                                             return (
