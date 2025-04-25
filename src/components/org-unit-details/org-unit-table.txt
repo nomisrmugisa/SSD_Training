@@ -190,8 +190,8 @@ export function OrgUnitTable(props: Props) {
         'earlyInitiation_checkBox': 'Importance of early initiation of breastfeeding',
         'breastfeedingFirst6Months_checkBox': 'Breastfeeding in the first 6 months',
         'exclusiveBreastfeeding_checkBox': 'Exclusive breastfeeding during the first 6 months',
-        'dangersOfMixedFeeding_checkBox': 'Dangers of mixed feeding in the first 6 months',
-        'breastFeedingOnDemand_checkBox': 'Breastfeeding on demand, both day and night',
+        'dangersOfMixedFeeding_checkBox':'Dangers of mixed feeding in the first 6 months',
+        'breastFeedingOnDemand_checkBox':'Breastfeeding on demand, both day and night',
         'goodHygiene_checkBox': 'Good hygiene practices',
         'complementaryFeeding_checkBox': 'Complementary feeding',
         'healthSeekingBehavior_checkBox': 'Health seeking behavior',
@@ -448,9 +448,6 @@ export function OrgUnitTable(props: Props) {
 
     const [showColumns, setShowColumns] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-
-    const [selectedTrainings, setSelectedTrainings] = useState([]); // e.g. ['Water Sanitation & Hygiene', 'Nutrition']
-
 
     // for additional colms returning data
     const renderCheckCell = (val?: boolean) => val === true ? '✓' : '✗';
@@ -709,37 +706,31 @@ export function OrgUnitTable(props: Props) {
                             Header: ' Date of Training', accessor: 'reportDate',
                             headerClassName: 'additional-header-cell date-column', // Add class
                             className: 'date-column',
-                            minWidth: 100,
-                            training: filter
+                            minWidth: 100
                         },
                         // { Header: 'Due Date', accessor: 'dueDate' },                                                
                         {
                             Header: ' 1. Fishing Methods', accessor: 'fishingMethods_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 2. Post Handling and Hygiene', accessor: 'postHandlingMethods_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         }, // Added
                         {
                             Header: ' 3. Fishing Marketing and Record Keeping', accessor: 'fishingMarketing_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 4. Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 5. Did you apply the lessons from fishery training in your life',
                             accessor: 'appliedLessons_dropdown',
                             headerClassName: 'additional-header-cell dropdown-column',
                             className: 'dropdown-column',
-                            minWidth: 100,
-                            training: filter
+                            minWidth: 100
                         }
                         // { Header: 'Estimated Fish Catch', accessor: 'estimatedFishCatch' },
                         // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
@@ -751,89 +742,73 @@ export function OrgUnitTable(props: Props) {
                             Header: ' Date of Training', accessor: 'reportDate',
                             headerClassName: 'additional-header-cell date-column', // Add class
                             className: 'date-column',
-                            minWidth: 100,
-                            training: filter
+                            minWidth: 100
                         },
                         // { Header: 'Due Date', accessor: 'dueDate' },
 
 
                         {
                             Header: ' 1. Land Preparation and Sowing', accessor: 'landPreparation_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 2. Nursery bed Preparation and Transplanting', accessor: 'nurseryPreparation_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 3. Weeding and Pest Control', accessor: 'weeding_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 4. Harvesting', accessor: 'harvesting_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 5. Post Harvest Handling', accessor: 'postHarvestHandling_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 6. Storage', accessor: 'storage_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 7. Post Harvest Handling and Hygiene', accessor: 'postHarvestHygiene_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 8. Losses Marking and Record Keeping', accessor: 'lossesMarking_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
 
                         {
                             Header: ' 9. Did you apply the lessons from the farming trainings in your life', accessor: 'appliedLessons_dropdown',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 10. Increased income', accessor: 'increasedIncome_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 11. Increased agricultural production', accessor: 'increasedProduction_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 12. Started a new livelihood activity', accessor: 'newLivelihood_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 13. Increased my skills/knowledge', accessor: 'increasedSkills_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 14. Increased my family\'s resilience to shocks', accessor: 'increasedResilience_checkBox',
-                            headerClassName: 'additional-header-cell',
-                            training: filter
+                            headerClassName: 'additional-header-cell'
                         },
                         {
                             Header: ' 15. Others (specify)', accessor: 'others_text',
                             headerClassName: 'additional-header-cell text-column', // Add class
                             className: 'text-column',
-                            minWidth: 100,
-                            training: filter
+                            minWidth: 100
                         }
                         // Comment out these columns
                         // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
@@ -849,39 +824,32 @@ export function OrgUnitTable(props: Props) {
                         Header: ' Date of Training', accessor: 'reportDate',
                         headerClassName: 'additional-header-cell date-column', // Add class
                         className: 'date-column',
-                        minWidth: 100,
-                        training: filter
+                        minWidth: 100
                     },
                     // { Header: 'Due Date', accessor: 'dueDate' },
                     {
                         Header: ' 1. Food Safety', accessor: 'foodSafety_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 2. CLTS (Community Lead Total Sanitation)', accessor: 'promotersAttendance_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 3. Personal Hygiene', accessor: 'personalHygiene_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 4. Household Hygene', accessor: 'householdHygiene_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 5. Clean and Safe Water', accessor: 'cleanSafeWater_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 6. Use of Latrine and Excreta Disposal', accessor: 'latrineDisposal_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                 );
                 break;
@@ -891,91 +859,75 @@ export function OrgUnitTable(props: Props) {
                         Header: ' Date of Training', accessor: 'reportDate',
                         headerClassName: 'additional-header-cell date-column', // Add class
                         className: 'date-column',
-                        minWidth: 100,
-                        training: filter
+                        minWidth: 100
                     },
                     // { Header: 'Due Date', accessor: 'dueDate' },
                     {
                         Header: ' 1. Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 2. Importance of early initiation of breastfeeding', accessor: 'earlyInitiation_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 3. Breastfeeding in the first 6 months', accessor: 'breastfeedingFirst6Months_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 4. Exclusive breastfeeding during the first 6 months', accessor: 'exclusiveBreastfeeding_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 5. Dangers of mixed feeding in the first 6 monthsExclusive breastfeeding during the first 6 months', accessor: 'dangersOfMixedFeeding_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 6. Breastfeeding on demand, both day and night', accessor: 'breastFeedingOnDemand_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 7. Complementary feeding', accessor: 'complementaryFeeding_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 8. Good hygiene practices', accessor: 'goodHygiene_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 9. Growth monitoring', accessor: 'growthMonitoring_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 10. Health seeking behavior', accessor: 'healthSeekingBehavior_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
 
                     {
                         Header: ' 11. Kitchen gardening and fruit trees', accessor: 'kitchenGardens_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 12. Cooking Demonstration', accessor: 'cookingDemonstration_checkBox',
-                        headerClassName: 'additional-header-cell',
-                        training: filter
+                        headerClassName: 'additional-header-cell'
                     },
                     {
                         Header: ' 13. Beneficiary Category', accessor: 'Beneficiary_Category_dropDown',
                         headerClassName: 'additional-header-cell dropdown-column',
                         className: 'dropdown-column',
-                        minWidth: 100,
-                        training: filter
+                        minWidth: 100
                     },
                     {
                         Header: ' 14. Other Male', accessor: 'Other_Male_no_input',
                         headerClassName: 'additional-header-cell text-column', // Add class
                         className: 'text-column',
-                        minWidth: 100,
-                        training: filter
+                        minWidth: 100
                     },
                     {
                         Header: ' 15. Other Female', accessor: 'Other_Female_no_input',
                         headerClassName: 'additional-header-cell text-column', // Add class
                         className: 'text-column',
-                        minWidth: 100,
-                        training: filter
+                        minWidth: 100
                     },
                 );
                 break;
@@ -986,13 +938,12 @@ export function OrgUnitTable(props: Props) {
         // Add the "Add / Edit Event" column
         if (filter) {
             columns.push({
-                Header: ` Add / Edit Event`,
+                Header: ' Add / Edit Event',
                 accessor: 'addEditEvent',
                 headerClassName: 'additional-header-cell actions-header',
                 className: 'actions-cell',
                 minWidth: 140, // Set minimum width
-                width: 140,
-                training: filter
+                width: 140
             });
         }
 
@@ -1651,68 +1602,68 @@ export function OrgUnitTable(props: Props) {
     // POST Date - create event 
 
     const handleReportDateSubmit = async (
-        e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
-        trackInstanceId: string
-    ) => {
-        // Handle both Enter key and blur events
-        if (e.type === 'keydown') {
-            const keyboardEvent = e as React.KeyboardEvent<HTMLInputElement>;
-            if (keyboardEvent.key !== 'Enter') return;
-        }
+            e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
+            trackInstanceId: string
+        ) => {
+            // Handle both Enter key and blur events
+            if (e.type === 'keydown') {
+                const keyboardEvent = e as React.KeyboardEvent<HTMLInputElement>;
+                if (keyboardEvent.key !== 'Enter') return;
+            }
 
-        const reportDate = fetchedDates[trackInstanceId]?.reportDate;
+            const reportDate = fetchedDates[trackInstanceId]?.reportDate;
 
-        if (!reportDate) {
-            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
-            setMessage('Date of training is required');
-            setIsError(true);
-            return;
-        } else {
-            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
-            setMessage('');  // Clear the message if valid
-            setIsError(false);
-        }
+            if (!reportDate) {
+                setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
+                setMessage('Date of training is required');
+                setIsError(true);
+                return;
+            } else {
+                setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
+                setMessage('');  // Clear the message if valid
+                setIsError(false);
+            }
 
-        try {
-            const payload = {
-                events: [{
-                    trackedEntityInstance: trackInstanceId,
-                    program: 'n2iAPy3PGx7',
-                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
-                    enrollment: '',
-                    orgUnit: props.orgUnitId,
-                    notes: [],
-                    dataValues: [],
-                    status: 'ACTIVE',
-                    eventDate: reportDate,
-                }]
-            };
+            try {
+                const payload = {
+                    events: [{
+                        trackedEntityInstance: trackInstanceId,
+                        program: 'n2iAPy3PGx7',
+                        programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+                        enrollment: '',
+                        orgUnit: props.orgUnitId,
+                        notes: [],
+                        dataValues: [],
+                        status: 'ACTIVE',
+                        eventDate: reportDate,
+                    }]
+                };
 
-            const response = await axios.post(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
-                payload
-            );
+                const response = await axios.post(
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    payload
+                );
 
-            const createdEventId = response.data.response.importSummaries[0].reference;
+                const createdEventId = response.data.response.importSummaries[0].reference;
 
-            setFetchedDates(prev => ({
-                ...prev,
-                [trackInstanceId]: {
-                    ...prev[trackInstanceId],
-                    eventId: createdEventId
-                }
-            }));
+                setFetchedDates(prev => ({
+                    ...prev,
+                    [trackInstanceId]: {
+                        ...prev[trackInstanceId],
+                        eventId: createdEventId
+                    }
+                }));
 
-            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
-            console.log(`✅ Event created: ${createdEventId}`);
-            setMessage('Date of Training Successfully Saved');
+                setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
+                console.log(`✅ Event created: ${createdEventId}`);
+                setMessage('Date of Training Successfully Saved');
 
-        } catch (error) {
-            console.error('❌ Error creating event:', error);
-            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
-            setMessage('Failed to save training date');
-            setIsError(true);
-        }
+            } catch (error) {
+                console.error('❌ Error creating event:', error);
+                setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
+                setMessage('Failed to save training date');
+                setIsError(true);
+            }
     };
 
     // PUT remaining data elements 
@@ -1976,63 +1927,37 @@ export function OrgUnitTable(props: Props) {
         }
     };
 
-    const handleFilterChange = async (training) => {
-        let newSelected;
-        if (training === 'Livelihood') {
-            newSelected = ['Livelihood'];
-        } else {
-            // If Livelihood is already selected, start fresh
-            if (selectedTrainings.includes('Livelihood')) {
-                newSelected = [training];
-            } else {
-                // Toggle selection for Water Sanitation & Hygiene or Nutrition
-                newSelected = selectedTrainings.includes(training)
-                    ? selectedTrainings.filter(t => t !== training)
-                    : [...selectedTrainings, training];
-            }
-        }
-        setSelectedTrainings(newSelected);
+    const handleFilterChange = async (newFilter: string) => {
 
-        // Set program stage for compatibility (optional, can be removed if not needed)
-        setSelectedProgramStage(newSelected.length === 1 ? newSelected[0] : '');
+        console.log('Filter changed to:', newFilter, 'filteredData:', filteredData);
+        setTrainingFilter(newFilter); // Update the training filter state
+        setSelectedProgramStage(newFilter as ProgramStage); // Update selectedProgramStage
 
-        // Update columns for all selected trainings
-        let allCols = [];
-        newSelected.forEach(filter => {
-            allCols = [...allCols, ...getAdditionalColumns(filter)];
-        });
-        setAdditionalColumns(allCols);
+        // Update columns immediately when filter changes
+        setAdditionalColumns(getAdditionalColumns(newFilter));
 
-        // Fetch additional data for all rows for each selected training
-        const allFetchedDates = {};
-        for (const filter of newSelected) {
-            const updatedFetchedDates = await Promise.all(
-                filteredData.map(async (activity) => {
-                    const additionalData = await fetchAdditionalData(activity.trackInstanceId, filter, trackFilter);
-                    return {
-                        trackInstanceId: activity.trackInstanceId,
-                        reportDate: additionalData.reportDate,
-                        dueDate: additionalData.dueDate,
-                        eventId: additionalData.eventId,
-                        dataValues: additionalData.dataValues || {}
-                    };
-                })
-            );
-            updatedFetchedDates.forEach(({ trackInstanceId, reportDate, dueDate, eventId, dataValues }) => {
-                // Merge data for each trackInstanceId
-                allFetchedDates[trackInstanceId] = {
-                    ...(allFetchedDates[trackInstanceId] || {}),
-                    reportDate,
-                    dueDate,
-                    eventId,
-                    dataValues: {
-                        ...(allFetchedDates[trackInstanceId]?.dataValues || {}),
-                        ...dataValues
-                    }
+        // Fetch additional data for all rows based on the new filter
+        const updatedFetchedDates = await Promise.all(
+            filteredData.map(async (activity) => {
+                const additionalData = await fetchAdditionalData(activity.trackInstanceId, newFilter, trackFilter);
+                console.log({ 'Additional Data': additionalData })
+                return {
+                    trackInstanceId: activity.trackInstanceId,
+                    reportDate: additionalData.reportDate,
+                    dueDate: additionalData.dueDate,
+                    eventId: additionalData.eventId,
+                    dataValues: additionalData.dataValues || {}
                 };
-            });
-        }
-        setFetchedDates(allFetchedDates);
+            })
+        );
+
+        // Update the state with the fetched dates
+        // Update the state with the fetched dates
+        const newFetchedDates: { [key: string]: FetchedData } = {};
+        updatedFetchedDates.forEach(({ trackInstanceId, reportDate, dueDate, eventId, dataValues }) => {
+            newFetchedDates[trackInstanceId] = { reportDate, dueDate, eventId, dataValues };
+        });
+        setFetchedDates(newFetchedDates);
     };
 
     const getTopicOptions = (track: string, filter: string) => {
@@ -2501,13 +2426,6 @@ export function OrgUnitTable(props: Props) {
         ));
     };
 
-    const handleColumnToggle = (topic) => {
-        setTopicsVis(prev => ({
-            ...prev,
-            [topic]: !prev[topic],  // Toggle visibility
-        }));
-    };
-
     const handleProgramStageChange = async (newFilter: ProgramStage) => {
         setSelectedProgramStage(newFilter);
         setTrainingFilter(newFilter);
@@ -2641,28 +2559,25 @@ export function OrgUnitTable(props: Props) {
                         <input
                             type="radio"
                             value="Livelihood"
-                            // checked={trainingFilter === 'Livelihood'}
-                            checked={selectedTrainings.length === 1 && selectedTrainings[0] === 'Livelihood'}
+                            checked={trainingFilter === 'Livelihood'}
                             onChange={() => handleFilterChange('Livelihood')}
                         />
                         Livelihood
                     </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <input
-                            type="checkbox"
+                            type="radio"
                             value="Water Sanitation & Hygiene"
-                            // checked={trainingFilter === 'Water Sanitation & Hygiene'}
-                            checked={selectedTrainings.includes('Water Sanitation & Hygiene')}
+                            checked={trainingFilter === 'Water Sanitation & Hygiene'}
                             onChange={() => handleFilterChange('Water Sanitation & Hygiene')}
                         />
                         Water Sanitation & Hygiene
                     </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <input
-                            type="checkbox"
+                            type="radio"
                             value="Nutrition"
-                            // checked={trainingFilter === 'Nutrition'}
-                            checked={selectedTrainings.includes('Nutrition')}
+                            checked={trainingFilter === 'Nutrition'}
                             onChange={() => handleFilterChange('Nutrition')}
                         />
                         Nutrition
@@ -2720,35 +2635,32 @@ export function OrgUnitTable(props: Props) {
                         Topics ▼
                     </button>
                     {showTopics && (
-                        <div className="filter-menu absolute mt-1 p-2 bg-white border rounded shadow-lg z-10"
-                            style={{ minWidth: '220px', zIndex: 999 }}>
-                            {/* Group columns by training filter */}
-                            {Array.from(new Set(additionalColumns.map(c => c.training))).map(training => (
-                                <div key={training}>
-                                    {/* Bold training header */}
-                                    <div className="font-bold mt-2 mb-1 text-sm first:mt-0">
-                                        <b>{training}</b>
-                                    </div>
-                                    {additionalColumns
-                                        .filter(col => col.training === training)
-                                        .map(col => (
-                                            <label key={col.accessor} className="flex items-start py-1 pl-2">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={topicsVis[col.accessor] || false}
-                                                    onChange={() => handleColumnToggle(col.accessor)}
-                                                />
-                                                {col.Header}
-                                            </label>
-                                        ))}
-                                </div>
+                        <div
+                            className="filter-menu absolute mt-1 p-2 bg-white border rounded shadow-lg z-10"
+                            style={{ minWidth: '180px', zIndex: 999 }}
+                        >
+                            {additionalColumns.map(col => (
+                                <label
+                                    key={col.accessor}
+                                    className="flex items-start py-1"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={topicsVis[col.accessor]}
+                                        onChange={e => {
+                                            const isChecked = e.target.checked     // grab it now
+                                            setTopicsVis(prev => ({
+                                                ...prev,
+                                                [col.accessor]: isChecked
+                                            }))
+                                        }}
+                                    />
+                                    {col.Header}
+                                </label>
                             ))}
                         </div>
                     )}
                 </div>
-
-
-
 
             </div>
 
@@ -3153,7 +3065,7 @@ export function OrgUnitTable(props: Props) {
                                             if (col.accessor === 'reportDate') {
                                                 label = 'Date of Training';
                                             } else if (col.accessor === 'addEditEvent') {
-                                                label = `Action (${col.training})`;
+                                                label = 'Action';
                                             } else {
                                                 // count how many visible non-date, non-action columns come before this one
                                                 const visibleIndex = additionalColumns
@@ -3527,7 +3439,7 @@ export function OrgUnitTable(props: Props) {
                                                 type="date"
                                                 value={newIndirectData.recordDate}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, recordDate: e.target.value })}
-
+                                                
                                                 className="w-full p-2 mb-2"
                                             />
                                         </td>
