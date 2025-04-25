@@ -23,3 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 .idea
 .d2
+
+/src/components/org-unit-details/org-unit-table-merge.txt

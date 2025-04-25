@@ -360,3 +360,14 @@
 .text-column input {
   min-width: 120px;
 }
+
+/* Highlighting rows */
+.highlight-row {
+  background-color: #d8efff  !important; /* light blue for example */
+  font-weight: bold;
+}
+
+tr.highlight-row td {
+  background-color: #b7ccdb !important;
+}
+

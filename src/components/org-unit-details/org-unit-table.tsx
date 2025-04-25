@@ -27,6 +27,7 @@ interface FetchedData {
     reportDate: string;
     dueDate: string;
     eventId: string;
+    events?: { [training: string]: string };
     dataValues: { [key: string]: string | boolean }; // To hold the values for each data element
 }
 
@@ -449,8 +450,7 @@ export function OrgUnitTable(props: Props) {
     const [showColumns, setShowColumns] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const [selectedTrainings, setSelectedTrainings] = useState([]); // e.g. ['Water Sanitation & Hygiene', 'Nutrition']
-
+    const [selectedTrainings, setSelectedTrainings] = useState<string[]>([]); // e.g. ['Water Sanitation & Hygiene', 'Nutrition']
 
     // for additional colms returning data
     const renderCheckCell = (val?: boolean) => val === true ? '✓' : '✗';
@@ -607,13 +607,58 @@ export function OrgUnitTable(props: Props) {
     }, [trainingFilter]);
 
     // update columns when track filter changes
+    // useEffect(() => {
+    //     if (trainingFilter === 'Livelihood') {
+    //         // Re-run getAdditionalColumns with current training filter to update columns
+    //         setAdditionalColumns(getAdditionalColumns(trainingFilter));
+    //     }
+    // }, [trackFilter, trainingFilter]);
     useEffect(() => {
-        if (trainingFilter === 'Livelihood') {
-            // Re-run getAdditionalColumns with current training filter to update columns
-            setAdditionalColumns(getAdditionalColumns(trainingFilter));
+        if (!trainingFilter) {
+            setAdditionalColumns([]);
+            return;
         }
-    }, [trackFilter, trainingFilter]);
 
+        let selectedTrainings: string[] = [];
+
+        // Livelihood is exclusive
+        if (trainingFilter === 'Livelihood') {
+            selectedTrainings = ['Livelihood'];
+        } else {
+            selectedTrainings = trainingFilter.split(',').map(t => t.trim());
+        }
+
+        const mergedCols: any[] = [];
+
+        // Add "Date of Training" first
+        mergedCols.push({
+            Header: 'Date of Training',
+            accessor: 'reportDate',
+            headerClassName: 'additional-header-cell date-column',
+            className: 'date-column',
+            minWidth: 100,
+            training: 'shared'
+        });
+
+        // Add all topic columns from selected filters
+        selectedTrainings.forEach(filter => {
+            const cols = getAdditionalColumns(filter);
+            mergedCols.push(...cols);
+        });
+
+        // Add Action last
+        mergedCols.push({
+            Header: 'Add / Edit Event',
+            accessor: 'addEditEvent',
+            headerClassName: 'additional-header-cell actions-header',
+            className: 'actions-cell',
+            minWidth: 140,
+            width: 140,
+            training: 'Action'
+        });
+
+        setAdditionalColumns(mergedCols);
+    }, [trainingFilter, trackFilter]);
 
     useEffect(() => {
         if (!indirectBeneficiaries.length) return;
@@ -705,33 +750,33 @@ export function OrgUnitTable(props: Props) {
             case 'Livelihood':
                 if (trackFilter === 'Fisher') {
                     columns.push(
-                        {
-                            Header: ' Date of Training', accessor: 'reportDate',
-                            headerClassName: 'additional-header-cell date-column', // Add class
-                            className: 'date-column',
-                            minWidth: 100,
-                            training: filter
-                        },
+                        // {
+                        //     Header: ' Date of Training', accessor: 'reportDate',
+                        //     headerClassName: 'additional-header-cell date-column', // Add class
+                        //     className: 'date-column',
+                        //     minWidth: 100,
+                        //     training: filter
+                        // },
                         // { Header: 'Due Date', accessor: 'dueDate' },                                                
                         {
                             Header: ' 1. Fishing Methods', accessor: 'fishingMethods_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 2. Post Handling and Hygiene', accessor: 'postHandlingMethods_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         }, // Added
                         {
                             Header: ' 3. Fishing Marketing and Record Keeping', accessor: 'fishingMarketing_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 4. Fishing Oil Preparation', accessor: 'fishingOilPreparation_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 5. Did you apply the lessons from fishery training in your life',
@@ -739,7 +784,7 @@ export function OrgUnitTable(props: Props) {
                             headerClassName: 'additional-header-cell dropdown-column',
                             className: 'dropdown-column',
                             minWidth: 100,
-                            training: filter
+                            training: 'Livelihood'
                         }
                         // { Header: 'Estimated Fish Catch', accessor: 'estimatedFishCatch' },
                         // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
@@ -747,93 +792,93 @@ export function OrgUnitTable(props: Props) {
                     );
                 } else if (trackFilter === 'Farmer') {
                     columns.push(
-                        {
-                            Header: ' Date of Training', accessor: 'reportDate',
-                            headerClassName: 'additional-header-cell date-column', // Add class
-                            className: 'date-column',
-                            minWidth: 100,
-                            training: filter
-                        },
+                        // {
+                        //     Header: ' Date of Training', accessor: 'reportDate',
+                        //     headerClassName: 'additional-header-cell date-column', // Add class
+                        //     className: 'date-column',
+                        //     minWidth: 100,
+                        //     training: filter
+                        // },
                         // { Header: 'Due Date', accessor: 'dueDate' },
 
 
                         {
                             Header: ' 1. Land Preparation and Sowing', accessor: 'landPreparation_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 2. Nursery bed Preparation and Transplanting', accessor: 'nurseryPreparation_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 3. Weeding and Pest Control', accessor: 'weeding_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 4. Harvesting', accessor: 'harvesting_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 5. Post Harvest Handling', accessor: 'postHarvestHandling_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 6. Storage', accessor: 'storage_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 7. Post Harvest Handling and Hygiene', accessor: 'postHarvestHygiene_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 8. Losses Marking and Record Keeping', accessor: 'lossesMarking_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
 
                         {
                             Header: ' 9. Did you apply the lessons from the farming trainings in your life', accessor: 'appliedLessons_dropdown',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 10. Increased income', accessor: 'increasedIncome_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 11. Increased agricultural production', accessor: 'increasedProduction_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 12. Started a new livelihood activity', accessor: 'newLivelihood_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 13. Increased my skills/knowledge', accessor: 'increasedSkills_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 14. Increased my family\'s resilience to shocks', accessor: 'increasedResilience_checkBox',
                             headerClassName: 'additional-header-cell',
-                            training: filter
+                            training: 'Livelihood'
                         },
                         {
                             Header: ' 15. Others (specify)', accessor: 'others_text',
                             headerClassName: 'additional-header-cell text-column', // Add class
                             className: 'text-column',
                             minWidth: 100,
-                            training: filter
+                            training: 'Livelihood'
                         }
                         // Comment out these columns
                         // { Header: 'Income Earned/Week', accessor: 'incomeEarned' },
@@ -845,137 +890,137 @@ export function OrgUnitTable(props: Props) {
                 break;
             case 'Water Sanitation & Hygiene':
                 columns.push(
-                    {
-                        Header: ' Date of Training', accessor: 'reportDate',
-                        headerClassName: 'additional-header-cell date-column', // Add class
-                        className: 'date-column',
-                        minWidth: 100,
-                        training: filter
-                    },
+                    // {
+                    //     Header: ' Date of Training', accessor: 'reportDate',
+                    //     headerClassName: 'additional-header-cell date-column', // Add class
+                    //     className: 'date-column',
+                    //     minWidth: 100,
+                    //     training: filter
+                    // },
                     // { Header: 'Due Date', accessor: 'dueDate' },
                     {
                         Header: ' 1. Food Safety', accessor: 'foodSafety_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Water Sanitation & Hygiene'
                     },
                     {
                         Header: ' 2. CLTS (Community Lead Total Sanitation)', accessor: 'promotersAttendance_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Water Sanitation & Hygiene'
                     },
                     {
                         Header: ' 3. Personal Hygiene', accessor: 'personalHygiene_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Water Sanitation & Hygiene'
                     },
                     {
                         Header: ' 4. Household Hygene', accessor: 'householdHygiene_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Water Sanitation & Hygiene'
                     },
                     {
                         Header: ' 5. Clean and Safe Water', accessor: 'cleanSafeWater_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Water Sanitation & Hygiene'
                     },
                     {
                         Header: ' 6. Use of Latrine and Excreta Disposal', accessor: 'latrineDisposal_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Water Sanitation & Hygiene'
                     },
                 );
                 break;
             case 'Nutrition':
                 columns.push(
-                    {
-                        Header: ' Date of Training', accessor: 'reportDate',
-                        headerClassName: 'additional-header-cell date-column', // Add class
-                        className: 'date-column',
-                        minWidth: 100,
-                        training: filter
-                    },
+                    // {
+                    //     Header: ' Date of Training', accessor: 'reportDate',
+                    //     headerClassName: 'additional-header-cell date-column', // Add class
+                    //     className: 'date-column',
+                    //     minWidth: 100,
+                    //     training: filter
+                    // },
                     // { Header: 'Due Date', accessor: 'dueDate' },
                     {
                         Header: ' 1. Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 2. Importance of early initiation of breastfeeding', accessor: 'earlyInitiation_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 3. Breastfeeding in the first 6 months', accessor: 'breastfeedingFirst6Months_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 4. Exclusive breastfeeding during the first 6 months', accessor: 'exclusiveBreastfeeding_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 5. Dangers of mixed feeding in the first 6 monthsExclusive breastfeeding during the first 6 months', accessor: 'dangersOfMixedFeeding_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 6. Breastfeeding on demand, both day and night', accessor: 'breastFeedingOnDemand_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 7. Complementary feeding', accessor: 'complementaryFeeding_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 8. Good hygiene practices', accessor: 'goodHygiene_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 9. Growth monitoring', accessor: 'growthMonitoring_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 10. Health seeking behavior', accessor: 'healthSeekingBehavior_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
 
                     {
                         Header: ' 11. Kitchen gardening and fruit trees', accessor: 'kitchenGardens_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 12. Cooking Demonstration', accessor: 'cookingDemonstration_checkBox',
                         headerClassName: 'additional-header-cell',
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 13. Beneficiary Category', accessor: 'Beneficiary_Category_dropDown',
                         headerClassName: 'additional-header-cell dropdown-column',
                         className: 'dropdown-column',
                         minWidth: 100,
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 14. Other Male', accessor: 'Other_Male_no_input',
                         headerClassName: 'additional-header-cell text-column', // Add class
                         className: 'text-column',
                         minWidth: 100,
-                        training: filter
+                        training: 'Nutrition'
                     },
                     {
                         Header: ' 15. Other Female', accessor: 'Other_Female_no_input',
                         headerClassName: 'additional-header-cell text-column', // Add class
                         className: 'text-column',
                         minWidth: 100,
-                        training: filter
+                        training: 'Nutrition'
                     },
                 );
                 break;
@@ -983,18 +1028,6 @@ export function OrgUnitTable(props: Props) {
                 break;
         }
 
-        // Add the "Add / Edit Event" column
-        if (filter) {
-            columns.push({
-                Header: ` Add / Edit Event`,
-                accessor: 'addEditEvent',
-                headerClassName: 'additional-header-cell actions-header',
-                className: 'actions-cell',
-                minWidth: 140, // Set minimum width
-                width: 140,
-                training: filter
-            });
-        }
 
         return columns;
     };
@@ -1006,24 +1039,7 @@ export function OrgUnitTable(props: Props) {
         setGlobalFilter: setSearch,
     });
 
-    // Function to handle beneficiary search
-    const handleBeneficiarySearch = async (event) => {
-        if (event.key === 'Enter') {
-            try {
-                const response = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/query.json?ou=${props.orgUnitId}&ouMode=ACCESSIBLE&program=n2iAPy3PGx7&attribute=tUjM7KxKvCO:LIKE:${beneficiarySearch}&attribute=FwEpAEagGeK:LIKE:${trackFilter}&pageSize=50&page=1&totalPages=false`);
-                const data = await response.json();
-                setSearchResults(data.rows); // Set the search results
-                setIsModalVisible(true); // Show the modal
-                console.log(trackFilter);
-                // console.log({searchResults})
-            } catch (error) {
-                console.error('Error fetching search results:', error);
-            }
-        }
-    };
-
     // New method to handle beneficiary name search
-
     const handleBeneficiarySearch1 = (event) => {
         const searchValue = event.target.value.toLowerCase();
         setBeneficiarySearch(searchValue);
@@ -1649,7 +1665,6 @@ export function OrgUnitTable(props: Props) {
     };
 
     // POST Date - create event 
-
     const handleReportDateSubmit = async (
         e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
         trackInstanceId: string
@@ -1669,46 +1684,79 @@ export function OrgUnitTable(props: Props) {
             return;
         } else {
             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
-            setMessage('');  // Clear the message if valid
+            setMessage('');
             setIsError(false);
         }
 
-        try {
-            const payload = {
-                events: [{
-                    trackedEntityInstance: trackInstanceId,
-                    program: 'n2iAPy3PGx7',
-                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
-                    enrollment: '',
-                    orgUnit: props.orgUnitId,
-                    notes: [],
-                    dataValues: [],
-                    status: 'ACTIVE',
-                    eventDate: reportDate,
-                }]
-            };
+        //  Step 1: Parse trainingFilter string
+        const selectedTrainings = trainingFilter
+            .split(',')
+            .map(t => t.trim())
+            .filter(Boolean); // eliminate blank entries
 
-            const response = await axios.post(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
-                payload
+        console.debug('[DEBUG] trainingFilter:', trainingFilter);
+        console.debug('[DEBUG] selectedTrainings:', selectedTrainings);
+
+        // const eventsMap: Record<string, string> = {};
+
+        try {
+            const createdEvents = await Promise.all(
+                selectedTrainings.map(async training => {
+                    const stage = PROGRAM_STAGE_MAPPING[training];
+
+                    if (!stage) {
+                        console.warn(`No programStage mapped for training: "${training}"`);
+                        return null;
+                    }
+
+                    const payload = {
+                        events: [{
+                            trackedEntityInstance: trackInstanceId,
+                            program: 'n2iAPy3PGx7',
+                            programStage: stage,
+                            orgUnit: props.orgUnitId,
+                            eventDate: reportDate,
+                            status: 'ACTIVE',
+                            dataValues: []
+                        }]
+                    };
+
+                    const res = await axios.post(
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                        payload
+                    );
+
+                    return {
+                        training,
+                        eventId: res.data.response.importSummaries[0].reference
+                    };
+                })
             );
 
-            const createdEventId = response.data.response.importSummaries[0].reference;
+            // Step 2: Build event mapping
+            const eventsMap = createdEvents
+                .filter((entry): entry is { training: string, eventId: string } => !!entry)
+                .reduce((acc, curr) => {
+                    acc[curr.training] = curr.eventId;
+                    return acc;
+                }, {} as Record<string, string>);
 
+            console.debug('[DEBUG] eventsMap:', eventsMap);
+
+            // Step 3: Save both date and new event map
             setFetchedDates(prev => ({
                 ...prev,
                 [trackInstanceId]: {
                     ...prev[trackInstanceId],
-                    eventId: createdEventId
+                    reportDate,
+                    events: eventsMap
                 }
             }));
 
             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
-            console.log(`✅ Event created: ${createdEventId}`);
             setMessage('Date of Training Successfully Saved');
-
         } catch (error) {
-            console.error('❌ Error creating event:', error);
+            console.error('Error creating training events:', error);
             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
             setMessage('Failed to save training date');
             setIsError(true);
@@ -1719,22 +1767,66 @@ export function OrgUnitTable(props: Props) {
     const sendDataValueUpdate = async (
         trackInstanceId: string,
         dataElementName: string,
-        value: string | boolean
+        value: string | boolean,
+        training: string
     ) => {
-        const eventId = fetchedDates[trackInstanceId]?.eventId;
         const orgUnit = props.orgUnitId;
         const program = 'n2iAPy3PGx7';
-        const programStage = PROGRAM_STAGE_MAPPING[trainingFilter];
+        const programStage = PROGRAM_STAGE_MAPPING[training];
 
-        if (!eventId || !dataElementName) return;
+        if (!programStage || !dataElementName) return;
 
-        console.log('Event ID for addn cols: ', eventId);
+        const reportDate = fetchedDates[trackInstanceId]?.reportDate;
+        let eventId = fetchedDates[trackInstanceId]?.events?.[training];
 
-        const dataElementId = dataElementIDsByFilter[trainingFilter]?.[trackFilter]?.[dataElementName] ||
-            dataElementIDsByFilter[trainingFilter]?.[dataElementName];
+        // If eventId is missing, try to fetch matching event from API
+        if (!eventId && reportDate) {
+            try {
+                const res = await axios.get(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+                    params: {
+                        trackedEntityInstance: trackInstanceId,
+                        program,
+                        fields: 'event,eventDate,programStage',
+                    }
+                });
+
+                const matchedEvent = res.data.events.find(
+                    (ev: any) =>
+                        ev.eventDate?.startsWith(reportDate) && ev.programStage === programStage
+                );
+
+                if (matchedEvent) {
+                    eventId = matchedEvent.event;
+
+                    // Store it for future
+                    setFetchedDates(prev => ({
+                        ...prev,
+                        [trackInstanceId]: {
+                            ...prev[trackInstanceId],
+                            events: {
+                                ...(prev[trackInstanceId]?.events || {}),
+                                [training]: eventId
+                            }
+                        }
+                    }));
+                } else {
+                    console.warn(`No matching event found for TEI ${trackInstanceId}, training: ${training}`);
+                    return;
+                }
+            } catch (err) {
+                console.error('Failed to fetch existing events:', err);
+                return;
+            }
+        }
+
+        if (!eventId) return;
+
+        const dataElementId =
+            dataElementIDsByFilter[training]?.[trackFilter]?.[dataElementName] ||
+            dataElementIDsByFilter[training]?.[dataElementName];
 
         if (!dataElementId) {
-            console.warn(`❌ Missing dataElementId for ${dataElementName}`);
+            console.warn(`Missing dataElementId for ${dataElementName} under training: ${training}`);
             return;
         }
 
@@ -1756,13 +1848,14 @@ export function OrgUnitTable(props: Props) {
 
         try {
             await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${eventId}/${dataElementId}`, payload);
-            console.log(`✅ PUT: ${dataElementName} = ${value}`);
+            console.log(`PUT: ${dataElementName} = ${value}`);
             setMessage(`Data Element - ${dataElementId} successfully updated.`);
         } catch (error) {
-            console.error('❌ Failed to send data value update:', error);
+            console.error('Failed to send data value update:', error);
             setMessage(`Data Element - ${dataElementId} update failed.`);
         }
     };
+
 
     //  handling present / absent indirect beneficiaries
     const handleIndirectPresentChange = async (
@@ -1819,7 +1912,7 @@ export function OrgUnitTable(props: Props) {
                 // parentData.dataValues is { [label: string]: string|boolean }
                 for (const [label, value] of Object.entries(parentData.dataValues)) {
                     // This calls your existing helper: it does PUT /api/events/{eventId}/{dataElementId}
-                    await sendDataValueUpdate(indirectId, label, value);
+                    await sendDataValueUpdate(indirectId, label, value, trainingFilter);
                 }
             } catch (err) {
                 console.error('❌ Error creating indirect event + dataValues:', err);
@@ -1903,10 +1996,22 @@ export function OrgUnitTable(props: Props) {
             },
         }));
 
+        const colMeta = additionalColumns.find(col => dataValueMapping[col.accessor] === dataElementName);
+        const training = colMeta?.training || selectedTrainings[0];
+
         // Send immediately for checkboxes
         if (typeof value === 'boolean') {
-            sendDataValueUpdate(trackInstanceId, dataElementName, value);
+            sendDataValueUpdate(trackInstanceId, dataElementName, value, colMeta.training);
         }
+
+        // In handleDataValueChange
+        console.log('Dispatching update with:', {
+            dataElementName,
+            training: colMeta?.training,
+            hasEventId: !!fetchedDates[trackInstanceId]?.events?.[colMeta.training]
+        });
+
+        console.log('Events created:', fetchedDates[trackInstanceId]?.events)
     };
 
     const fetchAdditionalData = async (trackInstanceId: string, trainingFilter: string, trackFilter: string): Promise<FetchedData> => {
@@ -1978,6 +2083,8 @@ export function OrgUnitTable(props: Props) {
 
     const handleFilterChange = async (training) => {
         let newSelected;
+
+
         if (training === 'Livelihood') {
             newSelected = ['Livelihood'];
         } else {
@@ -1993,6 +2100,8 @@ export function OrgUnitTable(props: Props) {
         }
         setSelectedTrainings(newSelected);
 
+        setTrainingFilter(newSelected.join(','));
+
         // Set program stage for compatibility (optional, can be removed if not needed)
         setSelectedProgramStage(newSelected.length === 1 ? newSelected[0] : '');
 
@@ -2001,6 +2110,32 @@ export function OrgUnitTable(props: Props) {
         newSelected.forEach(filter => {
             allCols = [...allCols, ...getAdditionalColumns(filter)];
         });
+
+        // Add unified date column
+        if (newSelected.length > 0) {
+            allCols.unshift({
+                Header: 'Date of Training',
+                accessor: 'reportDate',
+                headerClassName: 'additional-header-cell date-column',
+                className: 'date-column',
+                minWidth: 100,
+                training: 'Date'
+            });
+        }
+
+        // Add Action column only once if any trainings are selected
+        if (newSelected.length > 0) {
+            allCols.push({
+                Header: "Add / Edit Event",
+                accessor: 'addEditEvent',
+                headerClassName: 'additional-header-cell actions-header',
+                className: 'actions-cell',
+                minWidth: 140,
+                width: 140,
+                training: 'Action'
+            });
+        }
+
         setAdditionalColumns(allCols);
 
         // Fetch additional data for all rows for each selected training
@@ -2131,16 +2266,18 @@ export function OrgUnitTable(props: Props) {
                     onClick={e => {
                         e.stopPropagation();
                         handleRecordClick(activity);
+                        setBeneficiarySearch(activity.patientID)
                     }}
+                    className={selectedBeneficiary?.trackInstanceId === activity.trackInstanceId ? 'highlight-row' : ''}
                 >
-                    {/* 1️⃣ Original columns */}
+                    {/* 1 Original columns */}
                     {columnsVis
                         .filter(c => c.visible)
                         .map(c => (
                             <td key={c.accessor}>{(activity as any)[c.accessor]}</td>
                         ))}
 
-                    {/* 2️⃣ Additional columns */}
+                    {/* 2 Additional columns */}
                     {additionalColumns.filter(col => topicsVis[col.accessor]).map(col => {
                         const isAction = col.accessor === 'addEditEvent';
                         const isCheckbox = col.accessor.includes('checkBox');
@@ -2276,10 +2413,12 @@ export function OrgUnitTable(props: Props) {
                                                         }
                                                         onKeyDown={e => {
                                                             if (e.key === 'Enter') {
+                                                                const training = col.training || selectedTrainings[0];
                                                                 sendDataValueUpdate(
                                                                     activity.trackInstanceId,
                                                                     dataValueMapping[col.accessor],
-                                                                    e.currentTarget.value === 'Yes'
+                                                                    e.currentTarget.value === 'Yes',
+                                                                    training
                                                                 );
                                                             }
                                                         }}
@@ -2309,10 +2448,12 @@ export function OrgUnitTable(props: Props) {
                                                         }
                                                         onKeyDown={e => {
                                                             if (e.key === 'Enter') {
+                                                                const training = col.training || selectedTrainings[0];
                                                                 sendDataValueUpdate(
                                                                     activity.trackInstanceId,
                                                                     dataValueMapping[col.accessor],
-                                                                    e.currentTarget.value === 'Yes'
+                                                                    e.currentTarget.value === 'Yes',
+                                                                    training
                                                                 );
                                                             }
                                                         }}
@@ -2336,10 +2477,12 @@ export function OrgUnitTable(props: Props) {
                                                         )}
                                                         onKeyDown={e => {
                                                             if (e.key === 'Enter') {
+                                                                const training = col.training || selectedTrainings[0];
                                                                 sendDataValueUpdate(
                                                                     activity.trackInstanceId,
                                                                     dataValueMapping[col.accessor],
-                                                                    e.currentTarget.value
+                                                                    e.currentTarget.value === 'Yes',
+                                                                    training
                                                                 );
                                                             }
                                                         }}
@@ -2364,10 +2507,12 @@ export function OrgUnitTable(props: Props) {
                                                     )}
                                                     onKeyDown={e => {
                                                         if (e.key === 'Enter') {
+                                                            const training = col.training || selectedTrainings[0];
                                                             sendDataValueUpdate(
                                                                 activity.trackInstanceId,
                                                                 dataValueMapping[col.accessor],
-                                                                e.currentTarget.value
+                                                                e.currentTarget.value === 'Yes',
+                                                                training
                                                             );
                                                         }
                                                     }}
@@ -2583,7 +2728,7 @@ export function OrgUnitTable(props: Props) {
             {/* Training Filters */}
             <h5 style={{ padding: '10px' }}>Training</h5>
 
-            {/* First div block - Track and Program Stage filters */}
+            {/* First div block - Search, New Beneficiary, Track and Program Stage filters */}
             <div className="flex space-x-4" style={{
                 padding: '0px 10px 10px 10px',
                 display: 'flex',
@@ -2752,7 +2897,7 @@ export function OrgUnitTable(props: Props) {
 
             </div>
 
-            {/* Second div block - Search, New Beneficiary, and Date */}
+            {/* Second div block - Add Beneficiary */}
             <div style={{
                 padding: '10px',
                 display: 'flex',
@@ -3153,18 +3298,29 @@ export function OrgUnitTable(props: Props) {
                                             if (col.accessor === 'reportDate') {
                                                 label = 'Date of Training';
                                             } else if (col.accessor === 'addEditEvent') {
-                                                label = `Action (${col.training})`;
+                                                label = `Action`;
                                             } else {
                                                 // count how many visible non-date, non-action columns come before this one
-                                                const visibleIndex = additionalColumns
-                                                    .filter(c =>
-                                                        c.accessor !== 'reportDate' &&
-                                                        c.accessor !== 'addEditEvent' &&
-                                                        topicsVis[c.accessor]
-                                                    )
-                                                    .findIndex(c => c.accessor === col.accessor);
+                                                const trainingPrefix =
+                                                    col.training === 'Nutrition' ? 'NUT' :
+                                                        col.training === 'Water Sanitation & Hygiene' ? 'WSH' :
+                                                            col.training === 'Livelihood' ? 'LIV' :
+                                                                'GEN';
 
-                                                label = String(fullIndex + 0);
+                                                // Count how many visible columns of this training come before this one
+                                                const trainingCols = additionalColumns.filter(c =>
+                                                    c.training === col.training &&
+                                                    c.accessor !== 'reportDate' &&
+                                                    c.accessor !== 'addEditEvent' &&
+                                                    topicsVis[c.accessor]
+                                                );
+
+
+                                                // Find the static index of this column (from full list)
+                                                const trainingIndex = trainingCols.findIndex(c => c.accessor === col.accessor);
+                                                label = `${trainingPrefix}-${trainingIndex + 1}`;
+
+                                                // label = String(fullIndex + 0);
                                             }
 
                                             return (
