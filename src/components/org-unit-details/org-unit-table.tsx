@@ -29,6 +29,7 @@ interface FetchedData {
     eventId: string;
     events?: { [training: string]: string };
     dataValues: { [key: string]: string | boolean }; // To hold the values for each data element
+    muacEventId?: string; // New field for MUAC-specific event
 }
 
 
@@ -40,8 +41,16 @@ export function OrgUnitTable(props: Props) {
     const PROGRAM_STAGE_MAPPING = {
         'Livelihood': 'H0vCgsI1d4M',
         'Water Sanitation & Hygiene': 'bTVReRuHapT',
-        'Nutrition': 'RXTq2YFOH5c'
+        'Nutrition': 'RXTq2YFOH5c',
+        'Muac Assessment': 'HEukVrLC2dT'
     };
+
+    const muacDataElementMapping: Record<string, string> = {
+        'Oedema': 'uOJmECsPp5M',
+        'Muac': 'LQNXHgUuLbD',
+        'Muac Classification': 'zDIgqaXsxjg'
+    };
+
 
     const dataElementIDsByFilter = {
         'Livelihood': {
@@ -94,6 +103,11 @@ export function OrgUnitTable(props: Props) {
             'Household Hygene': 'ss6pDJe2k6h',
             'Clean and Safe Water': 'xyaOOPDyjoN',
             'Use of Latrine and Excreta Disposal': 'dnlAV3tubDJ'
+        },
+        'Muac Assessment': {
+            'Oedema': 'uOJmECsPp5M',
+            'Muac': 'LQNXHgUuLbD',
+            'Muac Classification': 'zDIgqaXsxjg'
         }
     };
 
@@ -202,6 +216,12 @@ export function OrgUnitTable(props: Props) {
         'Beneficiary_Category_dropDown': 'Beneficiary Category',
         'Other_Male_no_input': 'Other Male',
         'Other_Female_no_input': 'Other Female',
+
+        // Nutrition assessment - Muac
+
+        'oedema_checkBox': 'Oedema',
+        'muac_num': 'Muac',
+        'muacClassification_text': 'Muac Classification'
 
         // Remove commented out mappings
         // 'incomeEarned': 'Income Earned/Week',
@@ -422,6 +442,10 @@ export function OrgUnitTable(props: Props) {
         muacColor: '#ffffff',
     });
 
+    // muac of addn cols
+    const [muacClass, setMuacClass] = useState<string>('');
+
+
     const filterDataByDate = (data, selectedDate) => {
         if (!selectedDate) return data; // If no date is selected, return all data
 
@@ -630,6 +654,27 @@ export function OrgUnitTable(props: Props) {
 
         const mergedCols: any[] = [];
 
+        if (selectedTrainings.length > 0) {
+            mergedCols.push(
+                {
+                    Header: 'Oedema',
+                    accessor: 'oedema_checkBox',
+                    headerClassName: 'additional-header-cell',
+                    className: 'oedema_checkBox',
+                    training: 'Muac Assessment',
+                    minWidth: 100
+                },
+                {
+                    Header: 'Muac',
+                    accessor: 'muac_num',
+                    headerClassName: 'additional-header-cell',
+                    className: 'muac_num',
+                    training: 'Muac Assessment',
+                    minWidth: 100
+                }
+            );
+        }
+
         // Add "Date of Training" first
         mergedCols.push({
             Header: 'Date of Training',
@@ -641,9 +686,15 @@ export function OrgUnitTable(props: Props) {
         });
 
         // Add all topic columns from selected filters
+        // Add all topic columns from selected filters
         selectedTrainings.forEach(filter => {
             const cols = getAdditionalColumns(filter);
-            mergedCols.push(...cols);
+            // Filter out MUAC columns since we already added them
+            const filteredCols = cols.filter(col =>
+                col.accessor !== 'oedema_checkBox' &&
+                col.accessor !== 'muac_num'
+            );
+            mergedCols.push(...filteredCols);
         });
 
         // Add Action last
@@ -746,6 +797,7 @@ export function OrgUnitTable(props: Props) {
     // Function to determine additional columns based on the training filter
     const getAdditionalColumns = (filter: string) => {
         const columns = [];
+
         switch (filter) {
             case 'Livelihood':
                 if (trackFilter === 'Fisher') {
@@ -1027,8 +1079,6 @@ export function OrgUnitTable(props: Props) {
             default:
                 break;
         }
-
-
         return columns;
     };
 
@@ -1063,15 +1113,6 @@ export function OrgUnitTable(props: Props) {
         });
 
         setFilteredData(filterDataByDate(filtered, dateFilter));
-    };
-
-    // Function to close the modal
-    const closeModal = () => {
-        setIsModalVisible(false);
-
-        setBeneficiarySearch(''); // Reset search input
-        setSelectedRecord(null); // Reset selected record
-        setShowFilterForm(false); // Hide filter form
     };
 
     const generatePatientId = async (): Promise<string> => {
@@ -1700,6 +1741,44 @@ export function OrgUnitTable(props: Props) {
         // const eventsMap: Record<string, string> = {};
 
         try {
+
+            // Creating Muac Event
+
+            try {
+                const muacPayload = {
+                    events: [{
+                        trackedEntityInstance: trackInstanceId,
+                        program: 'n2iAPy3PGx7',
+                        programStage: PROGRAM_STAGE_MAPPING['Muac Assessment'],
+                        orgUnit: props.orgUnitId,
+                        eventDate: reportDate,
+                        status: 'ACTIVE',
+                        dataValues: []
+                    }]
+                };
+
+                const muacRes = await axios.post(
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    muacPayload
+                );
+
+                const muacEventId = muacRes.data.response.importSummaries[0].reference;
+
+                // Store MUAC event ID
+                setFetchedDates(prev => ({
+                    ...prev,
+                    [trackInstanceId]: {
+                        ...prev[trackInstanceId],
+                        muacEventId
+                    }
+                }));
+            } catch (error) {
+                console.error('Error creating MUAC event:', error);
+            }
+
+
+            // Creating Events for Training Filters
+
             const createdEvents = await Promise.all(
                 selectedTrainings.map(async training => {
                     const stage = PROGRAM_STAGE_MAPPING[training];
@@ -1770,14 +1849,26 @@ export function OrgUnitTable(props: Props) {
         value: string | boolean,
         training: string
     ) => {
+
+        // Determine program stage based on data element
+        const isMuacColumn = ['Oedema', 'Muac', 'Muac Classification'].includes(dataElementName);
+        const programStage = isMuacColumn
+            ? PROGRAM_STAGE_MAPPING['Muac Assessment']
+            : PROGRAM_STAGE_MAPPING[training];
+
         const orgUnit = props.orgUnitId;
         const program = 'n2iAPy3PGx7';
-        const programStage = PROGRAM_STAGE_MAPPING[training];
+        // const programStage = PROGRAM_STAGE_MAPPING[training];
 
         if (!programStage || !dataElementName) return;
 
         const reportDate = fetchedDates[trackInstanceId]?.reportDate;
         let eventId = fetchedDates[trackInstanceId]?.events?.[training];
+
+        // Use MUAC event ID if available
+        if (isMuacColumn && fetchedDates[trackInstanceId]?.muacEventId) {
+            eventId = fetchedDates[trackInstanceId].muacEventId;
+        }
 
         // If eventId is missing, try to fetch matching event from API
         if (!eventId && reportDate) {
@@ -1797,18 +1888,17 @@ export function OrgUnitTable(props: Props) {
 
                 if (matchedEvent) {
                     eventId = matchedEvent.event;
-
                     // Store it for future
-                    setFetchedDates(prev => ({
-                        ...prev,
-                        [trackInstanceId]: {
-                            ...prev[trackInstanceId],
-                            events: {
-                                ...(prev[trackInstanceId]?.events || {}),
-                                [training]: eventId
-                            }
-                        }
-                    }));
+                    // setFetchedDates(prev => ({
+                    //     ...prev,
+                    //     [trackInstanceId]: {
+                    //         ...prev[trackInstanceId],
+                    //         events: {
+                    //             ...(prev[trackInstanceId]?.events || {}),
+                    //             [training]: eventId
+                    //         }
+                    //     }
+                    // }));
                 } else {
                     console.warn(`No matching event found for TEI ${trackInstanceId}, training: ${training}`);
                     return;
@@ -1855,7 +1945,6 @@ export function OrgUnitTable(props: Props) {
             setMessage(`Data Element - ${dataElementId} update failed.`);
         }
     };
-
 
     //  handling present / absent indirect beneficiaries
     const handleIndirectPresentChange = async (
@@ -2239,6 +2328,20 @@ export function OrgUnitTable(props: Props) {
         return '';
     };
 
+    const handleMuacChange = (trackInstanceId: string, muacValue: string, classification: string) => {
+        setFetchedDates(prev => ({
+            ...prev,
+            [trackInstanceId]: {
+                ...prev[trackInstanceId],
+                dataValues: {
+                    ...prev[trackInstanceId]?.dataValues,
+                    [dataValueMapping['muac_num']]: muacValue,
+                    [dataValueMapping['muacClassification']]: classification,
+                }
+            }
+        }));
+    };
+
     const renderTableRows = () => {
         // No data case
         if (!filteredData || filteredData.length === 0) {
@@ -2496,6 +2599,71 @@ export function OrgUnitTable(props: Props) {
                                                     />
                                                 );
                                             }
+                                            // numeric muac input
+                                            if (col.accessor === 'muac_num') {
+                                                const beneficiaryStage = activity.beneficiaryStage;
+                                                console.log('Data value mapping:', activity.beneficiaryStage);
+
+                                                return (
+                                                    <input
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        pattern="[0-9]*"
+                                                        className="form-input"
+                                                        value={String(fetchedData.dataValues[dataValueMapping[col.accessor]] || '')}
+                                                        onChange={(e) => {
+                                                            // strip out anything that isn’t a digit
+                                                            const onlyDigits = e.target.value.replace(/\D/g, '');
+                                                            const classification = computeMuacClassification(
+                                                                onlyDigits,
+                                                                beneficiaryStage
+                                                            );
+
+                                                            // Update both muac_num and muacClassification in memory
+                                                            handleMuacChange(
+                                                                activity.trackInstanceId,
+                                                                onlyDigits,
+                                                                classification
+                                                            );
+                                                            // setMuacClass(classification);
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            // allow only digits, Backspace, Delete, arrows, Tab
+                                                            if (
+                                                                !/[0-9]/.test(e.key) &&
+                                                                e.key !== 'Backspace' &&
+                                                                e.key !== 'Delete' &&
+                                                                e.key !== 'ArrowLeft' &&
+                                                                e.key !== 'ArrowRight' &&
+                                                                e.key !== 'Tab' &&
+                                                                e.key !== 'Enter'
+                                                            ) {
+                                                                e.preventDefault();
+                                                            }
+
+                                                            if (e.key === 'Enter') {
+                                                                const training = col.training || selectedTrainings[0];
+                                                                sendDataValueUpdate(
+                                                                    activity.trackInstanceId,
+                                                                    dataValueMapping[col.accessor],
+                                                                    fetchedData.dataValues[dataValueMapping[col.accessor]],
+                                                                    training
+                                                                );
+
+                                                                // Save Classification
+                                                                sendDataValueUpdate(
+                                                                    activity.trackInstanceId,
+                                                                    dataValueMapping['muacClassification'],
+                                                                    fetchedData.dataValues[dataValueMapping['muacClassification']],
+                                                                    training
+                                                                );
+                                                                console.log('Classification : ', fetchedData.dataValues[dataValueMapping['muacClassification']])
+                                                            }
+                                                        }}
+                                                        placeholder="Enter MUAC"
+                                                    />
+                                                );
+                                            }
                                             // fallback text input
                                             return (
                                                 <input
@@ -2553,7 +2721,9 @@ export function OrgUnitTable(props: Props) {
     };
 
     const renderIndirectRows = () => {
-        const inheritedCols = additionalColumns.filter(c => c.accessor !== 'addEditEvent' && topicsVis[c.accessor]);
+        // const inheritedCols = additionalColumns.filter(c => c.accessor !== 'addEditEvent' && topicsVis[c.accessor]);
+        const inheritedCols = additionalColumns.filter(c => topicsVis[c.accessor] || c.accessor === 'addEditEvent');
+
         if (!indirectBeneficiaries.length) {
             return (
                 <tr>
@@ -2606,7 +2776,6 @@ export function OrgUnitTable(props: Props) {
 
                 {/* 2️⃣ Additional columns (read‑only, inherited) */}
                 {inheritedCols.map(col => {
-                    // reuse the same cellClass + style logic you have for direct rows
                     const isAction = col.accessor === 'addEditEvent';
                     const isCheckbox = col.accessor.includes('checkBox');
                     const cellClass = isAction
@@ -2620,28 +2789,151 @@ export function OrgUnitTable(props: Props) {
                         ? { minWidth: col.minWidth }
                         : {};
 
-                    // now pick content based on accessor
-                    let content: React.ReactNode;
-                    if (col.accessor === 'reportDate') {
-                        // show the parent’s date
-                        content = parentData.reportDate?.split('T')[0] || '—';
-                    } else if (col.accessor === 'dueDate') {
-                        content = parentData.dueDate?.split('T')[0] || '—';
-                    } else {
-                        // everything else is a ✓/✗
-                        const label = dataValueMapping[col.accessor];
-                        // for a present indirect, we copied parentData into fetchedDates[ben] already
-                        const raw = fetchedDates[ben.trackInstanceId]?.dataValues[label];
-                        const flag = raw === true || raw === 'true';
-                        content = renderCheckCell(flag);
-                    }
+                    const inEdit = editableRows[ben.trackInstanceId] && !isAction;
 
                     return (
                         <td key={col.accessor} className={cellClass} style={style}>
-                            {content}
+                            {isAction ? (
+                                <div className="button-container">
+                                    {editableRows[ben.trackInstanceId] ? (
+                                        <>
+                                            <button
+                                                className="save-button btn"
+                                                style={{ backgroundColor: 'green' }}
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    handleSave(
+                                                        ben.trackInstanceId,
+                                                        fetchedDates[ben.trackInstanceId]?.eventId
+                                                    );
+                                                }}
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                className="cancel-button btn"
+                                                style={{ backgroundColor: 'red' }}
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    handleCancel(ben.trackInstanceId);
+                                                }}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                className="add-button btn"
+                                                style={{ backgroundColor: 'grey' }}
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    handleAdd(ben.trackInstanceId);
+                                                }}
+                                            >
+                                                Add
+                                            </button>
+                                            <button
+                                                className="edit-button btn"
+                                                style={{ backgroundColor: 'orange' }}
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    handleEdit(ben.trackInstanceId);
+                                                }}
+                                            >
+                                                Edit
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            ) : inEdit ? (
+                                col.accessor === 'reportDate' ? (
+                                    <input
+                                        type="date"
+                                        value={fetchedDates[ben.trackInstanceId]?.reportDate?.split('T')[0] || ''}
+                                        onChange={e =>
+                                            handleDateChangeForFetchedDates(
+                                                ben.trackInstanceId,
+                                                e.target.value
+                                            )
+                                        }
+                                        onKeyDown={e =>
+                                            handleReportDateSubmit(e, ben.trackInstanceId)
+                                        }
+                                        onBlur={e =>
+                                            handleReportDateSubmit(e, ben.trackInstanceId)
+                                        }
+                                    />
+                                ) : isCheckbox ? (
+                                    <input
+                                        type="checkbox"
+                                        disabled={!hasValidDate[ben.trackInstanceId]}
+                                        className="form-check-input"
+                                        checked={
+                                            fetchedDates[ben.trackInstanceId]?.dataValues[
+                                            dataValueMapping[col.accessor]
+                                            ] === true ||
+                                            fetchedDates[ben.trackInstanceId]?.dataValues[
+                                            dataValueMapping[col.accessor]
+                                            ] === 'true'
+                                        }
+                                        onChange={e =>
+                                            handleDataValueChange(
+                                                ben.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.checked
+                                            )
+                                        }
+                                    />
+                                ) : (
+                                    <input
+                                        type="text"
+                                        value={
+                                            String(
+                                                fetchedDates[ben.trackInstanceId]?.dataValues[
+                                                dataValueMapping[col.accessor]
+                                                ] || ''
+                                            )
+                                        }
+                                        onChange={e =>
+                                            handleDataValueChange(
+                                                ben.trackInstanceId,
+                                                dataValueMapping[col.accessor],
+                                                e.target.value
+                                            )
+                                        }
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter') {
+                                                const training = selectedTrainings[0];
+                                                sendDataValueUpdate(
+                                                    ben.trackInstanceId,
+                                                    dataValueMapping[col.accessor],
+                                                    e.currentTarget.value,
+                                                    training
+                                                );
+                                            }
+                                        }}
+                                    />
+                                )
+                            ) : (
+                                // Static display when NOT editing
+                                (() => {
+                                    if (col.accessor === 'reportDate') {
+                                        return parentData.reportDate?.split('T')[0] || '—';
+                                    } else if (col.accessor === 'dueDate') {
+                                        return parentData.dueDate?.split('T')[0] || '—';
+                                    } else {
+                                        const label = dataValueMapping[col.accessor];
+                                        const raw = fetchedDates[ben.trackInstanceId]?.dataValues[label];
+                                        const flag = raw === true || raw === 'true';
+                                        return renderCheckCell(flag);
+                                    }
+                                })()
+                            )}
                         </td>
                     );
                 })}
+
             </tr>
         ));
     };
@@ -2855,7 +3147,7 @@ export function OrgUnitTable(props: Props) {
                     )}
                 </div> */}
 
-                {/* Topivs Selector */}
+                {/* Topics Selector */}
                 <div className="relative column-filter-dropdown" ref={dropdownRef} style={{ position: 'relative' }}>
                     <button
                         className="btn btn-secondary"
@@ -2867,33 +3159,95 @@ export function OrgUnitTable(props: Props) {
                     {showTopics && (
                         <div className="filter-menu absolute mt-1 p-2 bg-white border rounded shadow-lg z-10"
                             style={{ minWidth: '220px', zIndex: 999 }}>
-                            {/* Group columns by training filter */}
-                            {Array.from(new Set(additionalColumns.map(c => c.training))).map(training => (
-                                <div key={training}>
-                                    {/* Bold training header */}
+
+                            {/* 1. Always show Shared columns (Date of Training) */}
+                            {additionalColumns.some(col => col.training === 'shared') && (
+                                <div>
                                     <div className="font-bold mt-2 mb-1 text-sm first:mt-0">
-                                        <b>{training}</b>
+                                        <b>Shared</b>
                                     </div>
                                     {additionalColumns
-                                        .filter(col => col.training === training)
+                                        .filter(col => col.training === 'shared')
                                         .map(col => (
                                             <label key={col.accessor} className="flex items-start py-1 pl-2">
                                                 <input
                                                     type="checkbox"
-                                                    checked={topicsVis[col.accessor] || false}
+                                                    checked={topicsVis[col.accessor] ?? true}
                                                     onChange={() => handleColumnToggle(col.accessor)}
                                                 />
                                                 {col.Header}
                                             </label>
                                         ))}
                                 </div>
-                            ))}
+                            )}
+
+                            {/* 2. Always show MUAC Assessment section if any training is selected */}
+                            {selectedTrainings.length > 0 && (
+                                <div>
+                                    <div className="font-bold mt-2 mb-1 text-sm">
+                                        <b>Muac Assessment</b>
+                                    </div>
+                                    {additionalColumns
+                                        .filter(col => col.training === 'Muac Assessment')
+                                        .map(col => (
+                                            <label key={col.accessor} className="flex items-start py-1 pl-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={topicsVis[col.accessor] ?? true}
+                                                    onChange={() => handleColumnToggle(col.accessor)}
+                                                />
+                                                {col.Header}
+                                            </label>
+                                        ))}
+                                </div>
+                            )}
+
+                            {/* 3. Show other training sections */}
+                            {Array.from(new Set(additionalColumns
+                                .filter(col => !['shared', 'Muac Assessment', 'Action'].includes(col.training))
+                                .map(c => c.training)))
+                                .filter(training => training)
+                                .map(training => (
+                                    <div key={training}>
+                                        <div className="font-bold mt-2 mb-1 text-sm">
+                                            <b>{training}</b>
+                                        </div>
+                                        {additionalColumns
+                                            .filter(col => col.training === training)
+                                            .map(col => (
+                                                <label key={col.accessor} className="flex items-start py-1 pl-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={topicsVis[col.accessor] ?? true}
+                                                        onChange={() => handleColumnToggle(col.accessor)}
+                                                    />
+                                                    {col.Header}
+                                                </label>
+                                            ))}
+                                    </div>
+                                ))}
+
+                            {/* 4. Action column at the bottom */}
+                            <div className="mt-3 pt-2 border-t">
+                                <div className="font-bold mb-1 text-sm">
+                                    <b>Actions</b>
+                                </div>
+                                {additionalColumns
+                                    .filter(col => col.training === 'Action')
+                                    .map(col => (
+                                        <label key={col.accessor} className="flex items-start py-1 pl-2">
+                                            <input
+                                                type="checkbox"
+                                                checked={topicsVis[col.accessor] ?? true}
+                                                onChange={() => handleColumnToggle(col.accessor)}
+                                            />
+                                            {col.Header}
+                                        </label>
+                                    ))}
+                            </div>
                         </div>
                     )}
                 </div>
-
-
-
 
             </div>
 
@@ -3299,13 +3653,17 @@ export function OrgUnitTable(props: Props) {
                                                 label = 'Date of Training';
                                             } else if (col.accessor === 'addEditEvent') {
                                                 label = `Action`;
+                                            } else if (col.accessor === 'oedema_checkBox') {
+                                                label = 'Oedema';
+                                            } else if (col.accessor === 'muac_num') {
+                                                label = 'Muac';
                                             } else {
                                                 // count how many visible non-date, non-action columns come before this one
                                                 const trainingPrefix =
                                                     col.training === 'Nutrition' ? 'NUT' :
                                                         col.training === 'Water Sanitation & Hygiene' ? 'WSH' :
                                                             col.training === 'Livelihood' ? 'LIV' :
-                                                                'GEN';
+                                                                'Muac';
 
                                                 // Count how many visible columns of this training come before this one
                                                 const trainingCols = additionalColumns.filter(c =>
@@ -3319,10 +3677,8 @@ export function OrgUnitTable(props: Props) {
                                                 // Find the static index of this column (from full list)
                                                 const trainingIndex = trainingCols.findIndex(c => c.accessor === col.accessor);
                                                 label = `${trainingPrefix}-${trainingIndex + 1}`;
-
                                                 // label = String(fullIndex + 0);
                                             }
-
                                             return (
                                                 <th
                                                     key={col.accessor}
@@ -3622,18 +3978,40 @@ export function OrgUnitTable(props: Props) {
                                             <th key={c.accessor}>{c.Header}</th>
                                         ))
                                     }
-
                                     {/* 2 Numbered additional columns */}
                                     {additionalColumns
-                                        .filter(col => col.accessor !== 'addEditEvent' && topicsVis[col.accessor])
+                                        .filter(col => topicsVis[col.accessor] || col.accessor === 'addEditEvent') // ← notice, keep addEditEvent
                                         .map((col) => {
+                                            if (col.accessor === 'addEditEvent') {
+                                                return (
+                                                    <th
+                                                        key="addEditEvent"
+                                                        className="additional-header-cell actions-header"
+                                                        style={{
+                                                            backgroundColor: '#f0f0f0', // Match the main table
+                                                            textAlign: 'center', // Center align
+                                                            minWidth: '140px' // Consistent width
+                                                        }}
+                                                        title="Action"
+                                                    >
+                                                        Action
+                                                    </th>
+                                                );
+                                            }
+
                                             const fullIndex = additionalColumns.findIndex(c => c.accessor === col.accessor);
 
                                             let label: string;
                                             if (col.accessor === 'reportDate') {
                                                 label = 'Date of Training';
+                                            } else if (col.accessor === 'oedema_checkBox') {
+                                                label = 'Oedema';
+                                            } else if (col.accessor === 'muac_num') {
+                                                label = 'Muac';
+                                            } else if (col.accessor === 'addEditEvent') {
+                                                label = 'Action';
                                             } else {
-                                                // count how many visible topic columns come *before* this one (excluding reportDate)
+                                                // count how many visible topic columns come *before* this one (excluding reportDate and addEditEvent)
                                                 const visibleBefore = additionalColumns
                                                     .filter(c =>
                                                         c.accessor !== 'addEditEvent' &&
@@ -3654,6 +4032,7 @@ export function OrgUnitTable(props: Props) {
                                                 </th>
                                             );
                                         })}
+
 
 
 

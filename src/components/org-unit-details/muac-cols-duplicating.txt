@@ -1,0 +1,310 @@
+org-unit-table.tsx:2263 Warning: Encountered two children with the same key, `oedema_checkBox`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    in div (at org-unit-table.tsx:2965)
+    in div (at org-unit-table.tsx:2961)
+    in div (at org-unit-table.tsx:2952)
+    in div (at org-unit-table.tsx:2825)
+    in main (at org-unit-table.tsx:2815)
+    in OrgUnitTable (at org-unit-details/index.tsx:33)
+    in Table (at org-unit-details/index.tsx:23)
+    in section (at org-unit-details/index.tsx:21)
+    in OrgUnitDetails (at App.tsx:34)
+    in Route (at App.tsx:33)
+    in Switch (at App.tsx:29)
+    in Router (created by HashRouter)
+    in HashRouter (at App.tsx:28)
+    in wrappedComponent (at src/index.tsx:37)
+    in QueryClientProvider (at src/index.tsx:36)
+    in DataProvider (created by DHIS2RuntimeProvider)
+    in ConfigProvider (created by DHIS2RuntimeProvider)
+    in DHIS2RuntimeProvider (at src/index.tsx:35)
+console.<computed> @ index.js:1
+overrideMethod @ hook.js:608
+printWarning @ react-dom.development.js:88
+error @ react-dom.development.js:60
+warnOnInvalidKey @ react-dom.development.js:13801
+reconcileChildrenArray @ react-dom.development.js:13832
+reconcileChildFibers @ react-dom.development.js:14305
+reconcileChildren @ react-dom.development.js:16769
+updateFragment @ react-dom.development.js:16977
+beginWork @ react-dom.development.js:18649
+beginWork$1 @ react-dom.development.js:23179
+performUnitOfWork @ react-dom.development.js:22154
+workLoopSync @ react-dom.development.js:22130
+performSyncWorkOnRoot @ react-dom.development.js:21756
+(anonymous) @ react-dom.development.js:11089
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+flushSyncCallbackQueueImpl @ react-dom.development.js:11084
+flushSyncCallbackQueue @ react-dom.development.js:11072
+scheduleUpdateOnFiber @ react-dom.development.js:21199
+dispatchAction @ react-dom.development.js:15660
+handleFilterChange @ org-unit-table.tsx:2263
+await in handleFilterChange
+onChange @ org-unit-table.tsx:2904
+callCallback @ react-dom.development.js:188
+invokeGuardedCallbackDev @ react-dom.development.js:237
+invokeGuardedCallback @ react-dom.development.js:292
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:306
+executeDispatch @ react-dom.development.js:389
+executeDispatchesInOrder @ react-dom.development.js:414
+executeDispatchesAndRelease @ react-dom.development.js:3278
+executeDispatchesAndReleaseTopLevel @ react-dom.development.js:3287
+forEachAccumulated @ react-dom.development.js:3257
+runEventsInBatch @ react-dom.development.js:3304
+runExtractedPluginEventsInBatch @ react-dom.development.js:3514
+handleTopLevel @ react-dom.development.js:3558
+batchedEventUpdates$1 @ react-dom.development.js:21871
+batchedEventUpdates @ react-dom.development.js:795
+dispatchEventForLegacyPluginEventSystem @ react-dom.development.js:3568
+attemptToDispatchEvent @ react-dom.development.js:4267
+dispatchEvent @ react-dom.development.js:4189
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+discreteUpdates$1 @ react-dom.development.js:21887
+discreteUpdates @ react-dom.development.js:806
+dispatchDiscreteEvent @ react-dom.development.js:4168Understand this error
+org-unit-table.tsx:2263 Warning: Encountered two children with the same key, `muac_text`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    in div (at org-unit-table.tsx:2965)
+    in div (at org-unit-table.tsx:2961)
+    in div (at org-unit-table.tsx:2952)
+    in div (at org-unit-table.tsx:2825)
+    in main (at org-unit-table.tsx:2815)
+    in OrgUnitTable (at org-unit-details/index.tsx:33)
+    in Table (at org-unit-details/index.tsx:23)
+    in section (at org-unit-details/index.tsx:21)
+    in OrgUnitDetails (at App.tsx:34)
+    in Route (at App.tsx:33)
+    in Switch (at App.tsx:29)
+    in Router (created by HashRouter)
+    in HashRouter (at App.tsx:28)
+    in wrappedComponent (at src/index.tsx:37)
+    in QueryClientProvider (at src/index.tsx:36)
+    in DataProvider (created by DHIS2RuntimeProvider)
+    in ConfigProvider (created by DHIS2RuntimeProvider)
+    in DHIS2RuntimeProvider (at src/index.tsx:35)
+console.<computed> @ index.js:1
+overrideMethod @ hook.js:608
+printWarning @ react-dom.development.js:88
+error @ react-dom.development.js:60
+warnOnInvalidKey @ react-dom.development.js:13801
+reconcileChildrenArray @ react-dom.development.js:13832
+reconcileChildFibers @ react-dom.development.js:14305
+reconcileChildren @ react-dom.development.js:16769
+updateFragment @ react-dom.development.js:16977
+beginWork @ react-dom.development.js:18649
+beginWork$1 @ react-dom.development.js:23179
+performUnitOfWork @ react-dom.development.js:22154
+workLoopSync @ react-dom.development.js:22130
+performSyncWorkOnRoot @ react-dom.development.js:21756
+(anonymous) @ react-dom.development.js:11089
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+flushSyncCallbackQueueImpl @ react-dom.development.js:11084
+flushSyncCallbackQueue @ react-dom.development.js:11072
+scheduleUpdateOnFiber @ react-dom.development.js:21199
+dispatchAction @ react-dom.development.js:15660
+handleFilterChange @ org-unit-table.tsx:2263
+await in handleFilterChange
+onChange @ org-unit-table.tsx:2904
+callCallback @ react-dom.development.js:188
+invokeGuardedCallbackDev @ react-dom.development.js:237
+invokeGuardedCallback @ react-dom.development.js:292
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:306
+executeDispatch @ react-dom.development.js:389
+executeDispatchesInOrder @ react-dom.development.js:414
+executeDispatchesAndRelease @ react-dom.development.js:3278
+executeDispatchesAndReleaseTopLevel @ react-dom.development.js:3287
+forEachAccumulated @ react-dom.development.js:3257
+runEventsInBatch @ react-dom.development.js:3304
+runExtractedPluginEventsInBatch @ react-dom.development.js:3514
+handleTopLevel @ react-dom.development.js:3558
+batchedEventUpdates$1 @ react-dom.development.js:21871
+batchedEventUpdates @ react-dom.development.js:795
+dispatchEventForLegacyPluginEventSystem @ react-dom.development.js:3568
+attemptToDispatchEvent @ react-dom.development.js:4267
+dispatchEvent @ react-dom.development.js:4189
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+discreteUpdates$1 @ react-dom.development.js:21887
+discreteUpdates @ react-dom.development.js:806
+dispatchDiscreteEvent @ react-dom.development.js:4168Understand this error
+org-unit-table.tsx:2263 Warning: Encountered two children with the same key, `muacClassification_text`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    in div (at org-unit-table.tsx:2965)
+    in div (at org-unit-table.tsx:2961)
+    in div (at org-unit-table.tsx:2952)
+    in div (at org-unit-table.tsx:2825)
+    in main (at org-unit-table.tsx:2815)
+    in OrgUnitTable (at org-unit-details/index.tsx:33)
+    in Table (at org-unit-details/index.tsx:23)
+    in section (at org-unit-details/index.tsx:21)
+    in OrgUnitDetails (at App.tsx:34)
+    in Route (at App.tsx:33)
+    in Switch (at App.tsx:29)
+    in Router (created by HashRouter)
+    in HashRouter (at App.tsx:28)
+    in wrappedComponent (at src/index.tsx:37)
+    in QueryClientProvider (at src/index.tsx:36)
+    in DataProvider (created by DHIS2RuntimeProvider)
+    in ConfigProvider (created by DHIS2RuntimeProvider)
+    in DHIS2RuntimeProvider (at src/index.tsx:35)
+console.<computed> @ index.js:1
+overrideMethod @ hook.js:608
+printWarning @ react-dom.development.js:88
+error @ react-dom.development.js:60
+warnOnInvalidKey @ react-dom.development.js:13801
+reconcileChildrenArray @ react-dom.development.js:13832
+reconcileChildFibers @ react-dom.development.js:14305
+reconcileChildren @ react-dom.development.js:16769
+updateFragment @ react-dom.development.js:16977
+beginWork @ react-dom.development.js:18649
+beginWork$1 @ react-dom.development.js:23179
+performUnitOfWork @ react-dom.development.js:22154
+workLoopSync @ react-dom.development.js:22130
+performSyncWorkOnRoot @ react-dom.development.js:21756
+(anonymous) @ react-dom.development.js:11089
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+flushSyncCallbackQueueImpl @ react-dom.development.js:11084
+flushSyncCallbackQueue @ react-dom.development.js:11072
+scheduleUpdateOnFiber @ react-dom.development.js:21199
+dispatchAction @ react-dom.development.js:15660
+handleFilterChange @ org-unit-table.tsx:2263
+await in handleFilterChange
+onChange @ org-unit-table.tsx:2904
+callCallback @ react-dom.development.js:188
+invokeGuardedCallbackDev @ react-dom.development.js:237
+invokeGuardedCallback @ react-dom.development.js:292
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:306
+executeDispatch @ react-dom.development.js:389
+executeDispatchesInOrder @ react-dom.development.js:414
+executeDispatchesAndRelease @ react-dom.development.js:3278
+executeDispatchesAndReleaseTopLevel @ react-dom.development.js:3287
+forEachAccumulated @ react-dom.development.js:3257
+runEventsInBatch @ react-dom.development.js:3304
+runExtractedPluginEventsInBatch @ react-dom.development.js:3514
+handleTopLevel @ react-dom.development.js:3558
+batchedEventUpdates$1 @ react-dom.development.js:21871
+batchedEventUpdates @ react-dom.development.js:795
+dispatchEventForLegacyPluginEventSystem @ react-dom.development.js:3568
+attemptToDispatchEvent @ react-dom.development.js:4267
+dispatchEvent @ react-dom.development.js:4189
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+discreteUpdates$1 @ react-dom.development.js:21887
+discreteUpdates @ react-dom.development.js:806
+dispatchDiscreteEvent @ react-dom.development.js:4168Understand this error
+index.js:1 Warning: Encountered two children with the same key, `oedema_checkBox`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    in div (at org-unit-table.tsx:2965)
+    in div (at org-unit-table.tsx:2961)
+    in div (at org-unit-table.tsx:2952)
+    in div (at org-unit-table.tsx:2825)
+    in main (at org-unit-table.tsx:2815)
+    in OrgUnitTable (at org-unit-details/index.tsx:33)
+    in Table (at org-unit-details/index.tsx:23)
+    in section (at org-unit-details/index.tsx:21)
+    in OrgUnitDetails (at App.tsx:34)
+    in Route (at App.tsx:33)
+    in Switch (at App.tsx:29)
+    in Router (created by HashRouter)
+    in HashRouter (at App.tsx:28)
+    in wrappedComponent (at src/index.tsx:37)
+    in QueryClientProvider (at src/index.tsx:36)
+    in DataProvider (created by DHIS2RuntimeProvider)
+    in ConfigProvider (created by DHIS2RuntimeProvider)
+    in DHIS2RuntimeProvider (at src/index.tsx:35)
+console.<computed> @ index.js:1
+overrideMethod @ hook.js:608
+printWarning @ react-dom.development.js:88
+error @ react-dom.development.js:60
+warnOnInvalidKey @ react-dom.development.js:13801
+reconcileChildrenArray @ react-dom.development.js:13832
+reconcileChildFibers @ react-dom.development.js:14305
+reconcileChildren @ react-dom.development.js:16769
+updateFragment @ react-dom.development.js:16977
+beginWork @ react-dom.development.js:18649
+beginWork$1 @ react-dom.development.js:23179
+performUnitOfWork @ react-dom.development.js:22154
+workLoopSync @ react-dom.development.js:22130
+performSyncWorkOnRoot @ react-dom.development.js:21756
+(anonymous) @ react-dom.development.js:11089
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+flushSyncCallbackQueueImpl @ react-dom.development.js:11084
+flushSyncCallbackQueue @ react-dom.development.js:11072
+flushPassiveEffectsImpl @ react-dom.development.js:22883
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+flushPassiveEffects @ react-dom.development.js:22820
+(anonymous) @ react-dom.development.js:22699
+workLoop @ scheduler.development.js:597
+flushWork @ scheduler.development.js:552
+performWorkUntilDeadline @ scheduler.development.js:164Understand this error
+index.js:1 Warning: Encountered two children with the same key, `muac_text`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    in div (at org-unit-table.tsx:2965)
+    in div (at org-unit-table.tsx:2961)
+    in div (at org-unit-table.tsx:2952)
+    in div (at org-unit-table.tsx:2825)
+    in main (at org-unit-table.tsx:2815)
+    in OrgUnitTable (at org-unit-details/index.tsx:33)
+    in Table (at org-unit-details/index.tsx:23)
+    in section (at org-unit-details/index.tsx:21)
+    in OrgUnitDetails (at App.tsx:34)
+    in Route (at App.tsx:33)
+    in Switch (at App.tsx:29)
+    in Router (created by HashRouter)
+    in HashRouter (at App.tsx:28)
+    in wrappedComponent (at src/index.tsx:37)
+    in QueryClientProvider (at src/index.tsx:36)
+    in DataProvider (created by DHIS2RuntimeProvider)
+    in ConfigProvider (created by DHIS2RuntimeProvider)
+    in DHIS2RuntimeProvider (at src/index.tsx:35)
+console.<computed> @ index.js:1
+overrideMethod @ hook.js:608
+printWarning @ react-dom.development.js:88
+error @ react-dom.development.js:60
+warnOnInvalidKey @ react-dom.development.js:13801
+reconcileChildrenArray @ react-dom.development.js:13832
+reconcileChildFibers @ react-dom.development.js:14305
+reconcileChildren @ react-dom.development.js:16769
+updateFragment @ react-dom.development.js:16977
+beginWork @ react-dom.development.js:18649
+beginWork$1 @ react-dom.development.js:23179
+performUnitOfWork @ react-dom.development.js:22154
+workLoopSync @ react-dom.development.js:22130
+performSyncWorkOnRoot @ react-dom.development.js:21756
+(anonymous) @ react-dom.development.js:11089
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+flushSyncCallbackQueueImpl @ react-dom.development.js:11084
+flushSyncCallbackQueue @ react-dom.development.js:11072
+flushPassiveEffectsImpl @ react-dom.development.js:22883
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+flushPassiveEffects @ react-dom.development.js:22820
+(anonymous) @ react-dom.development.js:22699
+workLoop @ scheduler.development.js:597
+flushWork @ scheduler.development.js:552
+performWorkUntilDeadline @ scheduler.development.js:164Understand this error
+index.js:1 Warning: Encountered two children with the same key, `muacClassification_text`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    in div (at org-unit-table.tsx:2965)
+    in div (at org-unit-table.tsx:2961)
+    in div (at org-unit-table.tsx:2952)
+    in div (at org-unit-table.tsx:2825)
+    in main (at org-unit-table.tsx:2815)
+    in OrgUnitTable (at org-unit-details/index.tsx:33)
+    in Table (at org-unit-details/index.tsx:23)
+    in section (at org-unit-details/index.tsx:21)
+    in OrgUnitDetails (at App.tsx:34)
+    in Route (at App.tsx:33)
+    in Switch (at App.tsx:29)
+    in Router (created by HashRouter)
+    in HashRouter (at App.tsx:28)
+    in wrappedComponent (at src/index.tsx:37)
+    in QueryClientProvider (at src/index.tsx:36)
+    in DataProvider (created by DHIS2RuntimeProvider)
+    in ConfigProvider (created by DHIS2RuntimeProvider)
+    in DHIS2RuntimeProvider (at src/index.tsx:35
+
+- i want to handle that issue of the 3 muac addn cols repeating when user selects bth water and nutrition
+
+now go through the code script and try and deduce what issue might be
