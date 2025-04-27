@@ -637,6 +637,7 @@ export function OrgUnitTable(props: Props) {
     //         setAdditionalColumns(getAdditionalColumns(trainingFilter));
     //     }
     // }, [trackFilter, trainingFilter]);
+    // Addn and Muac columns too 
     useEffect(() => {
         if (!trainingFilter) {
             setAdditionalColumns([]);
@@ -657,27 +658,33 @@ export function OrgUnitTable(props: Props) {
         if (selectedTrainings.length > 0) {
             mergedCols.push(
                 {
-                    Header: 'Oedema',
+                    Header: ' Oedema  ',
                     accessor: 'oedema_checkBox',
                     headerClassName: 'additional-header-cell',
                     className: 'oedema_checkBox',
                     training: 'Muac Assessment',
-                    minWidth: 100
+                    minWidth: 100,
+                    
                 },
                 {
-                    Header: 'Muac',
+                    Header: ' Muac',
                     accessor: 'muac_num',
                     headerClassName: 'additional-header-cell',
-                    className: 'muac_num',
+                    className: 'muac-value-cell', // New class for styling
                     training: 'Muac Assessment',
-                    minWidth: 100
+                    minWidth: 100,
+                    // Add custom Cell renderer
+                    Cell: ({ row }: { row: any }) => {
+                        const muacValue = fetchedDates[row.original.trackInstanceId]?.dataValues?.['Muac'];
+                        return muacValue || '—'; // Display the value or dash if empty
+                    }
                 }
             );
         }
 
         // Add "Date of Training" first
         mergedCols.push({
-            Header: 'Date of Training',
+            Header: ' Date of Training',
             accessor: 'reportDate',
             headerClassName: 'additional-header-cell date-column',
             className: 'date-column',
@@ -699,7 +706,7 @@ export function OrgUnitTable(props: Props) {
 
         // Add Action last
         mergedCols.push({
-            Header: 'Add / Edit Event',
+            Header: ' Add / Edit Event',
             accessor: 'addEditEvent',
             headerClassName: 'additional-header-cell actions-header',
             className: 'actions-cell',
@@ -1863,6 +1870,7 @@ export function OrgUnitTable(props: Props) {
         if (!programStage || !dataElementName) return;
 
         const reportDate = fetchedDates[trackInstanceId]?.reportDate;
+        // Check if we already have an event ID for this program stage
         let eventId = fetchedDates[trackInstanceId]?.events?.[training];
 
         // Use MUAC event ID if available
@@ -1870,7 +1878,7 @@ export function OrgUnitTable(props: Props) {
             eventId = fetchedDates[trackInstanceId].muacEventId;
         }
 
-        // If eventId is missing, try to fetch matching event from API
+        // If eventId is missing, try to fetch exisitng event from API
         if (!eventId && reportDate) {
             try {
                 const res = await axios.get(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
@@ -1881,27 +1889,53 @@ export function OrgUnitTable(props: Props) {
                     }
                 });
 
+                // Find event matching the report date
                 const matchedEvent = res.data.events.find(
                     (ev: any) =>
                         ev.eventDate?.startsWith(reportDate) && ev.programStage === programStage
                 );
 
+                // if (matchedEvent) {
+                //     eventId = matchedEvent.event;
+                //     // Store it for future
+                //     // setFetchedDates(prev => ({
+                //     //     ...prev,
+                //     //     [trackInstanceId]: {
+                //     //         ...prev[trackInstanceId],
+                //     //         events: {
+                //     //             ...(prev[trackInstanceId]?.events || {}),
+                //     //             [training]: eventId
+                //     //         }
+                //     //     }
+                //     // }));
+                // } else {
+                //     console.warn(`No matching event found for TEI ${trackInstanceId}, training: ${training}`);
+                //     return;
+                // }
+
                 if (matchedEvent) {
                     eventId = matchedEvent.event;
-                    // Store it for future
-                    // setFetchedDates(prev => ({
-                    //     ...prev,
-                    //     [trackInstanceId]: {
-                    //         ...prev[trackInstanceId],
-                    //         events: {
-                    //             ...(prev[trackInstanceId]?.events || {}),
-                    //             [training]: eventId
-                    //         }
-                    //     }
-                    // }));
-                } else {
-                    console.warn(`No matching event found for TEI ${trackInstanceId}, training: ${training}`);
-                    return;
+                    // Store it for future use
+                    if (isMuacColumn) {
+                        setFetchedDates(prev => ({
+                            ...prev,
+                            [trackInstanceId]: {
+                                ...prev[trackInstanceId],
+                                muacEventId: eventId
+                            }
+                        }));
+                    } else {
+                        setFetchedDates(prev => ({
+                            ...prev,
+                            [trackInstanceId]: {
+                                ...prev[trackInstanceId],
+                                events: {
+                                    ...(prev[trackInstanceId]?.events || {}),
+                                    [training]: eventId
+                                }
+                            }
+                        }));
+                    }
                 }
             } catch (err) {
                 console.error('Failed to fetch existing events:', err);
@@ -1909,8 +1943,57 @@ export function OrgUnitTable(props: Props) {
             }
         }
 
-        if (!eventId) return;
+        // If still no event ID, we need to create one
+        // if (!eventId) return;
+        if (!eventId) {
+            try {
+                const payload = {
+                    events: [{
+                        trackedEntityInstance: trackInstanceId,
+                        program: 'n2iAPy3PGx7',
+                        programStage,
+                        orgUnit: props.orgUnitId,
+                        eventDate: reportDate,
+                        status: 'ACTIVE',
+                        dataValues: []
+                    }]
+                };
 
+                const res = await axios.post(
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    payload
+                );
+
+                eventId = res.data.response.importSummaries[0].reference;
+
+                // Store the new event ID
+                if (isMuacColumn) {
+                    setFetchedDates(prev => ({
+                        ...prev,
+                        [trackInstanceId]: {
+                            ...prev[trackInstanceId],
+                            muacEventId: eventId
+                        }
+                    }));
+                } else {
+                    setFetchedDates(prev => ({
+                        ...prev,
+                        [trackInstanceId]: {
+                            ...prev[trackInstanceId],
+                            events: {
+                                ...(prev[trackInstanceId]?.events || {}),
+                                [training]: eventId
+                            }
+                        }
+                    }));
+                }
+            } catch (error) {
+                console.error('Error creating event:', error);
+                return;
+            }
+        }
+
+        // Now send the data value update
         const dataElementId =
             dataElementIDsByFilter[training]?.[trackFilter]?.[dataElementName] ||
             dataElementIDsByFilter[training]?.[dataElementName];
@@ -1957,14 +2040,34 @@ export function OrgUnitTable(props: Props) {
             [indirectId]: isPresent,
         }));
 
-        // Grab parent’s training event info
+        // Grab parent's training event info
         const parentId = selectedBeneficiary?.trackInstanceId!;
         const parentData = fetchedDates[parentId];
         if (!parentData) return;
 
         if (isPresent) {
-            // ─── Step A: Create the event (just like handleReportDateSubmit) ───
             try {
+                // Create MUAC event first
+                const muacPayload = {
+                    events: [{
+                        trackedEntityInstance: indirectId,
+                        program: 'n2iAPy3PGx7',
+                        programStage: PROGRAM_STAGE_MAPPING['Muac Assessment'],
+                        orgUnit: props.orgUnitId,
+                        notes: [],
+                        dataValues: [],
+                        status: 'ACTIVE',
+                        eventDate: parentData.reportDate,
+                    }]
+                };
+
+                const muacRes = await axios.post(
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    muacPayload
+                );
+                const muacEventId = muacRes.data.response.importSummaries[0].reference;
+
+                // Then create training event if needed
                 const payload = {
                     events: [{
                         trackedEntityInstance: indirectId,
@@ -1974,7 +2077,7 @@ export function OrgUnitTable(props: Props) {
                         notes: [],
                         dataValues: [],
                         status: 'ACTIVE',
-                        eventDate: parentData.reportDate,        // use parent’s date
+                        eventDate: parentData.reportDate,
                     }]
                 };
                 const resp = await axios.post(
@@ -1983,50 +2086,63 @@ export function OrgUnitTable(props: Props) {
                 );
                 const newEventId = resp.data.response.importSummaries[0].reference;
 
-                // Update fetchedDates so we can PUT the dataValues next
+                // Update fetchedDates with both events
                 setFetchedDates(prev => ({
                     ...prev,
                     [indirectId]: {
                         ...parentData,
-                        eventId: newEventId
+                        eventId: newEventId,
+                        muacEventId: muacEventId,
+                        dataValues: {
+                            ...parentData.dataValues,
+                            // Clear non-MUAC values since they should come from parent
+                            ...Object.fromEntries(
+                                Object.entries(parentData.dataValues)
+                                    .filter(([key]) =>
+                                        key === 'Oedema' ||
+                                        key === 'Muac' ||
+                                        key === 'Muac Classification'
+                                    )
+                            )
+                        }
                     }
                 }));
+
                 setHasValidDate(prev => ({
                     ...prev,
                     [indirectId]: true
                 }));
-                console.log(`✅ Indirect event created: ${newEventId}`);
 
-                // ─── Step B: Copy each dataValue from parent to this new event ───
-                // parentData.dataValues is { [label: string]: string|boolean }
-                for (const [label, value] of Object.entries(parentData.dataValues)) {
-                    // This calls your existing helper: it does PUT /api/events/{eventId}/{dataElementId}
-                    await sendDataValueUpdate(indirectId, label, value, trainingFilter);
-                }
             } catch (err) {
-                console.error('❌ Error creating indirect event + dataValues:', err);
-                // Roll back the checkbox if you like:
+                console.error('Error creating indirect events:', err);
                 setIndirectPresent(prev => ({ ...prev, [indirectId]: false }));
             }
         } else {
-            // ─── Absent: delete any event and clear out the values ───
+            // Delete both events if they exist
             const existingEventId = fetchedDates[indirectId]?.eventId;
-            if (existingEventId) {
-                try {
+            const existingMuacEventId = fetchedDates[indirectId]?.muacEventId;
+
+            try {
+                if (existingEventId) {
                     await axios.delete(
                         `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${existingEventId}`
                     );
-                } catch (e) {
-                    console.warn('⚠️ Failed to delete indirect event:', e);
                 }
+                if (existingMuacEventId) {
+                    await axios.delete(
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${existingMuacEventId}`
+                    );
+                }
+            } catch (e) {
+                console.warn('Failed to delete indirect events:', e);
             }
-            // Clear out the indirect’s fetchedDates
+
+            // Clear out the indirect's fetchedDates
             setFetchedDates(prev => ({
                 ...prev,
-                [indirectId]: { reportDate: '', dueDate: '', eventId: '', dataValues: {} }
+                [indirectId]: { reportDate: '', dueDate: '', eventId: '', muacEventId: '', dataValues: {} }
             }));
             setHasValidDate(prev => ({ ...prev, [indirectId]: false }));
-            console.log(`Indirect ${indirectId} marked absent, data cleared.`);
         }
     };
 
@@ -2103,71 +2219,165 @@ export function OrgUnitTable(props: Props) {
         console.log('Events created:', fetchedDates[trackInstanceId]?.events)
     };
 
+    // In your component's data fetching logic:
+    const loadAllAdditionalData = async () => {
+        const newFetchedDates: Record<string, FetchedData> = {};
+
+        // Process in batches to avoid overwhelming the API
+        const batchSize = 10;
+        for (let i = 0; i < filteredData.length; i += batchSize) {
+            const batch = filteredData.slice(i, i + batchSize);
+
+            await Promise.all(batch.map(async (activity) => {
+                try {
+                    const additionalData = await fetchAdditionalData(
+                        activity.trackInstanceId,
+                        trainingFilter,
+                        trackFilter
+                    );
+
+                    newFetchedDates[activity.trackInstanceId] = additionalData;
+
+                    // Also check if we have MUAC classification to update the row color
+                    if (additionalData.dataValues['Muac Classification']) {
+                        const muacClass = additionalData.dataValues['Muac Classification'];
+                        // You might want to update the row style based on this
+                    }
+                } catch (error) {
+                    console.error(`Failed to fetch data for ${activity.trackInstanceId}:`, error);
+                    newFetchedDates[activity.trackInstanceId] = {
+                        reportDate: '',
+                        dueDate: '',
+                        eventId: '',
+                        muacEventId: '',
+                        dataValues: {}
+                    };
+                }
+            }));
+        }
+
+        setFetchedDates(newFetchedDates);
+    };
+    // Call this whenever filteredData or trainingFilter changes
+    useEffect(() => {
+        if (filteredData.length > 0 && trainingFilter) {
+            loadAllAdditionalData();
+        }
+    }, [filteredData, trainingFilter, trackFilter]);
+
+
     const fetchAdditionalData = async (trackInstanceId: string, trainingFilter: string, trackFilter: string): Promise<FetchedData> => {
         const programStageMap = {
             'Livelihood': 'H0vCgsI1d4M',
             'Nutrition': 'RXTq2YFOH5c',
             'Water Sanitation & Hygiene': 'bTVReRuHapT',
+            'Muac Assessment': 'HEukVrLC2dT'
         };
 
-        const programStage = programStageMap[trainingFilter];
-        const url = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json?program=n2iAPy3PGx7&programStage=${programStage}&fields=enrollments[events[*]]`;
-        console.log('API URL:', url);
+        const stagesToFetch = [];
+
+        // Always fetch MUAC stage
+        stagesToFetch.push('Muac Assessment');
+
+        // Fetch the training stage if specified
+        if (trainingFilter && programStageMap[trainingFilter]) {
+            stagesToFetch.push(trainingFilter);
+        }
+
+        let reportDate = '';
+        let dueDate = '';
+        let eventId = '';
+        const dataValues: { [key: string]: string } = {};
+        let muacEventId = '';
 
         try {
-            const response = await axios.get(url);
-            const data = response.data;
+            // Fetch all relevant events at once
+            const response = await axios.get(
+                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json`,
+                {
+                    params: {
+                        program: 'n2iAPy3PGx7',
+                        fields: 'enrollments[events[event,eventDate,dueDate,programStage,dataValues[dataElement,value]]'
+                    }
+                }
+            );
 
-            // Initialize with empty values
-            let reportDate = '';
-            let dueDate = '';
-            let eventId = '';
-            const dataValues: { [key: string]: string } = {};
+            const events = response.data.enrollments?.[0]?.events || [];
 
-            if (data.enrollments && data.enrollments.length > 0) {
-                const events = data.enrollments[0].events || [];
+            // Process each event
+            events.forEach((event: any) => {
+                // Check if this is the training event
+                if (event.programStage === programStageMap[trainingFilter]) {
+                    reportDate = event.eventDate;
+                    dueDate = event.dueDate;
+                    eventId = event.event;
 
-                // Find the event that matches our program stage
-                const matchingEvent = events.find((event: any) =>
-                    event.programStage === programStage
-                );
-
-                if (matchingEvent) {
-                    reportDate = matchingEvent.eventDate;
-                    dueDate = matchingEvent.dueDate;
-                    eventId = matchingEvent.event;
-
-                    // Process data values
-                    matchingEvent.dataValues?.forEach((dataValue) => {
+                    // Process training data values
+                    event.dataValues?.forEach((dv: any) => {
                         Object.entries(dataValueMapping).forEach(([accessorKey, label]) => {
-                            const expectedId = dataElementMapping[trainingFilter]?.[trackFilter]?.[label]
-                                || dataElementMapping[trainingFilter]?.[label];
-
-
-                            if (expectedId === dataValue.dataElement) {
-                                dataValues[label] = dataValue.value;
+                            const expectedId = dataElementMapping[trainingFilter]?.[trackFilter]?.[label] ||
+                                dataElementMapping[trainingFilter]?.[label];
+                            if (expectedId === dv.dataElement) {
+                                dataValues[label] = dv.value;
                             }
-
-
                         });
                     });
+                }
 
+                // Check if this is the MUAC event
+                if (event.programStage === programStageMap['Muac Assessment']) {
+                    muacEventId = event.event;
+
+                    // Process MUAC data values
+                    event.dataValues?.forEach((dv: any) => {
+                        Object.entries(muacDataElementMapping).forEach(([label, deId]) => {
+                            if (deId === dv.dataElement) {
+                                dataValues[label] = dv.value;
+                            }
+                        });
+                    });
+                }
+            });
+
+            // For indirect beneficiaries, inherit non-MUAC data from direct beneficiary
+            const isIndirect = props.orgUnitDetails.some(b =>
+                b.trackInstanceId === trackInstanceId &&
+                b.directPatientID &&
+                b.directPatientID !== ''
+            );
+
+            if (isIndirect) {
+                const directBeneficiary = props.orgUnitDetails.find(b =>
+                    b.patientID === props.orgUnitDetails.find(b => b.trackInstanceId === trackInstanceId)?.directPatientID
+                );
+
+                if (directBeneficiary) {
+                    const directData = fetchedDates[directBeneficiary.trackInstanceId];
+                    if (directData) {
+                        // Only inherit non-MUAC data
+                        Object.entries(directData.dataValues || {}).forEach(([key, value]) => {
+                            if (!['Oedema', 'Muac', 'Muac Classification'].includes(key)) {
+                                dataValues[key] = String(value);
+                            }
+                        });
+                    }
                 }
             }
+
 
             return {
                 reportDate,
                 dueDate,
                 eventId,
+                muacEventId,
                 dataValues,
             };
-
-
-
         } catch (error) {
             console.error('Error fetching additional data:', error);
-            return { reportDate: '', dueDate: '', eventId: '', dataValues: {} };
+            return { reportDate: '', dueDate: '', eventId: '', muacEventId: '', dataValues: {} };
         }
+
+
     };
 
     const handleFilterChange = async (training) => {
@@ -2696,16 +2906,19 @@ export function OrgUnitTable(props: Props) {
                                         })()
                                     )
                                 ) : (
-                                    // 3️⃣ static display when not editing
+                                    // 3 static display when not editing
                                     col.accessor === 'reportDate' ? (
                                         fetchedData.reportDate.split('T')[0] || 'N/A'
                                     ) : col.accessor === 'dueDate' ? (
                                         fetchedData.dueDate.split('T')[0] || 'N/A'
                                     ) : col.accessor in dataValueMapping ? (
-                                        // fetchedData.dataValues[dataValueMapping[col.accessor]] || 'N/A'
-                                        renderCheckCell(
-                                            Boolean(
-                                                fetchedData.dataValues[dataValueMapping[col.accessor]]
+                                        // Special case for MUAC value display
+                                        dataValueMapping[col.accessor] === 'Muac' ? (
+                                            fetchedData.dataValues['Muac'] || '—'
+                                        ) : (
+                                            // Default checkmark display for other fields
+                                            renderCheckCell(
+                                                Boolean(fetchedData.dataValues[dataValueMapping[col.accessor]])
                                             )
                                         )
                                     ) : (
@@ -2767,17 +2980,19 @@ export function OrgUnitTable(props: Props) {
                     />
                 </td>
 
-                {/* 1️⃣ Original columns */}
+                {/* 1 Original columns */}
                 {columnsVis
                     .filter(c => c.visible)
                     .map(c => (
                         <td key={c.accessor}>{(ben as any)[c.accessor]}</td>
                     ))}
 
-                {/* 2️⃣ Additional columns (read‑only, inherited) */}
+                {/* 2 Additional columns (read‑only, inherited) */}
+
                 {inheritedCols.map(col => {
                     const isAction = col.accessor === 'addEditEvent';
                     const isCheckbox = col.accessor.includes('checkBox');
+                    const isMuacColumn = col.accessor === 'muac_num' || col.accessor === 'oedema_checkBox';
                     const cellClass = isAction
                         ? 'actions-cell'
                         : col.className
@@ -2789,7 +3004,8 @@ export function OrgUnitTable(props: Props) {
                         ? { minWidth: col.minWidth }
                         : {};
 
-                    const inEdit = editableRows[ben.trackInstanceId] && !isAction;
+                    // Only allow editing for MUAC columns
+                    const inEdit = editableRows[ben.trackInstanceId] && isMuacColumn;
 
                     return (
                         <td key={col.accessor} className={cellClass} style={style}>
@@ -2847,35 +3063,63 @@ export function OrgUnitTable(props: Props) {
                                     )}
                                 </div>
                             ) : inEdit ? (
-                                col.accessor === 'reportDate' ? (
+                                // Editing mode - only for MUAC columns
+                                col.accessor === 'muac_num' ? (
                                     <input
-                                        type="date"
-                                        value={fetchedDates[ben.trackInstanceId]?.reportDate?.split('T')[0] || ''}
-                                        onChange={e =>
-                                            handleDateChangeForFetchedDates(
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        className="form-input"
+                                        value={String(fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] || '')}
+                                        onChange={(e) => {
+                                            const onlyDigits = e.target.value.replace(/\D/g, '');
+                                            const classification = computeMuacClassification(
+                                                onlyDigits,
+                                                ben.beneficiaryStage
+                                            );
+                                            handleMuacChange(
                                                 ben.trackInstanceId,
-                                                e.target.value
-                                            )
-                                        }
-                                        onKeyDown={e =>
-                                            handleReportDateSubmit(e, ben.trackInstanceId)
-                                        }
-                                        onBlur={e =>
-                                            handleReportDateSubmit(e, ben.trackInstanceId)
-                                        }
+                                                onlyDigits,
+                                                classification
+                                            );
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (
+                                                !/[0-9]/.test(e.key) &&
+                                                e.key !== 'Backspace' &&
+                                                e.key !== 'Delete' &&
+                                                e.key !== 'ArrowLeft' &&
+                                                e.key !== 'ArrowRight' &&
+                                                e.key !== 'Tab' &&
+                                                e.key !== 'Enter'
+                                            ) {
+                                                e.preventDefault();
+                                            }
+
+                                            if (e.key === 'Enter') {
+                                                const training = col.training || selectedTrainings[0];
+                                                sendDataValueUpdate(
+                                                    ben.trackInstanceId,
+                                                    dataValueMapping[col.accessor],
+                                                    fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]],
+                                                    training
+                                                );
+                                                sendDataValueUpdate(
+                                                    ben.trackInstanceId,
+                                                    dataValueMapping['muacClassification'],
+                                                    fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping['muacClassification']],
+                                                    training
+                                                );
+                                            }
+                                        }}
+                                        placeholder="Enter MUAC"
                                     />
-                                ) : isCheckbox ? (
+                                ) : col.accessor === 'oedema_checkBox' ? (
                                     <input
                                         type="checkbox"
-                                        disabled={!hasValidDate[ben.trackInstanceId]}
-                                        className="form-check-input"
                                         checked={
-                                            fetchedDates[ben.trackInstanceId]?.dataValues[
-                                            dataValueMapping[col.accessor]
-                                            ] === true ||
-                                            fetchedDates[ben.trackInstanceId]?.dataValues[
-                                            dataValueMapping[col.accessor]
-                                            ] === 'true'
+                                            fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] === true ||
+                                            fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] === 'true'
                                         }
                                         onChange={e =>
                                             handleDataValueChange(
@@ -2885,36 +3129,7 @@ export function OrgUnitTable(props: Props) {
                                             )
                                         }
                                     />
-                                ) : (
-                                    <input
-                                        type="text"
-                                        value={
-                                            String(
-                                                fetchedDates[ben.trackInstanceId]?.dataValues[
-                                                dataValueMapping[col.accessor]
-                                                ] || ''
-                                            )
-                                        }
-                                        onChange={e =>
-                                            handleDataValueChange(
-                                                ben.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.value
-                                            )
-                                        }
-                                        onKeyDown={e => {
-                                            if (e.key === 'Enter') {
-                                                const training = selectedTrainings[0];
-                                                sendDataValueUpdate(
-                                                    ben.trackInstanceId,
-                                                    dataValueMapping[col.accessor],
-                                                    e.currentTarget.value,
-                                                    training
-                                                );
-                                            }
-                                        }}
-                                    />
-                                )
+                                ) : null
                             ) : (
                                 // Static display when NOT editing
                                 (() => {
@@ -2922,12 +3137,22 @@ export function OrgUnitTable(props: Props) {
                                         return parentData.reportDate?.split('T')[0] || '—';
                                     } else if (col.accessor === 'dueDate') {
                                         return parentData.dueDate?.split('T')[0] || '—';
-                                    } else {
-                                        const label = dataValueMapping[col.accessor];
-                                        const raw = fetchedDates[ben.trackInstanceId]?.dataValues[label];
-                                        const flag = raw === true || raw === 'true';
-                                        return renderCheckCell(flag);
+                                    } else if (col.accessor in dataValueMapping) {
+                                        // Special handling for MUAC columns
+                                        if (dataValueMapping[col.accessor] === 'Muac') {
+                                            // Return the actual MUAC value or dash if empty
+                                            return fetchedDates[ben.trackInstanceId]?.dataValues['Muac'] || '—';
+                                        } else if (dataValueMapping[col.accessor] === 'Oedema') {
+                                            // Return checkmark for Oedema
+                                            const oedemaValue = fetchedDates[ben.trackInstanceId]?.dataValues['Oedema'];
+                                            return renderCheckCell(oedemaValue === true || oedemaValue === 'true');
+                                        } else {
+                                            // Default checkmark display for other checkbox fields
+                                            const raw = fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]];
+                                            return renderCheckCell(raw === true || raw === 'true');
+                                        }
                                     }
+                                    return '—';
                                 })()
                             )}
                         </td>
@@ -3190,7 +3415,11 @@ export function OrgUnitTable(props: Props) {
                                     {additionalColumns
                                         .filter(col => col.training === 'Muac Assessment')
                                         .map(col => (
-                                            <label key={col.accessor} className="flex items-start py-1 pl-2">
+                                            <label 
+                                                key={col.accessor} 
+                                                className="flex items-start py-1 pl-2"
+                                                style={{ marginRight:'10px'}}
+                                            >
                                                 <input
                                                     type="checkbox"
                                                     checked={topicsVis[col.accessor] ?? true}
@@ -3979,8 +4208,9 @@ export function OrgUnitTable(props: Props) {
                                         ))
                                     }
                                     {/* 2 Numbered additional columns */}
+
                                     {additionalColumns
-                                        .filter(col => topicsVis[col.accessor] || col.accessor === 'addEditEvent') // ← notice, keep addEditEvent
+                                        .filter(col => topicsVis[col.accessor] || col.accessor === 'addEditEvent')
                                         .map((col) => {
                                             if (col.accessor === 'addEditEvent') {
                                                 return (
@@ -3988,9 +4218,9 @@ export function OrgUnitTable(props: Props) {
                                                         key="addEditEvent"
                                                         className="additional-header-cell actions-header"
                                                         style={{
-                                                            backgroundColor: '#f0f0f0', // Match the main table
-                                                            textAlign: 'center', // Center align
-                                                            minWidth: '140px' // Consistent width
+                                                            backgroundColor: '#f0f0f0',
+                                                            textAlign: 'center',
+                                                            minWidth: '140px'
                                                         }}
                                                         title="Action"
                                                     >
@@ -3999,27 +4229,31 @@ export function OrgUnitTable(props: Props) {
                                                 );
                                             }
 
-                                            const fullIndex = additionalColumns.findIndex(c => c.accessor === col.accessor);
-
-                                            let label: string;
+                                            let label = '';
                                             if (col.accessor === 'reportDate') {
                                                 label = 'Date of Training';
                                             } else if (col.accessor === 'oedema_checkBox') {
                                                 label = 'Oedema';
                                             } else if (col.accessor === 'muac_num') {
                                                 label = 'Muac';
-                                            } else if (col.accessor === 'addEditEvent') {
-                                                label = 'Action';
                                             } else {
-                                                // count how many visible topic columns come *before* this one (excluding reportDate and addEditEvent)
-                                                const visibleBefore = additionalColumns
-                                                    .filter(c =>
-                                                        c.accessor !== 'addEditEvent' &&
-                                                        c.accessor !== 'reportDate' &&
-                                                        topicsVis[c.accessor]
-                                                    )
-                                                    .findIndex(c => c.accessor === col.accessor);
-                                                label = String(fullIndex + 0);
+                                                // Get the training prefix
+                                                const trainingPrefix =
+                                                    col.training === 'Nutrition' ? 'NUT' :
+                                                        col.training === 'Water Sanitation & Hygiene' ? 'WSH' :
+                                                            col.training === 'Livelihood' ? 'LIV' : '';
+
+                                                // Find the index within its training group
+                                                const trainingCols = additionalColumns.filter(c =>
+                                                    c.training === col.training &&
+                                                    c.accessor !== 'reportDate' &&
+                                                    c.accessor !== 'addEditEvent' &&
+                                                    topicsVis[c.accessor]
+                                                );
+
+                                                const trainingIndex = trainingCols.findIndex(c => c.accessor === col.accessor);
+
+                                                label = trainingPrefix ? `${trainingPrefix}-${trainingIndex + 1}` : col.Header;
                                             }
 
                                             return (
@@ -4031,12 +4265,8 @@ export function OrgUnitTable(props: Props) {
                                                     {label}
                                                 </th>
                                             );
-                                        })}
-
-
-
-
-
+                                        })
+                                    }
                                 </tr>
                             </thead>
 
@@ -4278,5 +4508,7 @@ export function OrgUnitTable(props: Props) {
         </main>
 
     );
+
+
 
 }
