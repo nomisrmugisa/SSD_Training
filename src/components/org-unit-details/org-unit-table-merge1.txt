@@ -781,7 +781,7 @@ export function OrgUnitTable(props: Props) {
             try {
                 // First request: Fetch the organization unit code
                 const orgUnitCodeResponse = await fetch(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/organisationUnits/${props.orgUnitId}`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/organisationUnits/${props.orgUnitId}`,
                     // `api/organisationUnits/${props.orgUnitId}`,
                     {
                         method: 'GET',
@@ -799,7 +799,7 @@ export function OrgUnitTable(props: Props) {
                 if (orgUnitCode) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
@@ -1153,7 +1153,7 @@ export function OrgUnitTable(props: Props) {
     const generatePatientId = async (): Promise<string> => {
         try {
             const response = await axios.get(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/m35qF41KIdK/generate`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/m35qF41KIdK/generate`,
                 {
                     headers: { 'Content-Type': 'application/json' }
                 }
@@ -1199,7 +1199,7 @@ export function OrgUnitTable(props: Props) {
     const fetchUser = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/me`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/me`,
                 // `api/me`, //with proxy
                 {
                     method: 'GET',
@@ -1272,7 +1272,7 @@ export function OrgUnitTable(props: Props) {
         try {
             // First POST request - Create tracked entity instance
             const response1 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`,
                 {
                     method: 'POST',
                     headers: {
@@ -1302,7 +1302,7 @@ export function OrgUnitTable(props: Props) {
 
             // Second POST request - Create enrollment
             const response2 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`,
                 {
                     method: 'POST',
                     headers: {
@@ -1335,7 +1335,7 @@ export function OrgUnitTable(props: Props) {
             };
 
             const response3 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                 {
                     method: 'POST',
                     headers: {
@@ -1432,7 +1432,7 @@ export function OrgUnitTable(props: Props) {
                 ]
             };
 
-            const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`, {
+            const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload1)
@@ -1452,7 +1452,7 @@ export function OrgUnitTable(props: Props) {
                 incidentDate: new Date().toISOString()
             };
 
-            const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`, {
+            const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload2)
@@ -1476,7 +1476,7 @@ export function OrgUnitTable(props: Props) {
                 }]
             };
 
-            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload3)
@@ -1707,7 +1707,7 @@ export function OrgUnitTable(props: Props) {
         try {
             if (isEditing) {
                 // PUT request for editing an existing record
-                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${id}`,
+                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${id}`,
                     {
                         method: 'PUT',
                         headers: {
@@ -1721,7 +1721,7 @@ export function OrgUnitTable(props: Props) {
                 // Handle success (e.g., update state, show message)
             } else {
                 // POST request for adding a new record
-                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     {
                         method: 'POST',
                         headers: {
@@ -1793,7 +1793,7 @@ export function OrgUnitTable(props: Props) {
                 };
 
                 const muacRes = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     muacPayload
                 );
 
@@ -1836,7 +1836,7 @@ export function OrgUnitTable(props: Props) {
                     };
 
                     const res = await axios.post(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                         payload
                     );
 
@@ -1909,7 +1909,7 @@ export function OrgUnitTable(props: Props) {
         // If eventId is missing, try to fetch exisitng event from API
         if (!eventId && reportDate) {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+                const res = await axios.get(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
                     params: {
                         trackedEntityInstance: trackInstanceId,
                         program,
@@ -1988,7 +1988,7 @@ export function OrgUnitTable(props: Props) {
                 };
 
                 const res = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     payload
                 );
 
@@ -2048,7 +2048,7 @@ export function OrgUnitTable(props: Props) {
         };
 
         try {
-            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${eventId}/${dataElementId}`, payload);
+            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}/${dataElementId}`, payload);
             console.log(`PUT: ${dataElementName} = ${value}`);
             setMessage(`Data Element - ${dataElementId} successfully updated.`);
         } catch (error) {
@@ -2090,7 +2090,7 @@ export function OrgUnitTable(props: Props) {
                 };
 
                 const muacRes = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     muacPayload
                 );
                 const muacEventId = muacRes.data.response.importSummaries[0].reference;
@@ -2109,7 +2109,7 @@ export function OrgUnitTable(props: Props) {
                     }]
                 };
                 const resp = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     payload
                 );
                 const newEventId = resp.data.response.importSummaries[0].reference;
@@ -2153,12 +2153,12 @@ export function OrgUnitTable(props: Props) {
             try {
                 if (existingEventId) {
                     await axios.delete(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${existingEventId}`
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${existingEventId}`
                     );
                 }
                 if (existingMuacEventId) {
                     await axios.delete(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${existingMuacEventId}`
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${existingMuacEventId}`
                     );
                 }
             } catch (e) {
@@ -2321,7 +2321,7 @@ export function OrgUnitTable(props: Props) {
         try {
             // Fetch all relevant events at once
             const response = await axios.get(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/${trackInstanceId}.json`,
                 {
                     params: {
                         program: 'n2iAPy3PGx7',
@@ -3257,7 +3257,7 @@ export function OrgUnitTable(props: Props) {
     const fetchProgramStageData = async (programStageId: string) => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/pending?programStage=${programStageId}`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/pending?programStage=${programStageId}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',

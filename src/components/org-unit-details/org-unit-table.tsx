@@ -438,6 +438,7 @@ export function OrgUnitTable(props: Props) {
         muacClassification: '',
         ben_facility_RegNo: '',
         directPatientID: '',
+        beneficiaryType: '',
 
         muacColor: '#ffffff',
     });
@@ -683,6 +684,16 @@ export function OrgUnitTable(props: Props) {
 
         const mergedCols: any[] = [];
 
+        // Add "Date of Training" first
+        mergedCols.push({
+            Header: ' Date of Training',
+            accessor: 'reportDate',
+            headerClassName: 'additional-header-cell date-column',
+            className: 'date-column',
+            minWidth: 100,
+            training: 'shared'
+        });
+
         if (selectedTrainings.length > 0) {
             mergedCols.push(
                 {
@@ -710,15 +721,7 @@ export function OrgUnitTable(props: Props) {
             );
         }
 
-        // Add "Date of Training" first
-        mergedCols.push({
-            Header: ' Date of Training',
-            accessor: 'reportDate',
-            headerClassName: 'additional-header-cell date-column',
-            className: 'date-column',
-            minWidth: 100,
-            training: 'shared'
-        });
+
 
         // Add all topic columns from selected filters
         // Add all topic columns from selected filters
@@ -781,7 +784,7 @@ export function OrgUnitTable(props: Props) {
             try {
                 // First request: Fetch the organization unit code
                 const orgUnitCodeResponse = await fetch(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/organisationUnits/${props.orgUnitId}`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/organisationUnits/${props.orgUnitId}`,
                     // `api/organisationUnits/${props.orgUnitId}`,
                     {
                         method: 'GET',
@@ -799,7 +802,7 @@ export function OrgUnitTable(props: Props) {
                 if (orgUnitCode) {
                     // Second request: Fetch the generated code using the organization unit code
                     const codeResponse = await fetch(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         // `api/trackedEntityAttributes/oqabsHE0ZUI/generate?ORG_UNIT_CODE=${orgUnitCode}`,
                         {
                             method: 'GET',
@@ -828,6 +831,28 @@ export function OrgUnitTable(props: Props) {
 
         fetchData();
     }, [trigger]);
+
+    // EFFECT: Clear message on click outside
+    useEffect(() => {
+        // Handler to clear the message state
+        const clearMessageOnClick = () => {
+            if (message) { // Only clear if there's a message showing
+                setMessage(null);
+                setIsError(false);
+            }
+        };
+
+        // Add the listener only when a message is displayed
+        if (message) {
+            document.addEventListener('mousedown', clearMessageOnClick);
+        }
+
+        // Cleanup: remove the listener when the component unmounts
+        // or when the message changes (to re-evaluate if the listener is needed)
+        return () => {
+            document.removeEventListener('mousedown', clearMessageOnClick);
+        };
+    }, [message]); 
 
     // Function to determine additional columns based on the training filter
     const getAdditionalColumns = (filter: string) => {
@@ -1153,7 +1178,7 @@ export function OrgUnitTable(props: Props) {
     const generatePatientId = async (): Promise<string> => {
         try {
             const response = await axios.get(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityAttributes/m35qF41KIdK/generate`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityAttributes/m35qF41KIdK/generate`,
                 {
                     headers: { 'Content-Type': 'application/json' }
                 }
@@ -1199,7 +1224,7 @@ export function OrgUnitTable(props: Props) {
     const fetchUser = async () => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/me`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/me`,
                 // `api/me`, //with proxy
                 {
                     method: 'GET',
@@ -1228,15 +1253,6 @@ export function OrgUnitTable(props: Props) {
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setLoading(true);
-
-        // Generate track instance ID
-        // const newId = await generateTrackInstId();
-        // if (!newId) {
-        //     console.error('Failed to generate a new trackedEntityInstance ID.');
-        //     setLoading(false);
-        //     setMessage('Failed to generate a new trackedEntityInstance ID.');
-        //     return;
-        // }
 
         // Fetch user data
         const userData = await fetchUser();
@@ -1272,7 +1288,7 @@ export function OrgUnitTable(props: Props) {
         try {
             // First POST request - Create tracked entity instance
             const response1 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`,
                 {
                     method: 'POST',
                     headers: {
@@ -1302,7 +1318,7 @@ export function OrgUnitTable(props: Props) {
 
             // Second POST request - Create enrollment
             const response2 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`,
                 {
                     method: 'POST',
                     headers: {
@@ -1335,7 +1351,7 @@ export function OrgUnitTable(props: Props) {
             };
 
             const response3 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                 {
                     method: 'POST',
                     headers: {
@@ -1399,6 +1415,17 @@ export function OrgUnitTable(props: Props) {
     };
 
     const handleSaveIndirect = async () => {
+        // REQUIREMENT 2: Check if more than one non-Livelihood training is selected
+        const activeTrainingFilters = selectedTrainings.filter(t => t !== 'Livelihood'); // Exclude Livelihood for this check
+        if (activeTrainingFilters.length > 1) {
+            setMessage('Indirect Beneficiary data can only be saved under ONE training (Nutrition OR WASH) at a time. Please select only one.');
+            setIsError(true);
+            setLoading(false); // Stop loading indicator if active
+            return; // Prevent saving
+        }
+        // If only one (or zero) non-Livelihood training is selected, proceed.
+        // Ensure we use the correct single training filter for the payload below.
+        const singleTrainingFilter = activeTrainingFilters.length === 1 ? activeTrainingFilters[0] : ''; // Get the single filter, if applicable
         setLoading(true);
 
         const userData = await fetchUser();
@@ -1428,11 +1455,11 @@ export function OrgUnitTable(props: Props) {
                     { attribute: "KNLojwshHCv", value: newIndirectData.muacClassification },
                     { attribute: "BDFFygBWNSH", value: newIndirectData.ben_facility_RegNo },
                     { attribute: "M9jR50uouZV", value: newIndirectData.directPatientID }, // Auto-populated
-                    // { attribute: "fTfrFfUPTDC", value: 'Indirect Beneficiary' }
+                    { attribute: "fTfrFfUPTDC", value: 'Indirect Beneficiary' }
                 ]
             };
 
-            const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances`, {
+            const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload1)
@@ -1452,7 +1479,7 @@ export function OrgUnitTable(props: Props) {
                 incidentDate: new Date().toISOString()
             };
 
-            const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/enrollments`, {
+            const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload2)
@@ -1467,7 +1494,8 @@ export function OrgUnitTable(props: Props) {
                 events: [{
                     trackedEntityInstance: trackedEntityInstance,
                     program: 'n2iAPy3PGx7',
-                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+                    // programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+                    programStage: PROGRAM_STAGE_MAPPING[singleTrainingFilter],
                     orgUnit: props.orgUnitId,
                     enrollment: enrollmentId,
                     dueDate: newIndirectData.recordDate,
@@ -1476,7 +1504,7 @@ export function OrgUnitTable(props: Props) {
                 }]
             };
 
-            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload3)
@@ -1510,6 +1538,7 @@ export function OrgUnitTable(props: Props) {
                 muacClassification: '',
                 ben_facility_RegNo: '',
                 directPatientID: '', // Still auto-filled before submit
+                beneficiaryType: '',
                 muacColor: '#ffffff'
             });
 
@@ -1553,6 +1582,7 @@ export function OrgUnitTable(props: Props) {
             initialMuac: '',
             muacClassification: '',
             ben_facility_RegNo: '',
+
             directPatientID: ''
 
         });
@@ -1707,7 +1737,7 @@ export function OrgUnitTable(props: Props) {
         try {
             if (isEditing) {
                 // PUT request for editing an existing record
-                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${id}`,
+                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${id}`,
                     {
                         method: 'PUT',
                         headers: {
@@ -1721,7 +1751,7 @@ export function OrgUnitTable(props: Props) {
                 // Handle success (e.g., update state, show message)
             } else {
                 // POST request for adding a new record
-                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     {
                         method: 'POST',
                         headers: {
@@ -1793,7 +1823,7 @@ export function OrgUnitTable(props: Props) {
                 };
 
                 const muacRes = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     muacPayload
                 );
 
@@ -1836,7 +1866,7 @@ export function OrgUnitTable(props: Props) {
                     };
 
                     const res = await axios.post(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                         payload
                     );
 
@@ -1909,7 +1939,7 @@ export function OrgUnitTable(props: Props) {
         // If eventId is missing, try to fetch exisitng event from API
         if (!eventId && reportDate) {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`, {
+                const res = await axios.get(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
                     params: {
                         trackedEntityInstance: trackInstanceId,
                         program,
@@ -1988,7 +2018,7 @@ export function OrgUnitTable(props: Props) {
                 };
 
                 const res = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     payload
                 );
 
@@ -2048,7 +2078,7 @@ export function OrgUnitTable(props: Props) {
         };
 
         try {
-            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${eventId}/${dataElementId}`, payload);
+            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}/${dataElementId}`, payload);
             console.log(`PUT: ${dataElementName} = ${value}`);
             setMessage(`Data Element - ${dataElementId} successfully updated.`);
         } catch (error) {
@@ -2090,7 +2120,7 @@ export function OrgUnitTable(props: Props) {
                 };
 
                 const muacRes = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     muacPayload
                 );
                 const muacEventId = muacRes.data.response.importSummaries[0].reference;
@@ -2109,7 +2139,7 @@ export function OrgUnitTable(props: Props) {
                     }]
                 };
                 const resp = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events`,
+                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     payload
                 );
                 const newEventId = resp.data.response.importSummaries[0].reference;
@@ -2153,12 +2183,12 @@ export function OrgUnitTable(props: Props) {
             try {
                 if (existingEventId) {
                     await axios.delete(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${existingEventId}`
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${existingEventId}`
                     );
                 }
                 if (existingMuacEventId) {
                     await axios.delete(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}/api/events/${existingMuacEventId}`
+                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${existingMuacEventId}`
                     );
                 }
             } catch (e) {
@@ -2321,7 +2351,7 @@ export function OrgUnitTable(props: Props) {
         try {
             // Fetch all relevant events at once
             const response = await axios.get(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/${trackInstanceId}.json`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/${trackInstanceId}.json`,
                 {
                     params: {
                         program: 'n2iAPy3PGx7',
@@ -2657,7 +2687,7 @@ export function OrgUnitTable(props: Props) {
 
                         return (
                             <td key={col.accessor} className={cellClass} style={style}>
-                                { inEdit ? (
+                                {inEdit ? (
                                     // In‑row inputs when editing (excluding addEditEvent)
                                     col.accessor === 'reportDate' ? (
                                         <input
@@ -3257,7 +3287,7 @@ export function OrgUnitTable(props: Props) {
     const fetchProgramStageData = async (programStageId: string) => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}/api/trackedEntityInstances/pending?programStage=${programStageId}`,
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/pending?programStage=${programStageId}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -3291,9 +3321,16 @@ export function OrgUnitTable(props: Props) {
         // setIndirectBeneficiaries([]);
     };
 
-    
     // Function to handle clicking a record row
     const handleRecordClick = async (activity: OrgUnitDetails) => {
+        // REQUIREMENT 1: Check if track filter is selected
+        if (!trackFilter) {
+            setMessage('Please select a tracker (Farmer or Fisher) before selecting beneficiary.');
+            setIsError(true);
+            return; // Stop execution if no track is selected
+        }
+
+
         const trackInstId = activity.trackInstanceId;
         const isCurrentlySelected = selectedBeneficiary?.trackInstanceId === trackInstId;
         const isCurrentlyEditable = editableRows[trackInstId];
@@ -3492,7 +3529,16 @@ export function OrgUnitTable(props: Props) {
                 <div className="relative column-filter-dropdown" ref={dropdownRef} style={{ position: 'relative' }}>
                     <button
                         className="btn btn-secondary"
-                        onClick={() => setShowTopics(!showTopics)}
+                        onClick={() => {
+                            // REQUIREMENT 1: Check if track filter is selected
+                            if (!trackFilter) {
+                                setMessage('Please select a tracker (Farmer or Fisher) before viewing topics.');
+                                setIsError(true);
+                                return; // Stop if no track selected
+                            }
+                            setShowTopics(!showTopics)
+                        }
+                        }
                         style={{ zIndex: 1000 }}
                     >
                         Topics ▼
@@ -4033,7 +4079,7 @@ export function OrgUnitTable(props: Props) {
                                                             col.training === 'Livelihood' ? 'LIV' :
                                                                 'Muac';
 
-                                                
+
                                                 label = trainingPrefix ? `${trainingPrefix}-${number}` : col.Header;
                                             }
                                             return (
@@ -4340,22 +4386,6 @@ export function OrgUnitTable(props: Props) {
                                     {additionalColumns
                                         .filter(col => topicsVis[col.accessor] && col.accessor !== 'addEditEvent')
                                         .map((col) => {
-                                            // if (col.accessor === 'addEditEvent') {
-                                            //     return (
-                                            //         <th
-                                            //             key="addEditEvent"
-                                            //             className="additional-header-cell actions-header"
-                                            //             style={{
-                                            //                 backgroundColor: '#f0f0f0',
-                                            //                 textAlign: 'center',
-                                            //                 minWidth: '140px'
-                                            //             }}
-                                            //             title="Action"
-                                            //         >
-                                            //             Action
-                                            //         </th>
-                                            //     );
-                                            // }
 
                                             let label = '';
                                             if (col.accessor === 'reportDate') {
@@ -4375,7 +4405,7 @@ export function OrgUnitTable(props: Props) {
                                                         col.training === 'Water Sanitation & Hygiene' ? 'WSH' :
                                                             col.training === 'Livelihood' ? 'LIV' : '';
 
-                                                
+
                                                 label = trainingPrefix ? `${trainingPrefix}-${number}` : col.Header;
                                             }
 
