@@ -490,6 +490,8 @@ export function OrgUnitTable(props: Props) {
 
     const topicsRef = useRef<HTMLDivElement>(null);
 
+    const [selectedRecordOnly, setSelectedRecordOnly] = useState(false);
+
     // which of the “topics” (additional columns) are visible
     const [topicsVis, setTopicsVis] = useState<Record<string, boolean>>(() =>
         additionalColumns.reduce((acc, col) => {
@@ -498,15 +500,41 @@ export function OrgUnitTable(props: Props) {
         }, {} as Record<string, boolean>)
     );
 
+    // Modify the filteredData logic to account for selectedRecordOnly
+    useEffect(() => {
+        let data = props.orgUnitDetails;
+
+        if (selectedRecordOnly && selectedBeneficiary) {
+            data = [selectedBeneficiary];
+        }
+
+        if (trackFilter) {
+            data = data.filter(item => item.track === trackFilter);
+        }
+
+        setFilteredData(filterDataByDate(data, dateFilter));
+    }, [props.orgUnitDetails, dateFilter, trackFilter, selectedRecordOnly, selectedBeneficiary]);
+
+
     // re-initialize additional cols arrays for Topics filter
     useEffect(() => {
         const vis: Record<string, boolean> = {};
         additionalColumns.forEach(col => {
-            vis[col.accessor] = topicsVis[col.accessor] ?? false;
+            if (
+                col.accessor === 'reportDate' ||    // Always show Date of Training
+                col.training === 'Muac Assessment' ||  // Always show Muac Assessment columns
+                col.accessor === 'addEditEvent'
+            ) {
+                vis[col.accessor] = true;
+            } else {
+                vis[col.accessor] = topicsVis[col.accessor] ?? false;
+            }
         });
         setTopicsVis(vis);
     }, [additionalColumns]);
 
+
+    // show / hide dropdown
     useEffect(() => {
         const onClick = (e: MouseEvent) => {
             if (
@@ -664,7 +692,7 @@ export function OrgUnitTable(props: Props) {
                     className: 'oedema_checkBox',
                     training: 'Muac Assessment',
                     minWidth: 100,
-                    
+
                 },
                 {
                     Header: ' Muac',
@@ -2550,6 +2578,22 @@ export function OrgUnitTable(props: Props) {
                 }
             }
         }));
+
+        // Immediately save to backend if we have a valid date
+        if (hasValidDate[trackInstanceId]) {
+            sendDataValueUpdate(
+                trackInstanceId,
+                dataValueMapping['muac_num'],
+                muacValue,
+                'Muac Assessment'
+            );
+            sendDataValueUpdate(
+                trackInstanceId,
+                dataValueMapping['muacClassification'],
+                classification,
+                'Muac Assessment'
+            );
+        }
     };
 
     const renderTableRows = () => {
@@ -2935,7 +2979,7 @@ export function OrgUnitTable(props: Props) {
 
     const renderIndirectRows = () => {
         // const inheritedCols = additionalColumns.filter(c => c.accessor !== 'addEditEvent' && topicsVis[c.accessor]);
-        const inheritedCols = additionalColumns.filter(c => topicsVis[c.accessor] || c.accessor === 'addEditEvent');
+        const inheritedCols = additionalColumns.filter(c => topicsVis[c.accessor] && c.accessor !== 'addEditEvent');
 
         if (!indirectBeneficiaries.length) {
             return (
@@ -3130,31 +3174,97 @@ export function OrgUnitTable(props: Props) {
                                         }
                                     />
                                 ) : null
-                            ) : (
+                            ) :
                                 // Static display when NOT editing
-                                (() => {
-                                    if (col.accessor === 'reportDate') {
-                                        return parentData.reportDate?.split('T')[0] || '—';
-                                    } else if (col.accessor === 'dueDate') {
-                                        return parentData.dueDate?.split('T')[0] || '—';
-                                    } else if (col.accessor in dataValueMapping) {
-                                        // Special handling for MUAC columns
-                                        if (dataValueMapping[col.accessor] === 'Muac') {
-                                            // Return the actual MUAC value or dash if empty
-                                            return fetchedDates[ben.trackInstanceId]?.dataValues['Muac'] || '—';
-                                        } else if (dataValueMapping[col.accessor] === 'Oedema') {
-                                            // Return checkmark for Oedema
-                                            const oedemaValue = fetchedDates[ben.trackInstanceId]?.dataValues['Oedema'];
-                                            return renderCheckCell(oedemaValue === true || oedemaValue === 'true');
-                                        } else {
-                                            // Default checkmark display for other checkbox fields
-                                            const raw = fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]];
-                                            return renderCheckCell(raw === true || raw === 'true');
+                                (
+
+                                    (() => {
+                                        if (col.accessor === 'reportDate') {
+                                            return parentData.reportDate?.split('T')[0] || '—';
+                                        } else if (col.accessor === 'dueDate') {
+                                            return parentData.dueDate?.split('T')[0] || '—';
+                                        } else if (col.accessor in dataValueMapping) {
+                                            if (col.accessor === 'muac_num') {
+                                                return (
+                                                    <input
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        pattern="[0-9]*"
+                                                        className="form-input"
+                                                        value={String(fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] || '')}
+                                                        onChange={(e) => {
+                                                            const onlyDigits = e.target.value.replace(/\D/g, '');
+                                                            const classification = computeMuacClassification(
+                                                                onlyDigits,
+                                                                ben.beneficiaryStage
+                                                            );
+                                                            handleMuacChange(
+                                                                ben.trackInstanceId,
+                                                                onlyDigits,
+                                                                classification
+                                                            );
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            if (
+                                                                !/[0-9]/.test(e.key) &&
+                                                                e.key !== 'Backspace' &&
+                                                                e.key !== 'Delete' &&
+                                                                e.key !== 'ArrowLeft' &&
+                                                                e.key !== 'ArrowRight' &&
+                                                                e.key !== 'Tab' &&
+                                                                e.key !== 'Enter'
+                                                            ) {
+                                                                e.preventDefault();
+                                                            }
+
+                                                            if (e.key === 'Enter') {
+                                                                const training = col.training || selectedTrainings[0];
+                                                                sendDataValueUpdate(
+                                                                    ben.trackInstanceId,
+                                                                    dataValueMapping[col.accessor],
+                                                                    fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]],
+                                                                    training
+                                                                );
+                                                                sendDataValueUpdate(
+                                                                    ben.trackInstanceId,
+                                                                    dataValueMapping['muacClassification'],
+                                                                    fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping['muacClassification']],
+                                                                    training
+                                                                );
+                                                            }
+                                                        }}
+                                                        placeholder="Enter MUAC"
+                                                    />
+                                                );
+                                            } else if (col.accessor === 'oedema_checkBox') {
+                                                return (
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={
+                                                            fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] === true ||
+                                                            fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] === 'true'
+                                                        }
+                                                        onChange={e =>
+                                                            handleDataValueChange(
+                                                                ben.trackInstanceId,
+                                                                dataValueMapping[col.accessor],
+                                                                e.target.checked
+                                                            )
+                                                        }
+                                                    />
+                                                );
+                                            } else {
+                                                // For other fields, just show a checkmark ✔️ or blank
+                                                const raw = fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]];
+                                                return renderCheckCell(raw === true || raw === 'true');
+                                            }
                                         }
-                                    }
-                                    return '—';
-                                })()
-                            )}
+                                        return '—';
+                                    })()
+
+                                )
+
+                            }
                         </td>
                     );
                 })}
@@ -3227,6 +3337,7 @@ export function OrgUnitTable(props: Props) {
 
     const handleRecordClick = (activity: OrgUnitDetails) => {
         setSelectedBeneficiary(activity);
+        setSelectedRecordOnly(true);
 
         // Always set indirect beneficiaries (even if empty)
         const indirect = activity.patientID
@@ -3415,10 +3526,10 @@ export function OrgUnitTable(props: Props) {
                                     {additionalColumns
                                         .filter(col => col.training === 'Muac Assessment')
                                         .map(col => (
-                                            <label 
-                                                key={col.accessor} 
+                                            <label
+                                                key={col.accessor}
                                                 className="flex items-start py-1 pl-2"
-                                                style={{ marginRight:'10px'}}
+                                                style={{ marginRight: '10px' }}
                                             >
                                                 <input
                                                     type="checkbox"
@@ -3478,6 +3589,26 @@ export function OrgUnitTable(props: Props) {
                     )}
                 </div>
 
+                {/*  Revert to all table rows */}
+                {
+                    selectedRecordOnly && (
+                        <button
+                            onClick={() => setSelectedRecordOnly(false)}
+                            className="border border-gray-300 rounded-md"
+                            style={{
+                                borderRadius: '5px',
+                                height: '40px',
+                                padding: '5px 10px',
+                                backgroundColor: '#f8f9fa',
+                                cursor: 'pointer',
+                                marginLeft: '10px'
+                            }}
+                        >
+                            Show All Records
+                        </button>
+                    )
+                }
+
             </div>
 
             {/* Second div block - Add Beneficiary */}
@@ -3490,7 +3621,7 @@ export function OrgUnitTable(props: Props) {
             }}>
 
 
-                {selectedProgramStage && (
+                {/* {selectedProgramStage && (
                     <button
                         type="button"
                         onClick={(e) => {
@@ -3508,7 +3639,7 @@ export function OrgUnitTable(props: Props) {
                     >
                         + Beneficiary
                     </button>
-                )}
+                )} */}
 
                 {/* <div style={{
                     display: 'flex',
@@ -3887,6 +4018,9 @@ export function OrgUnitTable(props: Props) {
                                             } else if (col.accessor === 'muac_num') {
                                                 label = 'Muac';
                                             } else {
+                                                // Extract the number from the Header (e.g. "1. Fishing Methods" -> "1")
+                                                const match = col.Header.match(/^\s*(\d+)\./);
+                                                const number = match ? match[1] : '';
                                                 // count how many visible non-date, non-action columns come before this one
                                                 const trainingPrefix =
                                                     col.training === 'Nutrition' ? 'NUT' :
@@ -3894,19 +4028,8 @@ export function OrgUnitTable(props: Props) {
                                                             col.training === 'Livelihood' ? 'LIV' :
                                                                 'Muac';
 
-                                                // Count how many visible columns of this training come before this one
-                                                const trainingCols = additionalColumns.filter(c =>
-                                                    c.training === col.training &&
-                                                    c.accessor !== 'reportDate' &&
-                                                    c.accessor !== 'addEditEvent' &&
-                                                    topicsVis[c.accessor]
-                                                );
-
-
-                                                // Find the static index of this column (from full list)
-                                                const trainingIndex = trainingCols.findIndex(c => c.accessor === col.accessor);
-                                                label = `${trainingPrefix}-${trainingIndex + 1}`;
-                                                // label = String(fullIndex + 0);
+                                                
+                                                label = trainingPrefix ? `${trainingPrefix}-${number}` : col.Header;
                                             }
                                             return (
                                                 <th
@@ -4210,24 +4333,24 @@ export function OrgUnitTable(props: Props) {
                                     {/* 2 Numbered additional columns */}
 
                                     {additionalColumns
-                                        .filter(col => topicsVis[col.accessor] || col.accessor === 'addEditEvent')
+                                        .filter(col => topicsVis[col.accessor] && col.accessor !== 'addEditEvent')
                                         .map((col) => {
-                                            if (col.accessor === 'addEditEvent') {
-                                                return (
-                                                    <th
-                                                        key="addEditEvent"
-                                                        className="additional-header-cell actions-header"
-                                                        style={{
-                                                            backgroundColor: '#f0f0f0',
-                                                            textAlign: 'center',
-                                                            minWidth: '140px'
-                                                        }}
-                                                        title="Action"
-                                                    >
-                                                        Action
-                                                    </th>
-                                                );
-                                            }
+                                            // if (col.accessor === 'addEditEvent') {
+                                            //     return (
+                                            //         <th
+                                            //             key="addEditEvent"
+                                            //             className="additional-header-cell actions-header"
+                                            //             style={{
+                                            //                 backgroundColor: '#f0f0f0',
+                                            //                 textAlign: 'center',
+                                            //                 minWidth: '140px'
+                                            //             }}
+                                            //             title="Action"
+                                            //         >
+                                            //             Action
+                                            //         </th>
+                                            //     );
+                                            // }
 
                                             let label = '';
                                             if (col.accessor === 'reportDate') {
@@ -4237,23 +4360,18 @@ export function OrgUnitTable(props: Props) {
                                             } else if (col.accessor === 'muac_num') {
                                                 label = 'Muac';
                                             } else {
+
+                                                // Extract the number from the Header (e.g. "1. Fishing Methods" -> "1")
+                                                const match = col.Header.match(/^\s*(\d+)\./);
+                                                const number = match ? match[1] : '';
                                                 // Get the training prefix
                                                 const trainingPrefix =
                                                     col.training === 'Nutrition' ? 'NUT' :
                                                         col.training === 'Water Sanitation & Hygiene' ? 'WSH' :
                                                             col.training === 'Livelihood' ? 'LIV' : '';
 
-                                                // Find the index within its training group
-                                                const trainingCols = additionalColumns.filter(c =>
-                                                    c.training === col.training &&
-                                                    c.accessor !== 'reportDate' &&
-                                                    c.accessor !== 'addEditEvent' &&
-                                                    topicsVis[c.accessor]
-                                                );
-
-                                                const trainingIndex = trainingCols.findIndex(c => c.accessor === col.accessor);
-
-                                                label = trainingPrefix ? `${trainingPrefix}-${trainingIndex + 1}` : col.Header;
+                                                
+                                                label = trainingPrefix ? `${trainingPrefix}-${number}` : col.Header;
                                             }
 
                                             return (
