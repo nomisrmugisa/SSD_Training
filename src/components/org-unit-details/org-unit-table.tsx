@@ -852,7 +852,23 @@ export function OrgUnitTable(props: Props) {
         return () => {
             document.removeEventListener('mousedown', clearMessageOnClick);
         };
-    }, [message]); 
+    }, [message]);
+
+    // Save Muac entiries in indirect ben table when date is preexisting
+    useEffect(() => {
+        if (!indirectBeneficiaries.length) return;
+        const loadIndirects = async () => {
+            const updates: { [key: string]: FetchedData } = {};
+            for (const ben of indirectBeneficiaries) {
+                updates[ben.trackInstanceId] = await fetchAdditionalData(
+                    ben.trackInstanceId, trainingFilter, trackFilter
+                );
+            }
+            setFetchedDates(prev => ({ ...prev, ...updates }));
+        };
+        loadIndirects();
+    }, [indirectBeneficiaries, trainingFilter, trackFilter]);
+
 
     // Function to determine additional columns based on the training filter
     const getAdditionalColumns = (filter: string) => {
@@ -1250,6 +1266,44 @@ export function OrgUnitTable(props: Props) {
         }
     };
 
+    // After successful POST (inside try block of handleSaveIndirect)
+    const fetchUpdatedIndirects = async () => {
+    const response = await fetch(
+        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances.json?ou=${props.orgUnitId}&filter=M9jR50uouZV:eq:${selectedBeneficiary?.patientID}&program=n2iAPy3PGx7`
+    );
+    const data = await response.json();
+
+    if (data.trackedEntityInstances) {
+        const mapped = data.trackedEntityInstances.map(instance => {
+            const attrMap = instance.attributes.reduce((acc, attr) => {
+                acc[attr.attribute] = attr.value;
+                return acc;
+            }, {});
+
+            return {
+                trackInstanceId: instance.trackedEntityInstance,
+                recordDate: instance.enrollments?.[0]?.enrollmentDate || '',
+                track: attrMap['FwEpAEagGeK'] || '',
+                sex: attrMap['IVvy19BmIOw'] || '',
+                age: attrMap['lvpNOLmDEEG'] || '',
+                patientID: attrMap['m35qF41KIdK'] || '',
+                dob: attrMap['r0AIdmEpPN9'] || '',
+                beneficiaryStage: attrMap['KmxskLLhS0k'] || '',
+                first_middleName: attrMap['tUjM7KxKvCO'] || '',
+                surname: attrMap['xts0QtWHpnK'] || '',
+                initialMuac: attrMap['MX1mGZlngtD'] || '',
+                muacClassification: attrMap['KNLojwshHCv'] || '',
+                ben_facility_RegNo: attrMap['BDFFygBWNSH'] || '',
+                directPatientID: attrMap['M9jR50uouZV'] || '',
+                beneficiaryType: attrMap['fTfrFfUPTDC'] || ''
+            };
+        });
+
+        setIndirectBeneficiaries(mapped);
+    }
+};
+
+
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setLoading(true);
@@ -1494,8 +1548,8 @@ export function OrgUnitTable(props: Props) {
                 events: [{
                     trackedEntityInstance: trackedEntityInstance,
                     program: 'n2iAPy3PGx7',
-                    // programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
-                    programStage: PROGRAM_STAGE_MAPPING[singleTrainingFilter],
+                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
+                    // programStage: PROGRAM_STAGE_MAPPING[singleTrainingFilter],
                     orgUnit: props.orgUnitId,
                     enrollment: enrollmentId,
                     dueDate: newIndirectData.recordDate,
@@ -1504,6 +1558,7 @@ export function OrgUnitTable(props: Props) {
                 }]
             };
 
+            console.log(`Program Stage ${PROGRAM_STAGE_MAPPING[trainingFilter]}`)
             const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1514,6 +1569,8 @@ export function OrgUnitTable(props: Props) {
 
             const createdEventId = (await response3.json()).response.importSummaries[0].reference;
             console.log(`✅ Indirect Event created with ID: ${createdEventId}`);
+
+
 
             // Reset the form
             setNewIndirectData({
@@ -1545,6 +1602,9 @@ export function OrgUnitTable(props: Props) {
             setMessage('Indirect beneficiary successfully saved!');
             setIsError(false);
             setIsAddingIndirect(false);
+
+            // Trigger data reload after successful save
+            await fetchUpdatedIndirects();
 
         } catch (error) {
             console.error('Error saving indirect beneficiary:', error);
@@ -1953,24 +2013,6 @@ export function OrgUnitTable(props: Props) {
                         ev.eventDate?.startsWith(reportDate) && ev.programStage === programStage
                 );
 
-                // if (matchedEvent) {
-                //     eventId = matchedEvent.event;
-                //     // Store it for future
-                //     // setFetchedDates(prev => ({
-                //     //     ...prev,
-                //     //     [trackInstanceId]: {
-                //     //         ...prev[trackInstanceId],
-                //     //         events: {
-                //     //             ...(prev[trackInstanceId]?.events || {}),
-                //     //             [training]: eventId
-                //     //         }
-                //     //     }
-                //     // }));
-                // } else {
-                //     console.warn(`No matching event found for TEI ${trackInstanceId}, training: ${training}`);
-                //     return;
-                // }
-
                 if (matchedEvent) {
                     eventId = matchedEvent.event;
                     // Store it for future use
@@ -2080,10 +2122,10 @@ export function OrgUnitTable(props: Props) {
         try {
             await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}/${dataElementId}`, payload);
             console.log(`PUT: ${dataElementName} = ${value}`);
-            setMessage(`Data Element - ${dataElementId} successfully updated.`);
+            setMessage(`Data Element - ${dataElementName} successfully updated.`);
         } catch (error) {
             console.error('Failed to send data value update:', error);
-            setMessage(`Data Element - ${dataElementId} update failed.`);
+            setMessage(`Data Element - ${dataElementName} update failed.`);
         }
     };
 
@@ -2525,55 +2567,6 @@ export function OrgUnitTable(props: Props) {
             });
         }
         setFetchedDates(allFetchedDates);
-    };
-
-    const getTopicOptions = (track: string, filter: string) => {
-        if (filter === 'Livelihood') {
-            if (track === 'Fisher') {
-                return ['Fishing Oil Preparation', 'Fishing Marketing', 'Fishing Methods'];
-            } else if (track === 'Farmer') {
-                return [
-                    'Harvesting',
-                    'Post Harvest Handling',
-                    'Land Preparation',
-                    'Nursery Preparation',
-                    'Post Harvest Hygiene',
-                    'Losses Marking',
-                    'Weeding',
-                    'Storage',
-                ];
-            }
-        } else if (filter === 'Nutrition') {
-            return [
-                'Nutrition Pregnancy',
-                'Early Initiation',
-                'Breastfeeding First 6 Months',
-                'Exclusive Breastfeeding',
-                'Good Hygiene Practices',
-                'Complementary Feeding',
-                'Health Seeking Behavior',
-                'Growth Monitoring',
-                'Kitchen Gardens',
-                'Cooking Demonstration',
-                'Pregnant',
-                'Lactating',
-            ];
-        } else if (filter === 'Water Sanitation & Hygiene') {
-            return [
-                'Food Safety',
-                'Promoters Attendance',
-                'Personal Hygiene',
-                'Household Hygiene',
-                'Clean Safe Water',
-                'Latrine Disposal',
-            ];
-        }
-        return [];
-    };
-
-    const formatDateForInput = (dateString) => {
-        if (!dateString) return '';
-        return new Date(dateString).toISOString().split('T')[0];
     };
 
     // Muac Classification
