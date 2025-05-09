@@ -176,6 +176,20 @@
   margin: 10px 0;
 }
 
+.success-message button {
+  margin-left: 10px;
+  padding: 2px 8px;
+  background-color: #04330f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.success-message button:hover {
+  background-color: #218838;
+}
+
 /* org-unit-table.css */
 /* Additional column headers */
 .additional-header-cell {
@@ -371,3 +385,94 @@ tr.highlight-row td {
   background-color: #b7ccdb !important;
 }
 
+/* Blinking red border for unchecked records */
+@keyframes blink {
+  0% { box-shadow: 0 0 0 0 rgba(240, 132, 191, 0.7); }
+  50% { box-shadow: 0 0 0 1.1px rgba(240, 132, 191, 0.7); }
+  100% { box-shadow: 0 0 0 0 rgba(240, 132, 191, 0.7); }
+}
+
+.unchecked-record {
+  animation: blink 1.5s infinite;
+  position: relative;
+  border-radius: 2px;
+  /* opacity: 0.2; */
+}
+
+/* Disabled checkbox style */
+.disabled-checkbox {
+  opacity: 0.1;
+  cursor: not-allowed;
+}
+
+/*  + New Event Spinner - waiting for data to load */
+/* + New Event Spinner - waiting for data to load */
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}
+
+.spinner-border {
+  display: inline-block;
+  width: 1rem; /* Or your preferred size */
+  height: 1rem; /* Or your preferred size */
+  vertical-align: -0.125em;
+  border: 0.2em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  /* Make it spin faster! */
+  animation: spinner-border 0.75s linear infinite;
+}
+
+.ms-2 { /* Add space if using Bootstrap margin class */
+    margin-left: 0.5rem;
+}
+
+/* For the tooltips */
+[title] {
+  position: relative;
+}
+
+[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+/* For the refresh button */
+/* button[title="Refresh page"]:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
+} */
+
+/* Disable row before previous row Muac entry */
+.disabled-row {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* Muac borders with no data */
+
+@keyframes blink-border {
+  0%, 100% { border: 2px solid red; }
+  50% { border: 2px solid transparent; }
+}
+
+.muac-column-incomplete {
+  animation: blink-border 1.5s infinite;
+  position: relative;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.7) inset; }
+  50% { box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.9) inset; }
+  100% { box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.7) inset; }
+}

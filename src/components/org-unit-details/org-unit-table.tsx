@@ -22,6 +22,19 @@ type Props = {
     orgUnitId: string;
 
 };
+type ProgramStage = 'Livelihood' | 'Water Sanitation & Hygiene' | 'Nutrition' | '';
+
+type RowInputValues = {
+    reportDate?: string;
+    dataValues?: Record<string, string | boolean | number>;
+    events?: Record<string, string>;
+    muacEventId?: string;
+    // other fields if any
+};
+
+type AllRowInputValues = {
+    [trackedEntityInstanceId: string]: RowInputValues;
+};
 
 interface FetchedData {
     reportDate: string;
@@ -31,9 +44,6 @@ interface FetchedData {
     dataValues: { [key: string]: string | boolean }; // To hold the values for each data element
     muacEventId?: string; // New field for MUAC-specific event
 }
-
-
-type ProgramStage = 'Livelihood' | 'Water Sanitation & Hygiene' | 'Nutrition' | '';
 
 
 export function OrgUnitTable(props: Props) {
@@ -51,7 +61,6 @@ export function OrgUnitTable(props: Props) {
         'Muac Classification': 'zDIgqaXsxjg'
     };
 
-
     const dataElementIDsByFilter = {
         'Livelihood': {
             'Fisher': {
@@ -59,7 +68,8 @@ export function OrgUnitTable(props: Props) {
                 'Fishing Marketing': 'QpLUEvB2sdy',
                 'Fishing Methods': 'OKc4NRIE3rS',
                 'Post Handling Methods': 'SinFNAlonqG',
-                'Applied Lessons': 'EvDeWfQDiuz'
+                'Applied Lessons': 'EvDeWfQDiuz',
+                'Present': 'FY2ZuB17VW3'
             },
             'Farmer': {
                 'Harvesting': 'RiNixd9BoZE',
@@ -76,7 +86,8 @@ export function OrgUnitTable(props: Props) {
                 'Started a new livelihood activity': 'Ee8oyMX7Aoc',
                 'Increased my skills/knowledge': 'I2KTNrvwsHT',
                 'Increased my family\'s resilience to shocks': 'RW2BS4l5KcN',
-                'Others': 'Si8dOtSlomM'
+                'Others': 'Si8dOtSlomM',
+                'Present': 'FY2ZuB17VW3'
             }
         },
         'Nutrition': {
@@ -95,6 +106,7 @@ export function OrgUnitTable(props: Props) {
             'Beneficiary Category': 'NA1ZhjvX47L',
             'Other Male': 'TQLLkvvbCD2',
             'Other Female': 'ojr5RiilqCk',
+            'Present': 'FY2ZuB17VW3'
         },
         'Water Sanitation & Hygiene': {
             'Food Safety': 'Q4dJyNwdyyJ',
@@ -102,7 +114,8 @@ export function OrgUnitTable(props: Props) {
             'Personal Hygiene': 'POMbjIgo3EF',
             'Household Hygene': 'ss6pDJe2k6h',
             'Clean and Safe Water': 'xyaOOPDyjoN',
-            'Use of Latrine and Excreta Disposal': 'dnlAV3tubDJ'
+            'Use of Latrine and Excreta Disposal': 'dnlAV3tubDJ',
+            'Present': 'FY2ZuB17VW3'
         },
         'Muac Assessment': {
             'Oedema': 'uOJmECsPp5M',
@@ -217,6 +230,8 @@ export function OrgUnitTable(props: Props) {
         'Other_Male_no_input': 'Other Male',
         'Other_Female_no_input': 'Other Female',
 
+        'present_checkBox': 'Present',
+
         // Nutrition assessment - Muac
 
         'oedema_checkBox': 'Oedema',
@@ -236,26 +251,29 @@ export function OrgUnitTable(props: Props) {
         { Header: 'Registration Date', accessor: 'recordDate', visible: true },
         { Header: 'Is Beneficiary Adult / Child', accessor: 'beneficiaryStage', visible: true },
         { Header: 'Beneficiary Type', accessor: 'beneficiaryType', visible: true },
-        { Header: 'Patient ID', accessor: 'patientID', visible: true },
+        // { Header: 'Patient ID', accessor: 'patientID', visible: true },
         { Header: 'First Name & Middle Name', accessor: 'first_middleName', visible: true },
         { Header: 'Surname', accessor: 'surname', visible: true },
         { Header: 'Sex', accessor: 'sex', visible: true },
         { Header: 'Age', accessor: 'age', visible: true },
         { Header: 'Date of Birth', accessor: 'dob', visible: true },
-        { Header: 'Initial Muac', accessor: 'initialMuac', visible: true },
-        { Header: 'Muac Classification', accessor: 'muacClassification', visible: true },
-        { Header: 'Beneficiary Facility Registration Number', accessor: 'ben_facility_RegNo', visible: true },
-        { Header: 'Direct Patient ID', accessor: 'directPatientID', visible: true },
+        // { Header: 'Initial Muac', accessor: 'initialMuac', visible: true },
+        // { Header: 'Muac Classification', accessor: 'muacClassification', visible: true },
+        // { Header: 'Beneficiary Facility Registration Number', accessor: 'ben_facility_RegNo', visible: true },
+        // { Header: 'Direct Patient ID', accessor: 'directPatientID', visible: true },
         { Header: 'Beneficiary Track', accessor: 'track', visible: true },
     ];
 
     const [columnsVis, setColumnsVis] = useState(() => {
-        const saved = localStorage.getItem('columnsVis');
-        return saved
-            ? /** parse and validate if you like **/ JSON.parse(saved)
-            : originalColumnOptions;
+        // Always start with the filtered originalColumnOptions (ignore localStorage)
+        return originalColumnOptions.filter(column =>
+            column.accessor !== 'patientID' &&
+            column.accessor !== 'initialMuac' &&
+            column.accessor !== 'muacClassification' &&
+            column.accessor !== 'ben_facility_RegNo' &&
+            column.accessor !== 'directPatientID'
+        );
     });
-
 
     // const credentials = btoa(`admin:Nomisr123$$$}`);
     const [search, setSearch] = useState('');
@@ -325,11 +343,6 @@ export function OrgUnitTable(props: Props) {
         muacColor: '#ffffff'
     });
 
-    const [isAddingNewRow, setIsAddingNewRow] = useState(false);
-
-    const [selectedFilter, setSelectedFilter] = useState(''); // State for radio button selection
-    const [beneficiaryFilter, setBeneficiaryFilter] = useState(''); // State for beneficiary dropdown
-    const [placeFilter, setPlaceFilter] = useState(''); // State for place search
     const [dateFilter, setDateFilter] = useState(''); // State for date search
     const [trackFilter, setTrackFilter] = useState(''); // State for track search
     const [beneficiarySearch, setBeneficiarySearch] = useState(''); // State for beneficiary search
@@ -345,71 +358,6 @@ export function OrgUnitTable(props: Props) {
     const [showFilterForm, setShowFilterForm] = useState(false); // State to control filter form visibility
 
     const [additionalColumns, setAdditionalColumns] = useState([]); // State to store additional columns
-    // Initialize state for additional columns
-    const [addColRow_lvh, setaddColRow_lvh] = useState({
-        reportDate: '',
-        dueDate: '',
-        topicsTrainedOn: {
-            harvesting: false,
-            postHarvestHandling: false,
-            landPreparation: false,
-            nurseryPreparation: false,
-            postHarvestHygiene: false,
-            lossesMarking: false,
-            weeding: false,
-            storage: false,
-            appliedLessons: '',
-            increasedIncome: false,
-            increasedProduction: false,
-            newLivelihood: false,
-            increasedSkills: false,
-            increasedResilience: false,
-            others: ''
-        },
-        fishingMethods: {
-            fishingOilPreparation: false,
-            fishingMarketing: false,
-            fishingMethods: false,
-            postHandlingMethods: false,
-            appliedLessons: '',
-            // estimatedFishCatch: '',
-        },
-        // incomeEarned: '',
-        // yieldInKgs: '',
-        // caseStories: '',
-        // landCultivated: '',
-        // Add other fields as necessary for Nutrition and Water Sanitation & Hygiene
-    });
-
-    const [addColRow_Wsh, setaddColRow_Wsh] = useState({
-        reportDate: '',
-        dueDate: '',
-        foodSafety: false,
-        promotersAttendance: false,
-        personalHygiene: false,
-        householdHygiene: false,
-        cleanSafeWater: false,
-        latrineDisposal: false,
-    });
-
-    const [addColRow_Nut, setaddColRow_Nut] = useState({
-        reportDate: '',
-        dueDate: '',
-        nutritionPregnancy: false,
-        earlyInitiation: false,
-        breastfeedingFirst6Months: false,
-        exclusiveBreastfeeding: false,
-        goodHygienePractices: false,
-        complementaryFeeding: false,
-        healthSeekingBehavior: false,
-        growthMonitoring: false,
-        kitchenGardens: false,
-        cookingDemonstration: false,
-        pregnant: false,
-        lactating: false,
-        other: '',
-    });
-
     const [columns, setColumns] = useState([]);
 
     const [selectedBeneficiary, setSelectedBeneficiary] = useState<OrgUnitDetails | null>(null);
@@ -443,10 +391,6 @@ export function OrgUnitTable(props: Props) {
         muacColor: '#ffffff',
     });
 
-    // muac of addn cols
-    const [muacClass, setMuacClass] = useState<string>('');
-
-
     const filterDataByDate = (data, selectedDate) => {
         if (!selectedDate) return data; // If no date is selected, return all data
 
@@ -455,27 +399,18 @@ export function OrgUnitTable(props: Props) {
             return registrationDate === selectedDate;
         });
     };
-
     // Filtered data based on the selected date
     // const filteredData = filterDataByDate(props.orgUnitDetails, dateFilter);
     const [filteredData, setFilteredData] = useState(props.orgUnitDetails);
 
     // const [fetchedDates, setFetchedDates] = useState<{ [key: string]: { reportDate: string; dueDate: string;[key: string]: string } }>({});
     const [fetchedDates, setFetchedDates] = useState<{ [key: string]: FetchedData }>({});
-    const [currentFilter, setCurrentFilter] = useState<string>('');
-
     const [selectedProgramStage, setSelectedProgramStage] = useState<ProgramStage>('');
-    const [filteredProgramData, setFilteredProgramData] = useState<any[]>([]);
-
     const [hasValidDate, setHasValidDate] = useState<{ [key: string]: boolean }>({});
-
-    // track each indirect row’s Present/Absent
-    const [indirectPresent, setIndirectPresent] = useState<{ [id: string]: boolean }>({});
-
-    const [showColumns, setShowColumns] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const [selectedTrainings, setSelectedTrainings] = useState<string[]>([]); // e.g. ['Water Sanitation & Hygiene', 'Nutrition']
+    const [isNewIndirectPresent, setIsNewIndirectPresent] = useState(false);
 
     // for additional colms returning data
     const renderCheckCell = (val?: boolean) => val === true ? '✓' : '✗';
@@ -488,11 +423,24 @@ export function OrgUnitTable(props: Props) {
     const totalCols = originalCount + extraCount;
 
     const [showTopics, setShowTopics] = useState(false);
-
     const topicsRef = useRef<HTMLDivElement>(null);
 
     const [selectedRecordOnly, setSelectedRecordOnly] = useState(false);
+    const [loadingAdditionalData, setLoadingAdditionalData] = useState(false);
+    const [resetTrigger, setResetTrigger] = useState(0);
+    const [isNewEntry, setIsNewEntry] = useState<{ [key: string]: boolean }>({});
 
+    const [lockSelection, setLockSelection] = useState(false);
+
+    // Adding new event
+    const [isLoadingData, setIsLoadingData] = useState(false);
+    const abortControllerRef = useRef<AbortController | null>(null);
+    const [lastSavedIndirectId, setLastSavedIndirectId] = useState<string | null>(null);
+    const [selectionLocked, setSelectionLocked] = useState(false);
+
+    const newIndirectRef = useRef<string | null>(null);
+    const [isJustSaved, setIsJustSaved] = useState(false);
+    const [editInputValues, setEditInputValues] = useState<AllRowInputValues>({});
     // which of the “topics” (additional columns) are visible
     const [topicsVis, setTopicsVis] = useState<Record<string, boolean>>(() =>
         additionalColumns.reduce((acc, col) => {
@@ -501,8 +449,40 @@ export function OrgUnitTable(props: Props) {
         }, {} as Record<string, boolean>)
     );
 
+    // 3. Add the brute-force useEffect - adding indirect ben and checking present
+    useEffect(() => {
+        if (lastSavedIndirectId && isJustSaved) {
+            // Only proceed if this is a newly saved record
+            const updateSingleRecord = async () => {
+                // Force UI update for just this record
+                setEditInputValues(prev => ({
+                    ...prev,
+                    [lastSavedIndirectId]: {
+                        ...prev[lastSavedIndirectId],
+                        dataValues: {
+                            ...prev[lastSavedIndirectId]?.dataValues,
+                            'Present': true,
+                        },
+                    },
+                }));
+
+                // Sync with API for just this record
+                await handleIndirectPresentChange(lastSavedIndirectId, true);
+
+                // Cleanup
+                newIndirectRef.current = null;
+                setLastSavedIndirectId(null);
+                setIsJustSaved(false); // Reset the flag
+            };
+
+            updateSingleRecord();
+        }
+    }, [lastSavedIndirectId, isJustSaved]);
+
     // Modify the filteredData logic to account for selectedRecordOnly
     useEffect(() => {
+        if (lockSelection) return; // Skip if selection is locked
+
         let data = props.orgUnitDetails;
 
         if (selectedRecordOnly && selectedBeneficiary) {
@@ -514,8 +494,39 @@ export function OrgUnitTable(props: Props) {
         }
 
         setFilteredData(filterDataByDate(data, dateFilter));
-    }, [props.orgUnitDetails, dateFilter, trackFilter, selectedRecordOnly, selectedBeneficiary]);
+    }, [props.orgUnitDetails, dateFilter, trackFilter, selectedRecordOnly, selectedBeneficiary, lockSelection]);
 
+    // 3. Add cleanup to reset lock when component unmounts
+    useEffect(() => {
+        return () => {
+            setLockSelection(false);
+        };
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            // Unlock selection when component unmounts
+            setLockSelection(false);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (selectionLocked) return; // Skip updates when locked
+
+        // Normal data loading logic...
+    }, [props.orgUnitDetails, selectionLocked]);
+
+    useEffect(() => {
+        const handleDocumentClick = (e) => {
+            if (selectionLocked && !e.target.closest('.protected-element')) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        };
+
+        document.addEventListener('click', handleDocumentClick);
+        return () => document.removeEventListener('click', handleDocumentClick);
+    }, [selectionLocked]);
 
     // re-initialize additional cols arrays for Topics filter
     useEffect(() => {
@@ -534,7 +545,6 @@ export function OrgUnitTable(props: Props) {
         setTopicsVis(vis);
     }, [additionalColumns]);
 
-
     // show / hide dropdown
     useEffect(() => {
         const onClick = (e: MouseEvent) => {
@@ -549,93 +559,6 @@ export function OrgUnitTable(props: Props) {
         document.addEventListener('mousedown', onClick);
         return () => document.removeEventListener('mousedown', onClick);
     }, [showTopics]);
-
-
-    // columns filter useEffect
-    // useEffect(() => {
-    //     const onClick = (e: MouseEvent) => {
-    //         if (
-    //             showColumns &&
-    //             dropdownRef.current &&
-    //             !dropdownRef.current.contains(e.target as Node)
-    //         ) {
-    //             setShowColumns(false);
-    //         }
-    //     };
-    //     document.addEventListener('mousedown', onClick);
-    //     return () => document.removeEventListener('mousedown', onClick);
-    // }, [showColumns]);
-
-    // 3 Keep localStorage in sync
-    useEffect(() => {
-        localStorage.setItem('columnsVis', JSON.stringify(columnsVis));
-    }, [columnsVis]);
-
-    useEffect(() => {
-        // Reset all additional column states when training filter changes
-        setaddColRow_lvh({
-            reportDate: '',
-            dueDate: '',
-            topicsTrainedOn: {
-                harvesting: false,
-                postHarvestHandling: false,
-                landPreparation: false,
-                nurseryPreparation: false,
-                postHarvestHygiene: false,
-                lossesMarking: false,
-                weeding: false,
-                storage: false,
-                appliedLessons: '',
-                increasedIncome: false,
-                increasedProduction: false,
-                newLivelihood: false,
-                increasedSkills: false,
-                increasedResilience: false,
-                others: ''
-            },
-            fishingMethods: {
-                fishingOilPreparation: false,
-                fishingMarketing: false,
-                fishingMethods: false,
-                postHandlingMethods: false,
-                appliedLessons: '',
-            }
-        });
-
-        setaddColRow_Wsh({
-            reportDate: '',
-            dueDate: '',
-            foodSafety: false,
-            promotersAttendance: false,
-            personalHygiene: false,
-            householdHygiene: false,
-            cleanSafeWater: false,
-            latrineDisposal: false,
-        });
-
-        setaddColRow_Nut({
-            reportDate: '',
-            dueDate: '',
-            nutritionPregnancy: false,
-            earlyInitiation: false,
-            breastfeedingFirst6Months: false,
-            exclusiveBreastfeeding: false,
-            goodHygienePractices: false,
-            complementaryFeeding: false,
-            healthSeekingBehavior: false,
-            growthMonitoring: false,
-            kitchenGardens: false,
-            cookingDemonstration: false,
-            pregnant: false,
-            lactating: false,
-            other: '',
-        });
-
-        // Clear fetched dates and data values
-        setFetchedDates({});
-        setHasValidDate({});
-
-    }, [trainingFilter]); // Trigger when trainingFilter changes
 
     // handle date filtering
     useEffect(() => {
@@ -660,12 +583,7 @@ export function OrgUnitTable(props: Props) {
     }, [trainingFilter]);
 
     // update columns when track filter changes
-    // useEffect(() => {
-    //     if (trainingFilter === 'Livelihood') {
-    //         // Re-run getAdditionalColumns with current training filter to update columns
-    //         setAdditionalColumns(getAdditionalColumns(trainingFilter));
-    //     }
-    // }, [trackFilter, trainingFilter]);
+
     // Addn and Muac columns too 
     useEffect(() => {
         if (!trainingFilter) {
@@ -713,16 +631,13 @@ export function OrgUnitTable(props: Props) {
                     training: 'Muac Assessment',
                     minWidth: 100,
                     // Add custom Cell renderer
-                    Cell: ({ row }: { row: any }) => {
-                        const muacValue = fetchedDates[row.original.trackInstanceId]?.dataValues?.['Muac'];
-                        return muacValue || '—'; // Display the value or dash if empty
-                    }
+                    // Cell: ({ row }: { row: any }) => {
+                    //     const muacValue = fetchedDates[row.original.trackInstanceId]?.dataValues?.['Muac'];
+                    //     return muacValue || '—'; // Display the value or dash if empty
+                    // }
                 }
             );
         }
-
-
-
         // Add all topic columns from selected filters
         // Add all topic columns from selected filters
         selectedTrainings.forEach(filter => {
@@ -735,28 +650,20 @@ export function OrgUnitTable(props: Props) {
             mergedCols.push(...filteredCols);
         });
 
-        // Add Action last
-        // mergedCols.push({
-        //     Header: ' Add / Edit Event',
-        //     accessor: 'addEditEvent',
-        //     headerClassName: 'additional-header-cell actions-header',
-        //     className: 'actions-cell',
-        //     minWidth: 140,
-        //     width: 140,
-        //     training: 'Action'
-        // });
-
         setAdditionalColumns(mergedCols);
     }, [trainingFilter, trackFilter]);
 
+    // Save Muac entiries in indirect ben table when date is preexisting
     useEffect(() => {
         if (!indirectBeneficiaries.length) return;
+        const controller = new AbortController();
+        const { signal } = controller;
         const loadIndirects = async () => {
             const updates: { [key: string]: FetchedData } = {};
             for (const ben of indirectBeneficiaries) {
                 // re‑use your existing helper to fetch the event + dataValues for each indirect
                 updates[ben.trackInstanceId] =
-                    await fetchAdditionalData(ben.trackInstanceId, trainingFilter, trackFilter);
+                    await fetchAdditionalData(ben.trackInstanceId, trainingFilter, trackFilter, signal);
             }
             setFetchedDates(prev => ({ ...prev, ...updates }));
         };
@@ -854,21 +761,12 @@ export function OrgUnitTable(props: Props) {
         };
     }, [message]);
 
-    // Save Muac entiries in indirect ben table when date is preexisting
     useEffect(() => {
-        if (!indirectBeneficiaries.length) return;
-        const loadIndirects = async () => {
-            const updates: { [key: string]: FetchedData } = {};
-            for (const ben of indirectBeneficiaries) {
-                updates[ben.trackInstanceId] = await fetchAdditionalData(
-                    ben.trackInstanceId, trainingFilter, trackFilter
-                );
-            }
-            setFetchedDates(prev => ({ ...prev, ...updates }));
-        };
-        loadIndirects();
-    }, [indirectBeneficiaries, trainingFilter, trackFilter]);
-
+        if (filteredData.length > 0 && trainingFilter) {
+            loadAllAdditionalData();
+        }
+    }, [filteredData, trainingFilter, trackFilter]);
+    // Reset addn cols data on choosin new ben
 
     // Function to determine additional columns based on the training filter
     const getAdditionalColumns = (filter: string) => {
@@ -878,14 +776,7 @@ export function OrgUnitTable(props: Props) {
             case 'Livelihood':
                 if (trackFilter === 'Fisher') {
                     columns.push(
-                        // {
-                        //     Header: ' Date of Training', accessor: 'reportDate',
-                        //     headerClassName: 'additional-header-cell date-column', // Add class
-                        //     className: 'date-column',
-                        //     minWidth: 100,
-                        //     training: filter
-                        // },
-                        // { Header: 'Due Date', accessor: 'dueDate' },                                                
+
                         {
                             Header: ' 1. Fishing Methods', accessor: 'fishingMethods_checkBox',
                             headerClassName: 'additional-header-cell',
@@ -920,15 +811,6 @@ export function OrgUnitTable(props: Props) {
                     );
                 } else if (trackFilter === 'Farmer') {
                     columns.push(
-                        // {
-                        //     Header: ' Date of Training', accessor: 'reportDate',
-                        //     headerClassName: 'additional-header-cell date-column', // Add class
-                        //     className: 'date-column',
-                        //     minWidth: 100,
-                        //     training: filter
-                        // },
-                        // { Header: 'Due Date', accessor: 'dueDate' },
-
 
                         {
                             Header: ' 1. Land Preparation and Sowing', accessor: 'landPreparation_checkBox',
@@ -1018,14 +900,7 @@ export function OrgUnitTable(props: Props) {
                 break;
             case 'Water Sanitation & Hygiene':
                 columns.push(
-                    // {
-                    //     Header: ' Date of Training', accessor: 'reportDate',
-                    //     headerClassName: 'additional-header-cell date-column', // Add class
-                    //     className: 'date-column',
-                    //     minWidth: 100,
-                    //     training: filter
-                    // },
-                    // { Header: 'Due Date', accessor: 'dueDate' },
+
                     {
                         Header: ' 1. Food Safety', accessor: 'foodSafety_checkBox',
                         headerClassName: 'additional-header-cell',
@@ -1060,14 +935,7 @@ export function OrgUnitTable(props: Props) {
                 break;
             case 'Nutrition':
                 columns.push(
-                    // {
-                    //     Header: ' Date of Training', accessor: 'reportDate',
-                    //     headerClassName: 'additional-header-cell date-column', // Add class
-                    //     className: 'date-column',
-                    //     minWidth: 100,
-                    //     training: filter
-                    // },
-                    // { Header: 'Due Date', accessor: 'dueDate' },
+
                     {
                         Header: ' 1. Nutrition during pregnancy and lactation', accessor: 'nutritionPregnancy_checkBox',
                         headerClassName: 'additional-header-cell',
@@ -1206,36 +1074,27 @@ export function OrgUnitTable(props: Props) {
         }
     };
 
-    const handleNewBeneficiaryClick = async () => {
-        // Auto generate the Patient ID
-        const newPatientId = await generatePatientId();
-        // Update newRowData to include the generated patient ID:
-        setNewRowData(prev => ({
-            ...prev,
-            patientID: newPatientId
-        }));
-        setIsAddingNewRow(true);
-    };
-
     const handleIndirectBeneficiaryAdd = async () => {
         // Generate a Patient ID from the system
         const newIndirectPatientId = await generatePatientId();
+        setLockSelection(true);
 
         // Ensure that directPatientID is set from the selected beneficiary. 
         // If selectedBeneficiary is null, handle appropriately.
         const directPatientIDValue = selectedBeneficiary ? selectedBeneficiary.patientID : '';
+        const directBenFacilityRegNo = selectedBeneficiary ? selectedBeneficiary.ben_facility_RegNo : '';
 
         // Update newIndirectData state with the auto-generated IDs
         setNewIndirectData(prev => ({
             ...prev,
             patientID: newIndirectPatientId,
-            directPatientID: directPatientIDValue // auto-populated
+            directPatientID: directPatientIDValue, // auto-populated
+            ben_facility_RegNo: directBenFacilityRegNo
         }));
 
         // Trigger the display of your indirect beneficiary input form
         setIsAddingIndirect(true);
     };
-
     // Function to fetch user
     const fetchUser = async () => {
         try {
@@ -1265,223 +1124,46 @@ export function OrgUnitTable(props: Props) {
             return null;
         }
     };
-
     // After successful POST (inside try block of handleSaveIndirect)
     const fetchUpdatedIndirects = async () => {
-    const response = await fetch(
-        `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances.json?ou=${props.orgUnitId}&filter=M9jR50uouZV:eq:${selectedBeneficiary?.patientID}&program=n2iAPy3PGx7`
-    );
-    const data = await response.json();
+        const response = await fetch(
+            `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances.json?ou=${props.orgUnitId}&filter=M9jR50uouZV:eq:${selectedBeneficiary?.patientID}&program=n2iAPy3PGx7`
+        );
+        const data = await response.json();
 
-    if (data.trackedEntityInstances) {
-        const mapped = data.trackedEntityInstances.map(instance => {
-            const attrMap = instance.attributes.reduce((acc, attr) => {
-                acc[attr.attribute] = attr.value;
-                return acc;
-            }, {});
+        if (data.trackedEntityInstances) {
+            const mapped = data.trackedEntityInstances.map(instance => {
+                const attrMap = instance.attributes.reduce((acc, attr) => {
+                    acc[attr.attribute] = attr.value;
+                    return acc;
+                }, {});
 
-            return {
-                trackInstanceId: instance.trackedEntityInstance,
-                recordDate: instance.enrollments?.[0]?.enrollmentDate || '',
-                track: attrMap['FwEpAEagGeK'] || '',
-                sex: attrMap['IVvy19BmIOw'] || '',
-                age: attrMap['lvpNOLmDEEG'] || '',
-                patientID: attrMap['m35qF41KIdK'] || '',
-                dob: attrMap['r0AIdmEpPN9'] || '',
-                beneficiaryStage: attrMap['KmxskLLhS0k'] || '',
-                first_middleName: attrMap['tUjM7KxKvCO'] || '',
-                surname: attrMap['xts0QtWHpnK'] || '',
-                initialMuac: attrMap['MX1mGZlngtD'] || '',
-                muacClassification: attrMap['KNLojwshHCv'] || '',
-                ben_facility_RegNo: attrMap['BDFFygBWNSH'] || '',
-                directPatientID: attrMap['M9jR50uouZV'] || '',
-                beneficiaryType: attrMap['fTfrFfUPTDC'] || ''
-            };
-        });
-
-        setIndirectBeneficiaries(mapped);
-    }
-};
-
-
-    const handleFormSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-        setLoading(true);
-
-        // Fetch user data
-        const userData = await fetchUser();
-        if (!userData) {
-            console.error('Failed to get username.');
-            setLoading(false);
-            setMessage('Failed to get username.');
-            return;
-        }
-
-        // First payload for tracked entity instance
-        const payload1 = {
-            trackedEntityType: "b8gedH8Po5d",
-            orgUnit: props.orgUnitId,
-            attributes: [
-                { attribute: "FwEpAEagGeK", value: newRowData.track },
-                { attribute: "IVvy19BmIOw", value: newRowData.sex },
-                { attribute: "lvpNOLmDEEG", value: newRowData.age },
-                { attribute: "m35qF41KIdK", value: newRowData.patientID },
-                { attribute: "r0AIdmEpPN9", value: newRowData.dob },
-                { attribute: "KmxskLLhS0k", value: newRowData.beneficiaryStage },
-                { attribute: "tUjM7KxKvCO", value: newRowData.first_middleName },
-                { attribute: "xts0QtWHpnK", value: newRowData.surname },
-                { attribute: "MX1mGZlngtD", value: newRowData.initialMuac },
-                { attribute: "KNLojwshHCv", value: newRowData.muacClassification },
-                { attribute: "BDFFygBWNSH", value: newRowData.ben_facility_RegNo },
-                { attribute: "M9jR50uouZV", value: newRowData.directPatientID },
-                { attribute: "fTfrFfUPTDC", value: newRowData.beneficiaryType }
-            ]
-        };
-
-
-        try {
-            // First POST request - Create tracked entity instance
-            const response1 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // 'Authorization': `Basic ${credentials}`,
-                    },
-                    body: JSON.stringify(payload1),
-                }
-            );
-
-            if (!response1.ok) {
-                throw new Error('Failed to create tracked entity instance');
-            }
-
-            const responseData = await response1.json();
-            const trackedEntityInstance = responseData.response.importSummaries[0].reference;
-
-            // Second payload for enrollment
-            const payload2 = {
-                trackedEntityInstance: trackedEntityInstance,
-                program: "n2iAPy3PGx7",
-                status: "ACTIVE",
-                orgUnit: props.orgUnitId,
-                enrollmentDate: newRowData.recordDate,
-                incidentDate: new Date().toISOString()
-            };
-
-            // Second POST request - Create enrollment
-            const response2 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // 'Authorization': `Basic ${credentials}`,
-                    },
-                    body: JSON.stringify(payload2),
-                }
-            );
-
-            if (!response2.ok) {
-                throw new Error('Failed to create enrollment');
-            }
-
-            const enrollmentResponseData = await response2.json();
-            const enrollmentId = enrollmentResponseData.response.importSummaries[0].reference;
-
-            // Third payload - create event after enrollment
-            const payload3 = {
-                events: [{
-                    trackedEntityInstance: trackedEntityInstance,
-                    program: 'n2iAPy3PGx7',
-                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter], // Dynamic from current filter
-                    orgUnit: props.orgUnitId,
-                    enrollment: enrollmentId, // Use the enrollment from previous step
-                    dueDate: newRowData.recordDate,
-                    eventDate: newRowData.recordDate,
-                    status: 'ACTIVE'
-                }]
-            };
-
-            const response3 = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // 'Authorization': `Basic ${credentials}`,
-                    },
-                    body: JSON.stringify(payload3),
-                }
-            );
-
-            if (!response3.ok) {
-                throw new Error('Failed to create event');
-            }
-
-            const eventResponseData = await response3.json();
-            const createdEventId = eventResponseData.response.importSummaries[0].reference;
-
-            console.log(`✅ Event created with ID: ${createdEventId}`);
-
-
-            // Reset form and show success message
-            setNewRowData({
-                id: '',
-                trackInstanceId: '',
-                recordDate: '',
-                track: '',
-                inactive: '',
-                beneficiaryStage: '',
-                careGiver: '',
-                careGiverAge: '',
-                patientID: '',
-                first_middleName: '',
-                surname: '',
-                dob: '',
-                orgUnit: '',
-                beneficiaryName: '',
-                nonBeneficiaryName: '',
-                sex: '',
-                age: '',
-                initialMuac: '',
-                muacClassification: '',
-                ben_facility_RegNo: '',
-                directPatientID: '',
-                beneficiaryType: '',
-                muacColor: '#ffffff'
+                return {
+                    trackInstanceId: instance.trackedEntityInstance,
+                    recordDate: instance.enrollments?.[0]?.enrollmentDate || '',
+                    track: attrMap['FwEpAEagGeK'] || '',
+                    sex: attrMap['IVvy19BmIOw'] || '',
+                    age: attrMap['lvpNOLmDEEG'] || '',
+                    patientID: attrMap['m35qF41KIdK'] || '',
+                    dob: attrMap['r0AIdmEpPN9'] || '',
+                    beneficiaryStage: attrMap['KmxskLLhS0k'] || '',
+                    first_middleName: attrMap['tUjM7KxKvCO'] || '',
+                    surname: attrMap['xts0QtWHpnK'] || '',
+                    initialMuac: attrMap['MX1mGZlngtD'] || '',
+                    muacClassification: attrMap['KNLojwshHCv'] || '',
+                    ben_facility_RegNo: attrMap['BDFFygBWNSH'] || '',
+                    directPatientID: attrMap['M9jR50uouZV'] || '',
+                    beneficiaryType: attrMap['fTfrFfUPTDC'] || ''
+                };
             });
-            setDateFilter('');
 
-            // await indexedDBManager.markBeneficiaryAsSynced(beneficiaryId); // change savedOnline flag to true
-            setMessage('Beneficiary successfully saved!');
-            setIsError(false);
-            setIsAddingNewRow(false); // Close the new row form
-
-        } catch (error) {
-            console.error('Error creating beneficiary:', error);
-            setMessage('Error creating beneficiary. Please try again.');
-            setIsError(true);
-        } finally {
-            setLoading(false);
+            setIndirectBeneficiaries(mapped);
         }
     };
 
     const handleSaveIndirect = async () => {
-        // REQUIREMENT 2: Check if more than one non-Livelihood training is selected
-        const activeTrainingFilters = selectedTrainings.filter(t => t !== 'Livelihood'); // Exclude Livelihood for this check
-        if (activeTrainingFilters.length > 1) {
-            setMessage('Indirect Beneficiary data can only be saved under ONE training (Nutrition OR WASH) at a time. Please select only one.');
-            setIsError(true);
-            setLoading(false); // Stop loading indicator if active
-            return; // Prevent saving
-        }
-        // If only one (or zero) non-Livelihood training is selected, proceed.
-        // Ensure we use the correct single training filter for the payload below.
-        const singleTrainingFilter = activeTrainingFilters.length === 1 ? activeTrainingFilters[0] : ''; // Get the single filter, if applicable
         setLoading(true);
-
+        setLockSelection(true);
         const userData = await fetchUser();
         if (!userData) {
             console.error('Failed to get username.');
@@ -1508,20 +1190,22 @@ export function OrgUnitTable(props: Props) {
                     { attribute: "MX1mGZlngtD", value: newIndirectData.initialMuac },
                     { attribute: "KNLojwshHCv", value: newIndirectData.muacClassification },
                     { attribute: "BDFFygBWNSH", value: newIndirectData.ben_facility_RegNo },
-                    { attribute: "M9jR50uouZV", value: newIndirectData.directPatientID }, // Auto-populated
+                    { attribute: "M9jR50uouZV", value: newIndirectData.directPatientID },  // Auto-populated
                     { attribute: "fTfrFfUPTDC", value: 'Indirect Beneficiary' }
                 ]
             };
-
             const response1 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload1)
             });
-
             if (!response1.ok) throw new Error('Failed to create tracked entity instance');
 
             const trackedEntityInstance = (await response1.json()).response.importSummaries[0].reference;
+            // Store the ID of the newly created indirect ben
+            newIndirectRef.current = trackedEntityInstance;
+            setLastSavedIndirectId(trackedEntityInstance);
+            setIsJustSaved(true);
 
             // --- Payload 2: enrollment ---
             const payload2 = {
@@ -1530,52 +1214,174 @@ export function OrgUnitTable(props: Props) {
                 status: "ACTIVE",
                 orgUnit: props.orgUnitId,
                 enrollmentDate: newIndirectData.recordDate,
-                incidentDate: new Date().toISOString()
+                // incidentDate: new Date().toISOString()
             };
-
             const response2 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/enrollments`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload2)
             });
-
             if (!response2.ok) throw new Error('Failed to create enrollment');
 
             const enrollmentId = (await response2.json()).response.importSummaries[0].reference;
 
-            // --- Payload 3: event ---
-            const payload3 = {
-                events: [{
-                    trackedEntityInstance: trackedEntityInstance,
-                    program: 'n2iAPy3PGx7',
-                    programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
-                    // programStage: PROGRAM_STAGE_MAPPING[singleTrainingFilter],
-                    orgUnit: props.orgUnitId,
-                    enrollment: enrollmentId,
-                    dueDate: newIndirectData.recordDate,
-                    eventDate: newIndirectData.recordDate,
-                    status: 'ACTIVE'
-                }]
-            };
+            // --- Add a small delay here (Keep this for the 409 issue) ---
+            await new Promise(resolve => setTimeout(resolve, 300));
+            // --- End of delay ---
 
-            console.log(`Program Stage ${PROGRAM_STAGE_MAPPING[trainingFilter]}`)
-            const response3 = await fetch(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload3)
+            // Assuming 'trackedEntityInstance' holds the ID of the newly created indirect beneficiary
+            // This was populated from the response of the first payload (TEI creation)
+
+            const createdTrainingEvents: Record<string, string> = {};
+            let muacEventId = ''; // Initialize muacEventId here
+
+            // Create events only if the 'Present' checkbox was checked
+            if (isNewIndirectPresent) {
+                // Create MUAC event first if 'Muac Assessment' is selected
+                if (selectedTrainings.includes('Muac Assessment')) {
+                    const muacPayload = {
+                        events: [{
+                            trackedEntityInstance: trackedEntityInstance,
+                            program: 'n2iAPy3PGx7',
+                            programStage: PROGRAM_STAGE_MAPPING['Muac Assessment'],
+                            orgUnit: props.orgUnitId,
+                            notes: [],
+                            dataValues: [],
+                            status: 'ACTIVE',
+                            eventDate: newIndirectData.recordDate, // Use recordDate from newIndirectData
+                            enrollment: enrollmentId, // Include enrollment ID
+                        }]
+                    };
+                    try {
+                        const muacRes = await axios.post( // Using axios.post for consistency
+                            `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
+                            muacPayload
+                        );
+                        // Check for errors in the DHIS2 response body
+                        if (muacRes.data.response.status === 'ERROR') {
+                            console.error('Failed to create indirect MUAC event on save:', muacRes.data.response.description);
+                            // Handle MUAC creation error if necessary
+                        } else {
+                            muacEventId = muacRes.data.response.importSummaries[0].reference;
+                            console.log(`Indirect MUAC Event created on save with ID: ${muacEventId}`);
+                        }
+                    } catch (err) {
+                        console.error('Error creating indirect MUAC event on save:', err);
+                        // Handle MUAC creation error if necessary
+                    }
+                }
+
+
+                // Create training events for other selected trainings (excluding MUAC)
+                const otherTrainingsToSave = selectedTrainings.filter(training => training !== 'Muac Assessment');
+
+                for (const training of otherTrainingsToSave) {
+                    const programStage = PROGRAM_STAGE_MAPPING[training];
+                    if (!programStage) {
+                        console.warn(`No programStage mapped for training: "${training}"`);
+                        continue; // Skip if no mapping exists
+                    }
+
+                    const eventPayload = {
+                        events: [{
+                            trackedEntityInstance: trackedEntityInstance,
+                            program: 'n2iAPy3PGx7',
+                            programStage: programStage,
+                            orgUnit: props.orgUnitId,
+                            notes: [],
+                            // Data values would typically be empty when initially creating from the 'add' row
+                            dataValues: [],
+                            status: 'ACTIVE',
+                            eventDate: newIndirectData.recordDate, // Use recordDate from newIndirectData
+                            dueDate: newIndirectData.recordDate, // Assuming dueDate is also recordDate
+                            enrollment: enrollmentId, // Include enrollment ID
+                        }]
+                    };
+
+                    try {
+                        const eventResponse = await axios.post( // Using axios.post here for consistency
+                            `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
+                            eventPayload
+                        );
+
+                        // Check if the event creation was successful based on DHIS2 response status
+                        if (eventResponse.data.response.status === 'ERROR') {
+                            console.error(`Failed to create event for ${training}:`, eventResponse.data.response.description);
+                            // Optionally handle error for individual training save
+                        } else {
+                            const createdEventId = eventResponse.data.response.importSummaries[0].reference;
+                            createdTrainingEvents[training] = createdEventId; // Store the event ID
+                            console.log(`Indirect Event created for ${training} on save with ID: ${createdEventId}`);
+                        }
+                    } catch (err) {
+                        console.error(`Error creating indirect event for ${training} on save:`, err);
+                        // Optionally handle error for individual training save
+                    }
+                }
+
+            } // End of if (isNewIndirectPresent) block for event creation
+
+            // --- Prepare initial dataValues based on selected trainings and MUAC ---
+            // This happens regardless of whether events were created, to structure the fetchedDates state
+            const initialDataValues: { [key: string]: string | boolean } = {};
+
+            // Include data elements for MUAC if 'Muac Assessment' is selected (regardless of successful event creation)
+            if (selectedTrainings.includes('Muac Assessment')) {
+                Object.keys(muacDataElementMapping).forEach(label => {
+                    initialDataValues[label] = ''; // Initialize MUAC data values as empty strings
+                });
+            }
+
+            // Include data elements for each selected training (regardless of successful event creation)
+            const allSelectedTrainings = selectedTrainings.filter(training => training !== 'Muac Assessment');
+            allSelectedTrainings.forEach(trainingName => {
+                const trainingSpecificMapping = dataElementMapping[trainingName];
+                if (trainingSpecificMapping) {
+                    // Get labels based on trackFilter if applicable, otherwise general mapping
+                    // Need to correctly identify the trackFilter for the new beneficiary
+                    const currentTrackFilter = newIndirectData.track; // Assuming 'track' holds the track value in newIndirectData
+
+                    const labelsToInitialize = (currentTrackFilter && trainingSpecificMapping[currentTrackFilter])
+                        ? Object.keys(trainingSpecificMapping[currentTrackFilter])
+                        : Object.keys(trainingSpecificMapping);
+
+                    labelsToInitialize.forEach(label => {
+                        // Avoid overwriting existing keys if they happen to have the same label (e.g., between trainings or with MUAC)
+                        if (initialDataValues[label] === undefined) {
+                            // Initialize based on expected type if possible (e.g., false for checkboxes)
+                            // This is tricky without data element type info. Empty string or false might work depending on rendering logic.
+                            // Let's assume empty string is a safe default for most inputs. Checkboxes might need false.
+                            // If your rendering handles empty string for checkboxes correctly, use ''.
+                            initialDataValues[label] = ''; // Initialize training data values as empty strings
+                        }
+                    });
+                }
             });
+            // --- End Prepare initial dataValues ---
 
-            if (!response3.ok) throw new Error('Failed to create event');
-
-            const createdEventId = (await response3.json()).response.importSummaries[0].reference;
-            console.log(`✅ Indirect Event created with ID: ${createdEventId}`);
-
-
+            setEditInputValues(prev => ({
+                ...prev,
+                [trackedEntityInstance]: {
+                    reportDate: newIndirectData.recordDate || '',
+                    dueDate: newIndirectData.recordDate || '',
+                    eventId: isNewIndirectPresent ? (Object.values(createdTrainingEvents)[0] || muacEventId || '') : '',
+                    muacEventId: isNewIndirectPresent ? muacEventId : '',
+                    events: isNewIndirectPresent ? createdTrainingEvents : {},
+                    dataValues: {
+                        ...initialDataValues,
+                        'Present': isNewIndirectPresent // Ensure Present status is set correctly
+                    }
+                }
+            }));
+            setHasValidDate(prev => ({
+                ...prev,
+                [trackedEntityInstance]: isNewIndirectPresent ? (Object.values(createdTrainingEvents)[0] || muacEventId ? true : false) : false // Mark as having a valid date only if events were intended/created
+            }));
 
             // Reset the form
             setNewIndirectData({
                 id: '',
-                trackInstanceId: '',
+                trackInstanceId: '', // Resetting this is fine, as it's used for the add row state
                 recordDate: '',
                 track: '',
                 inactive: '',
@@ -1594,239 +1400,43 @@ export function OrgUnitTable(props: Props) {
                 initialMuac: '',
                 muacClassification: '',
                 ben_facility_RegNo: '',
-                directPatientID: '', // Still auto-filled before submit
+                directPatientID: '',
                 beneficiaryType: '',
                 muacColor: '#ffffff'
             });
-
-            setMessage('Indirect beneficiary successfully saved!');
-            setIsError(false);
+            setIsNewEntry(prev => ({ ...prev, [newIndirectData.trackInstanceId]: false }));
             setIsAddingIndirect(false);
-
+            setIsNewIndirectPresent(false); // Reset the new present checkbox state
             // Trigger data reload after successful save
             await fetchUpdatedIndirects();
+            // setMessage('Indirect beneficiary successfully saved!');
+            setMessage(
+                <div>
+                    Indirect beneficiary successfully saved!
+                    <button
+                        onClick={() => {
+                            // Manual click - only mark this one as present
+                            if (newIndirectRef.current) {
+                                handleIndirectPresentChange(newIndirectRef.current, true);
+                            }
+                        }}
+                        className="btn btn-primary ms-2"
+                        style={{ marginLeft: '20px' }}
+                    // disabled={!newIndirectRef.current}
+                    >
+                        Enlist for Training
+                    </button>
+                </div>
+            );
 
-        } catch (error) {
-            console.error('Error saving indirect beneficiary:', error);
-            setMessage('Error saving indirect beneficiary.');
+            setIsError(false);
+
+        } catch { // Use any to accommodate potential error structure from fetch/axios
+            console.error('Error saving indirect beneficiary:');
+            setMessage('Error saving indirect beneficiary. ');
             setIsError(true);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleInputChange = async (event) => {
-        const { name, value } = event.target;
-        setFormData((prevData) => ({ ...prevData, [name]: value }));
-    }
-
-    const resetForm = () => {
-        setFormVisible(false);
-        setFormData({
-            recordDate: '',
-            track: '',
-            inactive: '',
-            beneficiaryStage: '',
-            careGiver: '',
-            careGiverAge: '',
-            patientID: '',
-            firstMiddleName: '',
-            surname: '',
-            dob: '',
-            orgUnit: '',
-            topicTrainedOn: '',
-            beneficiaryName: '',
-            nonBeneficiaryName: '',
-            sex: '',
-            age: '',
-            initialMuac: '',
-            muacClassification: '',
-            ben_facility_RegNo: '',
-
-            directPatientID: ''
-
-        });
-        setSelectedFilter('');
-    }
-
-    // Function to handle the add action
-    const handleAdd = (id: string) => {
-        setEditableRows((prev) => ({ ...prev, [id]: true }));
-        setOriginalValues((prev) => ({ ...prev, [id]: filteredData.find((d) => d.trackInstanceId === id) }));
-    };
-
-    // Function to handle the edit action
-    const handleEdit = async (trackInstId: string) => {
-        // Set the specific row to editable
-        setEditableRows((prev) => ({ ...prev, [trackInstId]: true }));
-
-        // Fetch additional data for the row being edited
-        const activity = filteredData.find((d) => d.trackInstanceId === trackInstId);
-        if (activity) {
-            const additionalData = await fetchAdditionalData(activity.trackInstanceId, trainingFilter, trackFilter);
-            // setFetchedDates(additionalData); // Store fetched dates in state
-            // Set the fetched dates and data values in the expected structure
-            setFetchedDates((prev) => ({
-                ...prev,
-                [trackInstId]: {
-                    reportDate: additionalData.reportDate,
-                    dueDate: additionalData.dueDate,
-                    eventId: additionalData.eventId,
-                    dataValues: additionalData.dataValues || {}, // Spread the data values
-                },
-            }));
-
-        }
-    };
-
-    const generateEventID = (): string => {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        const charactersLength = characters.length;
-        for (let i = 0; i < 11; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
-    }
-
-    // Function to handle posting additional columns 
-    const handleSave = async (trackInstId: string, id?: string) => {
-        const isEditing = id !== undefined; // Check if we have an ID to determine if we're editing
-
-        // Generate a new event ID if not editing
-        const eventId = isEditing ? id : generateEventID();
-        // Construct the payload based on the filter
-        let payload;
-
-        if (currentFilter === 'Livelihood') {
-            payload = {
-                dataValues: [
-                    ...(newRowData.track === 'Farmer'
-                        ? [
-                            { value: addColRow_lvh.topicsTrainedOn.harvesting ? 'true' : 'false', dataElement: 'RiNixd9BoZE' },
-                            { value: addColRow_lvh.topicsTrainedOn.postHarvestHandling ? 'true' : 'false', dataElement: 'oLxkWBGjWkV' },
-                            { value: addColRow_lvh.topicsTrainedOn.landPreparation ? 'true' : 'false', dataElement: 'Nmh0TPGuXWS' },
-                            { value: addColRow_lvh.topicsTrainedOn.nurseryPreparation ? 'true' : 'false', dataElement: 'VyqyQ0BZISo' },
-                            { value: addColRow_lvh.topicsTrainedOn.postHarvestHygiene ? 'true' : 'false', dataElement: 'EpaLpKMZj3y' },
-                            { value: addColRow_lvh.topicsTrainedOn.lossesMarking ? 'true' : 'false', dataElement: 'aUrLyHqOf0n' },
-                            { value: addColRow_lvh.topicsTrainedOn.weeding ? 'true' : 'false', dataElement: 'vVKfsZ8VgiG' },
-                            { value: addColRow_lvh.topicsTrainedOn.storage ? 'true' : 'false', dataElement: 'YzlNvVyLIkn' },
-                            { value: addColRow_lvh.topicsTrainedOn.appliedLessons, dataElement: 'ZBAx5UMH63F' },
-                            { value: addColRow_lvh.topicsTrainedOn.increasedIncome ? 'true' : 'false', dataElement: 'Tbnq2F0xX7D' },
-                            { value: addColRow_lvh.topicsTrainedOn.increasedProduction ? 'true' : 'false', dataElement: 'GwKxMZ8yaBm' },
-                            { value: addColRow_lvh.topicsTrainedOn.newLivelihood ? 'true' : 'false', dataElement: 'Ee8oyMX7Aoc' },
-                            { value: addColRow_lvh.topicsTrainedOn.increasedSkills ? 'true' : 'false', dataElement: 'I2KTNrvwsHT' },
-                            { value: addColRow_lvh.topicsTrainedOn.increasedResilience ? 'true' : 'false', dataElement: 'RW2BS4l5KcN' },
-                            { value: addColRow_lvh.topicsTrainedOn.others, dataElement: 'Si8dOtSlomM' }
-                        ]
-                        : [
-                            // Fisher track data elements remain unchanged
-                            { value: addColRow_lvh.fishingMethods.fishingOilPreparation ? 'true' : 'false', dataElement: 'erCm8YopB1D' },
-                            { value: addColRow_lvh.fishingMethods.fishingMarketing ? 'true' : 'false', dataElement: 'QpLUEvB2sdy' },
-                            { value: addColRow_lvh.fishingMethods.fishingMethods ? 'true' : 'false', dataElement: 'OKc4NRIE3rS' },
-                            { value: addColRow_lvh.fishingMethods.postHandlingMethods ? 'true' : 'false', dataElement: 'SinFNAlonqG' },
-                            { value: addColRow_lvh.fishingMethods.appliedLessons ? 'true' : 'false', dataElement: 'EvDeWfQDiuz' }
-                        ]),
-                    // Remove the commented out fields
-
-                ],
-                event: eventId,
-                program: 'n2iAPy3PGx7',
-                programStage: 'H0vCgsI1d4M',
-                orgUnit: props.orgUnitId,
-                trackedEntityInstance: trackInstId,
-                status: 'COMPLETED',
-                // dueDate: addColRow_lvh.dueDate,
-                eventDate: fetchedDates[trackInstId]?.reportDate,
-                completedDate: new Date().toISOString().split('T')[0],
-            };
-        } else if (currentFilter === 'Nutrition') {
-            payload = {
-                dataValues: [
-                    { "value": addColRow_Nut.nutritionPregnancy, dataElement: 'FVIkGrGWz1s' },
-                    { "value": addColRow_Nut.earlyInitiation, "dataElement": "URD2xr6Enhc" },
-                    { "value": addColRow_Nut.breastfeedingFirst6Months, "dataElement": "LzFFXJl5Iqu" },
-                    { "value": addColRow_Nut.exclusiveBreastfeeding, "dataElement": "ecFLn0i8QrL" },
-                    { "value": addColRow_Nut.goodHygienePractices, "dataElement": "ijTViGLk6hP" },
-                    { "value": addColRow_Nut.complementaryFeeding, "dataElement": "LzGN50sTSh3" },
-                    { "value": addColRow_Nut.healthSeekingBehavior, "dataElement": "C2GoFXyTUj2" },
-                    { "value": addColRow_Nut.growthMonitoring, "dataElement": "DK06Y2Viejs" },
-                    { "value": addColRow_Nut.kitchenGardens, "dataElement": "NOIbysghola" },
-                    { "value": addColRow_Nut.cookingDemonstration, "dataElement": "LhcJpqUzqcp" },
-                    { "value": addColRow_Nut.pregnant, "dataElement": "stU3OZCy64s" },
-                    { "value": addColRow_Nut.lactating, "dataElement": "NA1ZhjvX47L" },
-                    { "value": addColRow_Nut.other, "dataElement": "TQLLkvvbCD2" }
-                    // Add other fields as necessary
-                ],
-                event: eventId,
-                program: 'n2iAPy3PGx7',
-                programStage: 'RXTq2YFOH5c',
-                orgUnit: props.orgUnitId,
-                trackedEntityInstance: trackInstId,
-                status: 'COMPLETED',
-                // dueDate: addColRow_lvh.dueDate,
-                eventDate: fetchedDates[trackInstId]?.reportDate,
-                completedDate: new Date().toISOString().split('T')[0],
-            };
-        } else if (currentFilter === 'Water Sanitation & Hygiene') {
-
-            payload = {
-                dataValues: [
-                    { "value": addColRow_Wsh.foodSafety, "dataElement": 'Q4dJyNwdyyJ' },
-                    { "value": addColRow_Wsh.promotersAttendance, "dataElement": "zwumtCV5d8h" },
-                    { "value": addColRow_Wsh.personalHygiene, "dataElement": "POMbjIgo3EF" },
-                    { "value": addColRow_Wsh.householdHygiene, "dataElement": "ss6pDJe2k6h" },
-                    { "value": addColRow_Wsh.cleanSafeWater, "dataElement": "xyaOOPDyjoN" },
-                    { "value": addColRow_Wsh.latrineDisposal, "dataElement": "dnlAV3tubDJ" }
-                    // Add other fields as necessary
-                ],
-                event: eventId,
-                program: 'n2iAPy3PGx7',
-                programStage: 'bTVReRuHapT',
-                orgUnit: props.orgUnitId,
-                trackedEntityInstance: trackInstId,
-                status: 'ACTIVE',
-                // dueDate: addColRow_lvh.dueDate,
-                eventDate: fetchedDates[trackInstId]?.reportDate,
-            };
-        }
-        console.log({
-            'Event Date': fetchedDates[trackInstId]?.reportDate,
-            'Event Date 1': addColRow_lvh.reportDate
-        })
-        try {
-            if (isEditing) {
-                // PUT request for editing an existing record
-                const response = await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${id}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            // 'Authorization': `Basic ${credentials}`,
-                        },
-                        body: JSON.stringify(payload),
-                    }
-                );
-                console.log('Entry updated:', response.data);
-                // Handle success (e.g., update state, show message)
-            } else {
-                // POST request for adding a new record
-                const response = await axios.post(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            // 'Authorization': `Basic ${credentials}`,
-                        },
-                        body: JSON.stringify(payload),
-                    }
-                );
-                console.log('New entry added:', response.data);
-                // Handle success (e.g., update state, show message)
-            }
-        } catch (error) {
-            console.error('Error saving entry:', error);
-            // Handle error (e.g., show error message)
         }
     };
 
@@ -1841,83 +1451,34 @@ export function OrgUnitTable(props: Props) {
             if (keyboardEvent.key !== 'Enter') return;
         }
 
-        const reportDate = fetchedDates[trackInstanceId]?.reportDate;
+        const reportDate = editInputValues[trackInstanceId]?.reportDate;
 
         if (!reportDate) {
             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
             setMessage('Date of training is required');
             setIsError(true);
             return;
-        } else {
-            setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
-            setMessage('');
-            setIsError(false);
         }
 
-        //  Step 1: Parse trainingFilter string
+        // Parse trainingFilter string
         const selectedTrainings = trainingFilter
             .split(',')
             .map(t => t.trim())
-            .filter(Boolean); // eliminate blank entries
-
-        console.debug('[DEBUG] trainingFilter:', trainingFilter);
-        console.debug('[DEBUG] selectedTrainings:', selectedTrainings);
-
-        // const eventsMap: Record<string, string> = {};
+            .filter(Boolean);
 
         try {
+            // Object to store all created event IDs
+            const eventsMap: Record<string, string> = {};
+            let muacEventId = '';
 
-            // Creating Muac Event
-
-            try {
-                const muacPayload = {
-                    events: [{
-                        trackedEntityInstance: trackInstanceId,
-                        program: 'n2iAPy3PGx7',
-                        programStage: PROGRAM_STAGE_MAPPING['Muac Assessment'],
-                        orgUnit: props.orgUnitId,
-                        eventDate: reportDate,
-                        status: 'ACTIVE',
-                        dataValues: []
-                    }]
-                };
-
-                const muacRes = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
-                    muacPayload
-                );
-
-                const muacEventId = muacRes.data.response.importSummaries[0].reference;
-
-                // Store MUAC event ID
-                setFetchedDates(prev => ({
-                    ...prev,
-                    [trackInstanceId]: {
-                        ...prev[trackInstanceId],
-                        muacEventId
-                    }
-                }));
-            } catch (error) {
-                console.error('Error creating MUAC event:', error);
-            }
-
-
-            // Creating Events for Training Filters
-
-            const createdEvents = await Promise.all(
-                selectedTrainings.map(async training => {
-                    const stage = PROGRAM_STAGE_MAPPING[training];
-
-                    if (!stage) {
-                        console.warn(`No programStage mapped for training: "${training}"`);
-                        return null;
-                    }
-
-                    const payload = {
+            // 1. Create MUAC event if needed
+            if (selectedTrainings.includes('Muac Assessment')) {
+                try {
+                    const muacPayload = {
                         events: [{
                             trackedEntityInstance: trackInstanceId,
                             program: 'n2iAPy3PGx7',
-                            programStage: stage,
+                            programStage: PROGRAM_STAGE_MAPPING['Muac Assessment'],
                             orgUnit: props.orgUnitId,
                             eventDate: reportDate,
                             status: 'ACTIVE',
@@ -1925,40 +1486,63 @@ export function OrgUnitTable(props: Props) {
                         }]
                     };
 
-                    const res = await axios.post(
+                    const muacRes = await axios.post(
                         `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
-                        payload
+                        muacPayload
                     );
+                    muacEventId = muacRes.data.response.importSummaries[0].reference;
+                    eventsMap['Muac Assessment'] = muacEventId;
+                } catch (error) {
+                    console.error('Error creating MUAC event:', error);
+                }
+            }
 
-                    return {
-                        training,
-                        eventId: res.data.response.importSummaries[0].reference
-                    };
-                })
+            // 2. Create events for other trainings
+            await Promise.all(
+                selectedTrainings
+                    .filter(t => t !== 'Muac Assessment')
+                    .map(async training => {
+                        const stage = PROGRAM_STAGE_MAPPING[training];
+                        if (!stage) {
+                            console.warn(`No programStage mapped for training: "${training}"`);
+                            return;
+                        }
+
+                        const payload = {
+                            events: [{
+                                trackedEntityInstance: trackInstanceId,
+                                program: 'n2iAPy3PGx7',
+                                programStage: stage,
+                                orgUnit: props.orgUnitId,
+                                eventDate: reportDate,
+                                status: 'ACTIVE',
+                                dataValues: []
+                            }]
+                        };
+
+                        const res = await axios.post(
+                            `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
+                            payload
+                        );
+                        eventsMap[training] = res.data.response.importSummaries[0].reference;
+                    })
             );
 
-            // Step 2: Build event mapping
-            const eventsMap = createdEvents
-                .filter((entry): entry is { training: string, eventId: string } => !!entry)
-                .reduce((acc, curr) => {
-                    acc[curr.training] = curr.eventId;
-                    return acc;
-                }, {} as Record<string, string>);
-
-            console.debug('[DEBUG] eventsMap:', eventsMap);
-
-            // Step 3: Save both date and new event map
-            setFetchedDates(prev => ({
-                ...prev,
-                [trackInstanceId]: {
-                    ...prev[trackInstanceId],
+            setEditInputValues(prev => {
+                const updatedValues = { ...prev };
+                updatedValues[trackInstanceId] = {
+                    ...(prev[trackInstanceId] || {}),
                     reportDate,
-                    events: eventsMap
-                }
-            }));
+                    events: eventsMap,
+                    ...(muacEventId ? { muacEventId } : {}),
+                    dataValues: prev[trackInstanceId]?.dataValues || {}
+                };
+                return updatedValues;
+            });
 
             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: true }));
             setMessage('Date of Training Successfully Saved');
+            setIsError(false);
         } catch (error) {
             console.error('Error creating training events:', error);
             setHasValidDate(prev => ({ ...prev, [trackInstanceId]: false }));
@@ -1967,92 +1551,39 @@ export function OrgUnitTable(props: Props) {
         }
     };
 
-    // PUT remaining data elements 
     const sendDataValueUpdate = async (
         trackInstanceId: string,
         dataElementName: string,
         value: string | boolean,
         training: string
     ) => {
-
-        // Determine program stage based on data element
+        const currentValues = editInputValues[trackInstanceId] || {};
         const isMuacColumn = ['Oedema', 'Muac', 'Muac Classification'].includes(dataElementName);
         const programStage = isMuacColumn
             ? PROGRAM_STAGE_MAPPING['Muac Assessment']
             : PROGRAM_STAGE_MAPPING[training];
 
-        const orgUnit = props.orgUnitId;
-        const program = 'n2iAPy3PGx7';
-        // const programStage = PROGRAM_STAGE_MAPPING[training];
-
         if (!programStage || !dataElementName) return;
 
-        const reportDate = fetchedDates[trackInstanceId]?.reportDate;
-        // Check if we already have an event ID for this program stage
-        let eventId = fetchedDates[trackInstanceId]?.events?.[training];
+        const orgUnit = props.orgUnitId;
+        const program = 'n2iAPy3PGx7';
+        const reportDate = currentValues.reportDate;
 
-        // Use MUAC event ID if available
-        if (isMuacColumn && fetchedDates[trackInstanceId]?.muacEventId) {
-            eventId = fetchedDates[trackInstanceId].muacEventId;
+        // Get event ID from editInputValues
+        let eventId = currentValues.events?.[training];
+        if (isMuacColumn) {
+            eventId = currentValues.muacEventId;
         }
 
-        // If eventId is missing, try to fetch exisitng event from API
+        // If no event ID but we have a report date, create a new event
         if (!eventId && reportDate) {
-            try {
-                const res = await axios.get(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events`, {
-                    params: {
-                        trackedEntityInstance: trackInstanceId,
-                        program,
-                        fields: 'event,eventDate,programStage',
-                    }
-                });
-
-                // Find event matching the report date
-                const matchedEvent = res.data.events.find(
-                    (ev: any) =>
-                        ev.eventDate?.startsWith(reportDate) && ev.programStage === programStage
-                );
-
-                if (matchedEvent) {
-                    eventId = matchedEvent.event;
-                    // Store it for future use
-                    if (isMuacColumn) {
-                        setFetchedDates(prev => ({
-                            ...prev,
-                            [trackInstanceId]: {
-                                ...prev[trackInstanceId],
-                                muacEventId: eventId
-                            }
-                        }));
-                    } else {
-                        setFetchedDates(prev => ({
-                            ...prev,
-                            [trackInstanceId]: {
-                                ...prev[trackInstanceId],
-                                events: {
-                                    ...(prev[trackInstanceId]?.events || {}),
-                                    [training]: eventId
-                                }
-                            }
-                        }));
-                    }
-                }
-            } catch (err) {
-                console.error('Failed to fetch existing events:', err);
-                return;
-            }
-        }
-
-        // If still no event ID, we need to create one
-        // if (!eventId) return;
-        if (!eventId) {
             try {
                 const payload = {
                     events: [{
                         trackedEntityInstance: trackInstanceId,
-                        program: 'n2iAPy3PGx7',
+                        program,
                         programStage,
-                        orgUnit: props.orgUnitId,
+                        orgUnit,
                         eventDate: reportDate,
                         status: 'ACTIVE',
                         dataValues: []
@@ -2063,43 +1594,33 @@ export function OrgUnitTable(props: Props) {
                     `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
                     payload
                 );
-
                 eventId = res.data.response.importSummaries[0].reference;
 
-                // Store the new event ID
-                if (isMuacColumn) {
-                    setFetchedDates(prev => ({
-                        ...prev,
-                        [trackInstanceId]: {
-                            ...prev[trackInstanceId],
-                            muacEventId: eventId
-                        }
-                    }));
-                } else {
-                    setFetchedDates(prev => ({
-                        ...prev,
-                        [trackInstanceId]: {
-                            ...prev[trackInstanceId],
-                            events: {
-                                ...(prev[trackInstanceId]?.events || {}),
-                                [training]: eventId
-                            }
-                        }
-                    }));
-                }
+                // Update state with new event ID
+                setEditInputValues(prev => {
+                    const updated = { ...prev };
+                    updated[trackInstanceId] = {
+                        ...(updated[trackInstanceId] || {}),
+                        events: {
+                            ...(updated[trackInstanceId]?.events || {}),
+                            [training]: eventId
+                        },
+                        ...(isMuacColumn ? { muacEventId: eventId } : {})
+                    };
+                    return updated;
+                });
             } catch (error) {
                 console.error('Error creating event:', error);
                 return;
             }
         }
 
-        // Now send the data value update
-        const dataElementId =
-            dataElementIDsByFilter[training]?.[trackFilter]?.[dataElementName] ||
+        // Prepare payload
+        const dataElementId = dataElementIDsByFilter[training]?.[trackFilter]?.[dataElementName] ||
             dataElementIDsByFilter[training]?.[dataElementName];
 
         if (!dataElementId) {
-            console.warn(`Missing dataElementId for ${dataElementName} under training: ${training}`);
+            console.warn(`Missing dataElementId for ${dataElementName}`);
             return;
         }
 
@@ -2110,18 +1631,32 @@ export function OrgUnitTable(props: Props) {
             programStage,
             trackedEntityInstance: trackInstanceId,
             status: 'ACTIVE',
-            dataValues: [
-                {
-                    dataElement: dataElementId,
-                    value: typeof value === 'boolean' ? (value ? 'true' : 'false') : value,
-                    providedElsewhere: false
-                }
-            ]
+            dataValues: [{
+                dataElement: dataElementId,
+                value: typeof value === 'boolean' ? (value ? 'true' : 'false') : value,
+                providedElsewhere: false
+            }]
         };
 
         try {
-            await axios.put(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}/${dataElementId}`, payload);
-            console.log(`PUT: ${dataElementName} = ${value}`);
+            await axios.put(
+                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}/${dataElementId}`,
+                payload
+            );
+
+            // Update local state
+            setEditInputValues(prev => {
+                const updated = { ...prev };
+                updated[trackInstanceId] = {
+                    ...(updated[trackInstanceId] || {}),
+                    dataValues: {
+                        ...(updated[trackInstanceId]?.dataValues || {}),
+                        [dataElementName]: value
+                    }
+                };
+                return updated;
+            });
+
             setMessage(`Data Element - ${dataElementName} successfully updated.`);
         } catch (error) {
             console.error('Failed to send data value update:', error);
@@ -2130,243 +1665,302 @@ export function OrgUnitTable(props: Props) {
     };
 
     //  handling present / absent indirect beneficiaries
-    const handleIndirectPresentChange = async (
-        indirectId: string,
-        isPresent: boolean
-    ) => {
-        // Optimistically update the checkbox
-        setIndirectPresent(prev => ({
-            ...prev,
-            [indirectId]: isPresent,
-        }));
+    const handleIndirectPresentChange = async (indirectId: string, isPresent: boolean) => {
 
-        // Grab parent's training event info
-        const parentId = selectedBeneficiary?.trackInstanceId!;
-        const parentData = fetchedDates[parentId];
-        if (!parentData) return;
-
-        if (isPresent) {
-            try {
-                // Create MUAC event first
-                const muacPayload = {
-                    events: [{
-                        trackedEntityInstance: indirectId,
-                        program: 'n2iAPy3PGx7',
-                        programStage: PROGRAM_STAGE_MAPPING['Muac Assessment'],
-                        orgUnit: props.orgUnitId,
-                        notes: [],
-                        dataValues: [],
-                        status: 'ACTIVE',
-                        eventDate: parentData.reportDate,
-                    }]
-                };
-
-                const muacRes = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
-                    muacPayload
-                );
-                const muacEventId = muacRes.data.response.importSummaries[0].reference;
-
-                // Then create training event if needed
-                const payload = {
-                    events: [{
-                        trackedEntityInstance: indirectId,
-                        program: 'n2iAPy3PGx7',
-                        programStage: PROGRAM_STAGE_MAPPING[trainingFilter],
-                        orgUnit: props.orgUnitId,
-                        notes: [],
-                        dataValues: [],
-                        status: 'ACTIVE',
-                        eventDate: parentData.reportDate,
-                    }]
-                };
-                const resp = await axios.post(
-                    `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
-                    payload
-                );
-                const newEventId = resp.data.response.importSummaries[0].reference;
-
-                // Update fetchedDates with both events
-                setFetchedDates(prev => ({
-                    ...prev,
-                    [indirectId]: {
-                        ...parentData,
-                        eventId: newEventId,
-                        muacEventId: muacEventId,
-                        dataValues: {
-                            ...parentData.dataValues,
-                            // Clear non-MUAC values since they should come from parent
-                            ...Object.fromEntries(
-                                Object.entries(parentData.dataValues)
-                                    .filter(([key]) =>
-                                        key === 'Oedema' ||
-                                        key === 'Muac' ||
-                                        key === 'Muac Classification'
-                                    )
-                            )
-                        }
-                    }
-                }));
-
-                setHasValidDate(prev => ({
-                    ...prev,
-                    [indirectId]: true
-                }));
-
-            } catch (err) {
-                console.error('Error creating indirect events:', err);
-                setIndirectPresent(prev => ({ ...prev, [indirectId]: false }));
-            }
-        } else {
-            // Delete both events if they exist
-            const existingEventId = fetchedDates[indirectId]?.eventId;
-            const existingMuacEventId = fetchedDates[indirectId]?.muacEventId;
-
-            try {
-                if (existingEventId) {
-                    await axios.delete(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${existingEventId}`
-                    );
-                }
-                if (existingMuacEventId) {
-                    await axios.delete(
-                        `${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${existingMuacEventId}`
-                    );
-                }
-            } catch (e) {
-                console.warn('Failed to delete indirect events:', e);
-            }
-
-            // Clear out the indirect's fetchedDates
-            setFetchedDates(prev => ({
-                ...prev,
-                [indirectId]: { reportDate: '', dueDate: '', eventId: '', muacEventId: '', dataValues: {} }
-            }));
-            setHasValidDate(prev => ({ ...prev, [indirectId]: false }));
-        }
-    };
-
-    // Function to handle cancel action
-    const handleCancel = (id: string) => {
-        // Revert to original values
-        setEditableRows((prev) => ({ ...prev, [id]: false }));
-        // Optionally, reset the original values if needed
-        setOriginalValues((prev) => {
-            const newValues = { ...prev };
-            delete newValues[id]; // Remove the original values for this row
-            return newValues;
-        });
-    };
-
-    // Function to handle input change
-    const handleInputChange1 = (id: string, accessor: string, value: string | boolean) => {
-        // Update the original values for the row
-        setOriginalValues((prev) => ({
-            ...prev,
-            [id]: {
-                ...prev[id],
-                [accessor]: value,
-            },
-        }));
-    };
-
-    const handleDateChangeForFetchedDates = (trackInstanceId: string, newDate: string) => {
-        setFetchedDates((prev) => ({
-            ...prev,
-            [trackInstanceId]: {
-                ...prev[trackInstanceId],
-                reportDate: newDate,
-            },
-        }));
-    };
-
-    const handleDataValueChange = (
-        trackInstanceId: string,
-        dataElementName: string,
-        value: string | boolean
-    ) => {
-        if (!hasValidDate[trackInstanceId]) {
-            setMessage('Please set Date of Training first');
+        const parentId = selectedBeneficiary?.trackInstanceId;
+        if (!parentId) {
+            setMessage('No direct beneficiary selected');
             setIsError(true);
             return;
         }
-        setFetchedDates((prev) => ({
+
+        // Optimistic UI update
+        setEditInputValues(prev => ({
             ...prev,
-            [trackInstanceId]: {
-                ...prev[trackInstanceId],
-                dataValues: {
-                    ...prev[trackInstanceId]?.dataValues,
-                    [dataElementName]: value,
-                },
-            },
+            [indirectId]: {
+                ...(prev[indirectId] || {}),
+                Present: isPresent
+            }
         }));
 
-        const colMeta = additionalColumns.find(col => dataValueMapping[col.accessor] === dataElementName);
-        const training = colMeta?.training || selectedTrainings[0];
+        try {
+            if (isPresent) {
+                const parentData = editInputValues[parentId] || {};
+                const reportDate = parentData.reportDate;
+                console.log(`Report Date: ${reportDate}`);
 
-        // Send immediately for checkboxes
-        if (typeof value === 'boolean') {
-            sendDataValueUpdate(trackInstanceId, dataElementName, value, colMeta.training);
-        }
+                if (!reportDate) {
+                    setMessage('Must have a training date set first');
+                    setIsError(true);
+                    return;
+                }
 
-        // In handleDataValueChange
-        console.log('Dispatching update with:', {
-            dataElementName,
-            training: colMeta?.training,
-            hasEventId: !!fetchedDates[trackInstanceId]?.events?.[colMeta.training]
-        });
+                await Promise.all(
+                    selectedTrainings.map(async training => {
+                        const isMuac = training === 'Muac Assessment';
+                        const stage = PROGRAM_STAGE_MAPPING[training];
+                        if (!stage) return;
 
-        console.log('Events created:', fetchedDates[trackInstanceId]?.events)
-    };
+                        let eventId = editInputValues[indirectId]?.events?.[training];
 
-    // In your component's data fetching logic:
-    const loadAllAdditionalData = async () => {
-        const newFetchedDates: Record<string, FetchedData> = {};
+                        if (!eventId) {
+                            const payload = {
+                                events: [
+                                    {
+                                        trackedEntityInstance: indirectId,
+                                        program: 'n2iAPy3PGx7',
+                                        programStage: stage,
+                                        orgUnit: props.orgUnitId,
+                                        eventDate: reportDate,
+                                        status: 'ACTIVE',
+                                        dataValues: []
+                                    }
+                                ]
+                            };
 
-        // Process in batches to avoid overwhelming the API
-        const batchSize = 10;
-        for (let i = 0; i < filteredData.length; i += batchSize) {
-            const batch = filteredData.slice(i, i + batchSize);
+                            const res = await axios.post(
+                                `${process.env.REACT_APP_DHIS2_BASE_URL}api/events`,
+                                payload
+                            );
 
-            await Promise.all(batch.map(async (activity) => {
-                try {
-                    const additionalData = await fetchAdditionalData(
-                        activity.trackInstanceId,
-                        trainingFilter,
-                        trackFilter
-                    );
+                            eventId = res.data.response.importSummaries[0].reference;
 
-                    newFetchedDates[activity.trackInstanceId] = additionalData;
+                            // Update local state with new event ID
+                            setEditInputValues(prev => {
+                                const updated = { ...prev };
+                                updated[indirectId] = {
+                                    ...(updated[indirectId] || {}),
+                                    events: {
+                                        ...(updated[indirectId]?.events || {}),
+                                        [training]: eventId
+                                    },
+                                    ...(isMuac ? { muacEventId: eventId } : {})
+                                };
+                                return updated;
+                            });
+                        }
 
-                    // Also check if we have MUAC classification to update the row color
-                    if (additionalData.dataValues['Muac Classification']) {
-                        const muacClass = additionalData.dataValues['Muac Classification'];
-                        // You might want to update the row style based on this
-                    }
-                } catch (error) {
-                    console.error(`Failed to fetch data for ${activity.trackInstanceId}:`, error);
-                    newFetchedDates[activity.trackInstanceId] = {
-                        reportDate: '',
-                        dueDate: '',
-                        eventId: '',
-                        muacEventId: '',
-                        dataValues: {}
+                        // Inherit all non-MUAC data values from parent
+                        // Build inherited dataValues from parent
+                        const dataValues = [];
+                        const trainingDataElements =
+                            dataElementIDsByFilter[training]?.[trackFilter] ||
+                            dataElementIDsByFilter[training];
+
+                        if (trainingDataElements) {
+                            Object.entries(trainingDataElements).forEach(([label, dataElementId]) => {
+                                if (!['Oedema', 'Muac', 'Muac Classification'].includes(label)) {
+                                    const parentValue = parentData.dataValues?.[label];
+                                    if (parentValue !== undefined) {
+                                        dataValues.push({
+                                            dataElement: dataElementId,
+                                            value: typeof parentValue === 'boolean'
+                                                ? (parentValue ? 'true' : 'false')
+                                                : parentValue,
+                                            providedElsewhere: false
+                                        });
+                                    }
+                                }
+                            });
+
+                            // Update local state with inherited values
+                            setEditInputValues(prev => ({
+                                ...prev,
+                                [indirectId]: {
+                                    ...(prev[indirectId] || {}),
+                                    reportDate: parentData.reportDate,
+                                    dataValues: {
+                                        ...Object.entries(parentData.dataValues || {}).reduce((acc, [key, value]) => {
+                                            if (!['Oedema', 'Muac', 'Muac Classification'].includes(key)) {
+                                                acc[key] = value;
+                                            }
+                                            return acc;
+                                        }, {} as Record<string, string | boolean | number>),
+                                        Present: true
+                                    }
+                                }
+                            }));
+                        }
+
+                        // Only add Present=true for non-MUAC trainings
+                        if (!isMuac) {
+                            dataValues.push({
+                                dataElement: 'FY2ZuB17VW3',
+                                value: 'true',
+                                providedElsewhere: false
+                            });
+                        }
+                        // Update the event with the complete dataValues
+                        await axios.put(
+                            `${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}`,
+                            {
+                                event: eventId,
+                                trackedEntityInstance: indirectId,
+                                program: 'n2iAPy3PGx7',
+                                programStage: stage,
+                                orgUnit: props.orgUnitId,
+                                eventDate: reportDate,
+                                status: 'ACTIVE',
+                                dataValues
+                            }
+                        );
+                    })
+                );
+
+                // Update local state with inherited values
+                setEditInputValues(prev => {
+                    const updated = { ...prev };
+                    updated[indirectId] = {
+                        ...(updated[indirectId] || {}),
+                        reportDate,
+                        dataValues: {
+                            ...Object.entries(parentData.dataValues || {}).reduce((acc, [key, value]) => {
+                                if (!['Oedema', 'Muac', 'Muac Classification'].includes(key)) {
+                                    acc[key] = value;
+                                }
+                                return acc;
+                            }, {} as Record<string, string | boolean | number>),
+                            Present: true
+                        }
                     };
+                    return updated;
+                });
+            } else {
+                // Handle "Absent" case — delete events
+                await Promise.all(
+                    Object.values(editInputValues[indirectId]?.events || {}).map(eventId =>
+                        axios.delete(`${process.env.REACT_APP_DHIS2_BASE_URL}api/events/${eventId}`)
+                    )
+                );
+                // Reset state
+                setEditInputValues(prev => ({
+                    ...prev,
+                    [indirectId]: {
+                        ...(prev[indirectId] || {}),
+                        reportDate: '',
+                        events: {},
+                        muacEventId: '',
+                        dataValues: {
+                            Present: false
+                        }
+                    }
+                }));
+            }
+
+            setMessage(`Indirect beneficiary marked as ${isPresent ? 'present' : 'absent'}`);
+        } catch (error) {
+            console.error('Error updating indirect beneficiary:', error);
+            setMessage('Failed to update indirect beneficiary status');
+            setIsError(true);
+
+            // Rollback optimistic state
+            setEditInputValues(prev => ({
+                ...prev,
+                [indirectId]: {
+                    ...(prev[indirectId] || {}),
+                    Present: !isPresent
                 }
             }));
         }
-
-        setFetchedDates(newFetchedDates);
     };
-    // Call this whenever filteredData or trainingFilter changes
-    useEffect(() => {
-        if (filteredData.length > 0 && trainingFilter) {
-            loadAllAdditionalData();
+
+    const loadAllAdditionalData = async () => {
+        // 1. Abort previous request if still running and create new controller
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort('New data load requested');
         }
-    }, [filteredData, trainingFilter, trackFilter]);
+        abortControllerRef.current = new AbortController();
+        const { signal } = abortControllerRef.current; // Get signal for THIS execution
 
+        setIsLoadingData(true); // Set loading TRUE at the start
+        setLoadingAdditionalData(true); // If this state is used
+        setMessage('');
+        setIsError(false);
 
-    const fetchAdditionalData = async (trackInstanceId: string, trainingFilter: string, trackFilter: string): Promise<FetchedData> => {
+        const newFetchedDates: Record<string, FetchedData> = {};
+        const batchSize = 50; // Adjust batch size as needed
+
+        try {
+            for (let i = 0; i < filteredData.length; i += batchSize) {
+                // Throw if aborted before starting batch
+                signal.throwIfAborted();
+
+                const batch = filteredData.slice(i, i + batchSize);
+                const batchResults = await Promise.all(batch.map(async (activity) => {
+                    // Inside map, check signal again before fetch
+                    signal.throwIfAborted();
+                    try {
+                        const additionalData = await fetchAdditionalData(
+                            activity.trackInstanceId,
+                            trainingFilter,
+                            trackFilter,
+                            signal // Pass signal
+                        );
+                        return { id: activity.trackInstanceId, data: additionalData };
+                    } catch (error) {
+                        // Handle errors from fetchAdditionalData including aborts
+                        if (axios.isCancel(error)) {
+                            // Don't treat abort as a data error, return null or identifier
+                            return { id: activity.trackInstanceId, data: null, aborted: true };
+                        }
+                        console.error(`Failed to fetch data for ${activity.trackInstanceId}:`, error);
+                        // Return fetched data structure with error indicator or default
+                        return { id: activity.trackInstanceId, data: { reportDate: '', dueDate: '', eventId: '', muacEventId: '', dataValues: {}, events: {} }, error: true };
+                    }
+                }));
+
+                // Process batch results only if not aborted during Promise.all
+                signal.throwIfAborted();
+
+                batchResults.forEach(result => {
+                    // Add to newFetchedDates only if data exists and wasn't aborted
+                    if (result.data && !result.aborted) {
+                        newFetchedDates[result.id] = result.data;
+                    }
+                });
+            }
+
+            // Final state update only if the entire process wasn't aborted
+            signal.throwIfAborted();
+
+            setFetchedDates(prev => ({ ...prev, ...newFetchedDates })); // Merge carefully
+
+            // Update hasValidDate based on successfully fetched data
+            const validDatesUpdate: Record<string, boolean> = {};
+            Object.entries(newFetchedDates).forEach(([id, data]) => {
+                validDatesUpdate[id] = !!data.reportDate; // Or based on eventId/presence
+            });
+            setHasValidDate(prev => ({ ...prev, ...validDatesUpdate }));
+
+        } catch (error) {
+            if (axios.isCancel(error)) {
+                console.log('loadAllAdditionalData aborted:');
+            } else {
+                // Handle other errors during the loop or processing
+                console.error("Error loading additional data:", error);
+                // setMessage("Failed to load some event details.");
+                setIsError(true);
+            }
+        } finally {
+            // Set loading false ONLY if this specific signal was NOT aborted
+            if (!signal.aborted) {
+                setIsLoadingData(false);
+                setLoadingAdditionalData(false);
+                // Clear the ref only if this instance finished normally
+                if (abortControllerRef.current && abortControllerRef.current.signal === signal) {
+                    abortControllerRef.current = null;
+                }
+            }
+        }
+    };
+
+    // Call this whenever filteredData or trainingFilter changes
+    const fetchAdditionalData = async (
+        trackInstanceId: string,
+        trainingFilter: string,
+        trackFilter: string,
+        signal?: AbortSignal): Promise<FetchedData> => {
+
         const programStageMap = {
             'Livelihood': 'H0vCgsI1d4M',
             'Nutrition': 'RXTq2YFOH5c',
@@ -2374,24 +1968,28 @@ export function OrgUnitTable(props: Props) {
             'Muac Assessment': 'HEukVrLC2dT'
         };
 
-        const stagesToFetch = [];
+        // Split the trainingFilter string into an array of selected training names
+        const selectedTrainingsArray = trainingFilter.split(',').map(t => t.trim()).filter(Boolean);
 
-        // Always fetch MUAC stage
-        stagesToFetch.push('Muac Assessment');
+        // Get the program stage IDs for the selected trainings (excluding MUAC for this array)
+        const selectedTrainingStageIds = selectedTrainingsArray
+            .map(training => programStageMap[training])
+            .filter(stageId => stageId && stageId !== programStageMap['Muac Assessment']);
 
-        // Fetch the training stage if specified
-        if (trainingFilter && programStageMap[trainingFilter]) {
-            stagesToFetch.push(trainingFilter);
-        }
 
         let reportDate = '';
         let dueDate = '';
-        let eventId = '';
-        const dataValues: { [key: string]: string } = {};
+        // Use an object to store event IDs for each selected training program stage
+        const trainingEventIds: Record<string, string> = {};
+        const dataValues: { [key: string]: string | boolean } = {}; // Use boolean type for checkboxes
         let muacEventId = '';
 
+        // setIsLoadingData(true);
         try {
-            // Fetch all relevant events at once
+            // Check signal before making the request
+            signal.throwIfAborted();
+
+            // Fetch all relevant events at once for the tracked entity instance
             const response = await axios.get(
                 `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/${trackInstanceId}.json`,
                 {
@@ -2402,37 +2000,79 @@ export function OrgUnitTable(props: Props) {
                 }
             );
 
+            // Check signal again after request returns, before processing
+            signal.throwIfAborted();
             const events = response.data.enrollments?.[0]?.events || [];
 
-            // Process each event
+            // Process each event found
             events.forEach((event: any) => {
-                // Check if this is the training event
-                if (event.programStage === programStageMap[trainingFilter]) {
-                    reportDate = event.eventDate;
-                    dueDate = event.dueDate;
-                    eventId = event.event;
-
-                    // Process training data values
-                    event.dataValues?.forEach((dv: any) => {
-                        Object.entries(dataValueMapping).forEach(([accessorKey, label]) => {
-                            const expectedId = dataElementMapping[trainingFilter]?.[trackFilter]?.[label] ||
-                                dataElementMapping[trainingFilter]?.[label];
-                            if (expectedId === dv.dataElement) {
-                                dataValues[label] = dv.value;
-                            }
-                        });
-                    });
-                }
+                // Check if this event corresponds to one of the selected training program stages
+                const isSelectedTrainingEvent = selectedTrainingStageIds.includes(event.programStage);
 
                 // Check if this is the MUAC event
-                if (event.programStage === programStageMap['Muac Assessment']) {
-                    muacEventId = event.event;
+                const isMuacEvent = event.programStage === programStageMap['Muac Assessment'];
+
+                if (isSelectedTrainingEvent) {
+                    // Find the training name corresponding to this event's program stage
+                    const trainingName = Object.keys(programStageMap).find(key => programStageMap[key] === event.programStage);
+
+                    if (trainingName) {
+                        // Use the most recent event date and due date found among the selected training events
+                        if (event.eventDate) {
+                            // Keep the latest date if multiple training events have dates
+                            if (!reportDate || new Date(event.eventDate) > new Date(reportDate)) {
+                                reportDate = event.eventDate;
+                            }
+                        }
+                        if (event.dueDate) {
+                            // Keep the latest due date if multiple training events have due dates
+                            if (!dueDate || new Date(event.dueDate) > new Date(dueDate)) {
+                                dueDate = event.dueDate;
+                            }
+                        }
+
+
+                        trainingEventIds[trainingName] = event.event; // Store the event ID for this specific training
+
+                        // Process data values for this training event
+                        event.dataValues?.forEach((dv: any) => {
+                            if (dv.dataElement === 'FY2ZuB17VW3') {
+                                dataValues['Present'] = dv.value === 'true';
+                            }
+                            Object.entries(dataValueMapping).forEach(([accessorKey, label]) => {
+                                // Find the correct dataElementMapping based on the *current event's training program stage* and track
+                                const trainingSpecificMapping = dataElementMapping[trainingName];
+
+                                if (!trainingSpecificMapping) return; // Skip if no mapping for this training
+
+                                const expectedId = (trackFilter && trainingSpecificMapping[trackFilter]?.[label]) // Check track specific first for Livelihood
+                                    || trainingSpecificMapping[label]; // Then general mapping for other trainings
+
+                                if (expectedId === dv.dataElement) {
+                                    // Prioritize data values from more recent events if multiple events for the same training are found (though typically there should only be one per date/stage)
+                                    // For simplicity here, we'll just let later data values overwrite earlier ones if duplicates exist across events for the same training.
+                                    dataValues[label] = dv.value === 'true' ? true : dv.value === 'false' ? false : dv.value;
+                                }
+                            });
+                        });
+                    }
+                } else if (isMuacEvent) {
+                    // MUAC event processing remains similar
+                    // Use MUAC date/due date only if no training date/due date is found yet
+                    if (!reportDate && event.eventDate) {
+                        reportDate = event.eventDate;
+                    }
+                    if (!dueDate && event.dueDate) {
+                        dueDate = event.dueDate;
+                    }
+                    muacEventId = event.event; // Store MUAC event ID
 
                     // Process MUAC data values
                     event.dataValues?.forEach((dv: any) => {
                         Object.entries(muacDataElementMapping).forEach(([label, deId]) => {
                             if (deId === dv.dataElement) {
-                                dataValues[label] = dv.value;
+                                // Convert 'true'/'false' strings to booleans for checkboxes
+                                dataValues[label] = dv.value === 'true' ? true : dv.value === 'false' ? false : dv.value;
                             }
                         });
                     });
@@ -2445,39 +2085,66 @@ export function OrgUnitTable(props: Props) {
                 b.directPatientID &&
                 b.directPatientID !== ''
             );
-
             if (isIndirect) {
                 const directBeneficiary = props.orgUnitDetails.find(b =>
                     b.patientID === props.orgUnitDetails.find(b => b.trackInstanceId === trackInstanceId)?.directPatientID
                 );
-
                 if (directBeneficiary) {
-                    const directData = fetchedDates[directBeneficiary.trackInstanceId];
+                    // Fetch data for the direct beneficiary specifically to inherit values
+                    // Pass the original selectedTrainingsArray to the recursive call
+                    const directData = await fetchAdditionalData(directBeneficiary.trackInstanceId, selectedTrainingsArray.join(','), trackFilter, signal);
+
+
                     if (directData) {
-                        // Only inherit non-MUAC data
+                        // Only inherit non-MUAC data values
                         Object.entries(directData.dataValues || {}).forEach(([key, value]) => {
-                            if (!['Oedema', 'Muac', 'Muac Classification'].includes(key)) {
-                                dataValues[key] = String(value);
+                            // Only inherit if the indirect beneficiary doesn't already have a value for this data element
+                            // and the data element is not for MUAC
+                            if (!['Oedema', 'Muac', 'Muac Classification'].includes(key) && dataValues[key] === undefined) {
+                                dataValues[key] = value;
                             }
                         });
+                        // Inherit reportDate and dueDate if not present in the indirect's events
+                        if (!reportDate && directData.reportDate) {
+                            reportDate = directData.reportDate;
+                        }
+                        if (!dueDate && directData.dueDate) {
+                            dueDate = directData.dueDate;
+                        }
+
+                        // Inherit training event IDs and data values from the direct beneficiary
+                        Object.entries(directData.events || {}).forEach(([training, eventId]) => {
+                            if (!trainingEventIds[training]) { // Only inherit if the indirect beneficiary doesn't have their own event for this training
+                                trainingEventIds[training] = eventId;
+                            }
+                        });
+
                     }
                 }
             }
-
-
             return {
                 reportDate,
                 dueDate,
-                eventId,
+                eventId: Object.values(trainingEventIds)[0] || muacEventId, // Return one eventId (e.g., the first training one, or MUAC if no training) - this might need refinement depending on how eventId is used downstream if multiple exist
                 muacEventId,
-                dataValues,
+                events: trainingEventIds, // Store event IDs per training program
+                dataValues, // Combined data values from all relevant events
             };
+            // Always return empty data initially
+            // return {
+            //     reportDate: '',
+            //     dueDate: '',
+            //     eventId: '',
+            //     muacEventId: '',
+            //     dataValues: {},
+            //     events: {}
+            // };
         } catch (error) {
+            // setIsLoadingData(false);
             console.error('Error fetching additional data:', error);
-            return { reportDate: '', dueDate: '', eventId: '', muacEventId: '', dataValues: {} };
+            // Ensure default structure is returned even on error
+            return { reportDate: '', dueDate: '', eventId: '', muacEventId: '', dataValues: {}, events: {} };
         }
-
-
     };
 
     const handleFilterChange = async (training) => {
@@ -2486,6 +2153,7 @@ export function OrgUnitTable(props: Props) {
 
         if (training === 'Livelihood') {
             newSelected = ['Livelihood'];
+            // handleRecordClick()
         } else {
             // If Livelihood is already selected, start fresh
             if (selectedTrainings.includes('Livelihood')) {
@@ -2498,9 +2166,7 @@ export function OrgUnitTable(props: Props) {
             }
         }
         setSelectedTrainings(newSelected);
-
         setTrainingFilter(newSelected.join(','));
-
         // Set program stage for compatibility (optional, can be removed if not needed)
         setSelectedProgramStage(newSelected.length === 1 ? newSelected[0] : '');
 
@@ -2537,12 +2203,21 @@ export function OrgUnitTable(props: Props) {
 
         setAdditionalColumns(allCols);
 
+        // 1. Abort any previous/ongoing fetch controlled by the main ref
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort('Training filter changed');
+            console.log("Aborted previous fetch due to filter change.");
+        }
+        // 2. Create a new controller and signal for *this* fetch operation
+        abortControllerRef.current = new AbortController();
+        const { signal } = abortControllerRef.current;
+
         // Fetch additional data for all rows for each selected training
         const allFetchedDates = {};
         for (const filter of newSelected) {
             const updatedFetchedDates = await Promise.all(
                 filteredData.map(async (activity) => {
-                    const additionalData = await fetchAdditionalData(activity.trackInstanceId, filter, trackFilter);
+                    const additionalData = await fetchAdditionalData(activity.trackInstanceId, filter, trackFilter, signal);
                     return {
                         trackInstanceId: activity.trackInstanceId,
                         reportDate: additionalData.reportDate,
@@ -2568,7 +2243,6 @@ export function OrgUnitTable(props: Props) {
         }
         setFetchedDates(allFetchedDates);
     };
-
     // Muac Classification
     const computeMuacClassification = (muac: string, stage: string): string => {
         const muacValue = parseFloat(muac);
@@ -2589,33 +2263,60 @@ export function OrgUnitTable(props: Props) {
         return '';
     };
 
-    const handleMuacChange = (trackInstanceId: string, muacValue: string, classification: string) => {
-        setFetchedDates(prev => ({
+    const handleEditInputChange = (
+        trackInstanceId: string,
+        accessor: string,
+        value: string | boolean
+    ) => {
+        // if (!hasValidDate[trackInstanceId]) {
+        //     setMessage('Please set Date of Training first');
+        //     setIsError(true);
+        //     return;
+        // }
+        setEditInputValues(prev => ({
             ...prev,
             [trackInstanceId]: {
-                ...prev[trackInstanceId],
-                dataValues: {
-                    ...prev[trackInstanceId]?.dataValues,
-                    [dataValueMapping['muac_num']]: muacValue,
-                    [dataValueMapping['muacClassification']]: classification,
-                }
+                ...(prev[trackInstanceId] || {}), // Keep other values for this row
+                [accessor]: value // Update the specific field
             }
         }));
 
-        // Immediately save to backend if we have a valid date
-        if (hasValidDate[trackInstanceId]) {
-            sendDataValueUpdate(
-                trackInstanceId,
-                dataValueMapping['muac_num'],
-                muacValue,
-                'Muac Assessment'
-            );
-            sendDataValueUpdate(
-                trackInstanceId,
-                dataValueMapping['muacClassification'],
-                classification,
-                'Muac Assessment'
-            );
+        const colMeta = additionalColumns.find(col => dataValueMapping[col.accessor] === accessor);
+        const training = colMeta?.training || selectedTrainings[0];
+
+        // Send immediately for checkboxes
+        if (typeof value === 'boolean') {
+            sendDataValueUpdate(trackInstanceId, accessor, value, colMeta.training);
+        }
+
+    };
+    // You might need a specific handler for MUAC if it needs linked updates (like classification)
+    const handleEditMuacChange = (trackInstanceId: string, muacValue: string, classification: string) => {
+        setEditInputValues(prev => ({
+            ...prev,
+            [trackInstanceId]: {
+                ...(prev[trackInstanceId] || {}),
+                [dataValueMapping['muac_num']]: muacValue,
+                [dataValueMapping['muacClassification_text']]: classification,
+            }
+        }));
+    };
+
+    // Add this at the top of your file with other utility functions
+    const formatDateToDDMMYY = (dateString: string): string => {
+        if (!dateString) return '';
+
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString; // Return original if invalid
+
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+
+            return `${day}/${month}/${year}`;
+        } catch {
+            return dateString; // Return original if parsing fails
         }
     };
 
@@ -2633,12 +2334,17 @@ export function OrgUnitTable(props: Props) {
 
         return filteredData.map((activity, index) => {
             const fetchedData: FetchedData =
-                fetchedDates[activity.trackInstanceId] || {
+                fetchedDates[activity.trackInstanceId] ||
+                {
                     reportDate: '',
                     dueDate: '',
                     eventId: '',
-                    dataValues: {}
+                    muacEventId: '',
+                    dataValues: {},
+                    events: {}
                 };
+            // Determine if this is a new entry
+            const isNew = isNewEntry[activity.trackInstanceId] || false;
 
             return (
                 <tr
@@ -2653,9 +2359,14 @@ export function OrgUnitTable(props: Props) {
                     {/* 1 Original columns */}
                     {columnsVis
                         .filter(c => c.visible)
-                        .map(c => (
-                            <td key={c.accessor}>{(activity as any)[c.accessor]}</td>
-                        ))}
+                        .map(c => {
+                            const value = (activity as any)[c.accessor];
+                            // Format date columns
+                            if (c.accessor === 'recordDate' || c.accessor === 'dob') {
+                                return <td key={c.accessor}>{formatDateToDDMMYY(value)}</td>;
+                            }
+                            return <td key={c.accessor}>{value}</td>;
+                        })}
 
                     {/* 2 Additional columns */}
                     {additionalColumns.filter(col => topicsVis[col.accessor]).map(col => {
@@ -2685,10 +2396,13 @@ export function OrgUnitTable(props: Props) {
                                     col.accessor === 'reportDate' ? (
                                         <input
                                             type="date"
-                                            value={fetchedData.reportDate.split('T')[0] || ''}
+                                            // value={fetchedData.reportDate.split('T')[0] || ''}
+                                            // value={String(fetchedData.dataValues[dataValueMapping[col.accessor]] || '')}
+                                            value={String(editInputValues[activity.trackInstanceId]?.reportDate || '')}
                                             onChange={e =>
-                                                handleDateChangeForFetchedDates(
+                                                handleEditInputChange(
                                                     activity.trackInstanceId,
+                                                    'reportDate',
                                                     e.target.value
                                                 )
                                             }
@@ -2698,20 +2412,19 @@ export function OrgUnitTable(props: Props) {
                                             onBlur={e =>
                                                 handleReportDateSubmit(e, activity.trackInstanceId)
                                             }
+                                            title="Select the date and click outside the input field to save."
                                         />
                                     ) : isCheckbox ? (
                                         <input
                                             type="checkbox"
                                             disabled={!hasValidDate[activity.trackInstanceId]}
                                             className="form-check-input"
-                                            checked={
-                                                fetchedData.dataValues[dataValueMapping[col.accessor]] ===
-                                                true ||
-                                                fetchedData.dataValues[dataValueMapping[col.accessor]] ===
-                                                'true'
-                                            }
+                                            // checked={fetchedData.dataValues[dataValueMapping[col.accessor]] === true ||
+                                            //     fetchedData.dataValues[dataValueMapping[col.accessor]] === 'true'}
+                                            // checked={editInputValues[activity.trackInstanceId]?.[col.accessor] === true}
+                                            checked={!!editInputValues[activity.trackInstanceId]?.[dataValueMapping[col.accessor]]}
                                             onChange={e =>
-                                                handleDataValueChange(
+                                                handleEditInputChange(
                                                     activity.trackInstanceId,
                                                     dataValueMapping[col.accessor],
                                                     e.target.checked
@@ -2726,13 +2439,10 @@ export function OrgUnitTable(props: Props) {
                                                 return (
                                                     <select
                                                         className="form-select"
-                                                        value={String(
-                                                            fetchedData.dataValues[
-                                                            dataValueMapping[col.accessor]
-                                                            ] || ''
-                                                        )}
+                                                        // value={String(fetchedData.dataValues[dataValueMapping[col.accessor]] || '')}
+                                                        value={String(editInputValues[activity.trackInstanceId]?.[col.accessor] || '')}
                                                         onChange={e =>
-                                                            handleDataValueChange(
+                                                            handleEditInputChange(
                                                                 activity.trackInstanceId,
                                                                 dataValueMapping[col.accessor],
                                                                 e.target.value
@@ -2761,13 +2471,10 @@ export function OrgUnitTable(props: Props) {
                                                 return (
                                                     <select
                                                         className="form-select"
-                                                        value={String(
-                                                            fetchedData.dataValues[
-                                                            dataValueMapping[col.accessor]
-                                                            ] || ''
-                                                        )}
+                                                        // value={String(fetchedData.dataValues[dataValueMapping[col.accessor]] || '')}
+                                                        value={String(editInputValues[activity.trackInstanceId]?.[col.accessor] || '')}
                                                         onChange={e =>
-                                                            handleDataValueChange(
+                                                            handleEditInputChange(
                                                                 activity.trackInstanceId,
                                                                 dataValueMapping[col.accessor],
                                                                 e.target.value
@@ -2797,11 +2504,8 @@ export function OrgUnitTable(props: Props) {
                                                 return (
                                                     <input
                                                         type="number"
-                                                        value={Number(
-                                                            fetchedData.dataValues[
-                                                            dataValueMapping[col.accessor]
-                                                            ] || ''
-                                                        )}
+                                                        // value={String(fetchedData.dataValues[dataValueMapping[col.accessor]] || '')}
+                                                        value={String(editInputValues[activity.trackInstanceId]?.[col.accessor] || '')}
                                                         onKeyDown={e => {
                                                             if (e.key === 'Enter') {
                                                                 const training = col.training || selectedTrainings[0];
@@ -2814,7 +2518,7 @@ export function OrgUnitTable(props: Props) {
                                                             }
                                                         }}
                                                         onChange={e =>
-                                                            handleDataValueChange(
+                                                            handleEditInputChange(
                                                                 activity.trackInstanceId,
                                                                 dataValueMapping[col.accessor],
                                                                 e.target.value
@@ -2834,7 +2538,9 @@ export function OrgUnitTable(props: Props) {
                                                         inputMode="numeric"
                                                         pattern="[0-9]*"
                                                         className="form-input"
-                                                        value={String(fetchedData.dataValues[dataValueMapping[col.accessor]] || '')}
+                                                        // value={String(fetchedData.dataValues[dataValueMapping[col.accessor]] || '')}
+                                                        // value={String(editInputValues[activity.trackInstanceId]?.[col.accessor] || '')}
+                                                        value={String(editInputValues[activity.trackInstanceId]?.[dataValueMapping['muac_num']] || '')}
                                                         onChange={(e) => {
                                                             // strip out anything that isn’t a digit
                                                             const onlyDigits = e.target.value.replace(/\D/g, '');
@@ -2844,7 +2550,7 @@ export function OrgUnitTable(props: Props) {
                                                             );
 
                                                             // Update both muac_num and muacClassification in memory
-                                                            handleMuacChange(
+                                                            handleEditMuacChange(
                                                                 activity.trackInstanceId,
                                                                 onlyDigits,
                                                                 classification
@@ -2870,7 +2576,8 @@ export function OrgUnitTable(props: Props) {
                                                                 sendDataValueUpdate(
                                                                     activity.trackInstanceId,
                                                                     dataValueMapping[col.accessor],
-                                                                    fetchedData.dataValues[dataValueMapping[col.accessor]],
+                                                                    // fetchedData.dataValues[dataValueMapping[col.accessor]],
+                                                                    editInputValues[activity.trackInstanceId]?.[dataValueMapping['muac_num']],
                                                                     training
                                                                 );
 
@@ -2885,6 +2592,7 @@ export function OrgUnitTable(props: Props) {
                                                             }
                                                         }}
                                                         placeholder="Enter MUAC"
+                                                        title="Press Enter to save the MUAC value"
                                                     />
                                                 );
                                             }
@@ -2892,11 +2600,8 @@ export function OrgUnitTable(props: Props) {
                                             return (
                                                 <input
                                                     type="text"
-                                                    value={String(
-                                                        fetchedData.dataValues[
-                                                        dataValueMapping[col.accessor]
-                                                        ] || ''
-                                                    )}
+                                                    // value={String(fetchedData.dataValues[dataValueMapping[col.accessor]] || '')}
+                                                    value={String(editInputValues[activity.trackInstanceId]?.[col.accessor] || '')}
                                                     onKeyDown={e => {
                                                         if (e.key === 'Enter') {
                                                             const training = col.training || selectedTrainings[0];
@@ -2909,35 +2614,20 @@ export function OrgUnitTable(props: Props) {
                                                         }
                                                     }}
                                                     onChange={e =>
-                                                        handleDataValueChange(
+                                                        handleEditInputChange(
                                                             activity.trackInstanceId,
                                                             dataValueMapping[col.accessor],
                                                             e.target.value
                                                         )
                                                     }
+                                                    title="Press Enter to save the MUAC value"
                                                 />
                                             );
                                         })()
                                     )
                                 ) : (
-                                    // 3 static display when not editing
-                                    col.accessor === 'reportDate' ? (
-                                        fetchedData.reportDate.split('T')[0] || 'N/A'
-                                    ) : col.accessor === 'dueDate' ? (
-                                        fetchedData.dueDate.split('T')[0] || 'N/A'
-                                    ) : col.accessor in dataValueMapping ? (
-                                        // Special case for MUAC value display
-                                        dataValueMapping[col.accessor] === 'Muac' ? (
-                                            fetchedData.dataValues['Muac'] || '—'
-                                        ) : (
-                                            // Default checkmark display for other fields
-                                            renderCheckCell(
-                                                Boolean(fetchedData.dataValues[dataValueMapping[col.accessor]])
-                                            )
-                                        )
-                                    ) : (
-                                        (activity as any)[col.accessor] || ''
-                                    )
+                                    (activity as any)[col.accessor] || ''
+
                                 )}
                             </td>
                         );
@@ -2950,7 +2640,6 @@ export function OrgUnitTable(props: Props) {
     const renderIndirectRows = () => {
         // const inheritedCols = additionalColumns.filter(c => c.accessor !== 'addEditEvent' && topicsVis[c.accessor]);
         const inheritedCols = additionalColumns.filter(c => topicsVis[c.accessor] && c.accessor !== 'addEditEvent');
-
         if (!indirectBeneficiaries.length) {
             return (
                 <tr>
@@ -2967,280 +2656,321 @@ export function OrgUnitTable(props: Props) {
                 </tr>
             );
         }
-
         // grab the parent’s fetched record so we can inherit its dates & dataValues
         const parentId = selectedBeneficiary?.trackInstanceId!;
-        const parentData = fetchedDates[parentId] || {
+        const parentData = editInputValues[parentId] || {
             reportDate: '',
-            dueDate: '',
-            eventId: '',
             dataValues: {}
-        };
+        }
 
-        return indirectBeneficiaries.map(ben => (
-            <tr key={ben.trackInstanceId}>
-                {/* Present/Absent checkbox */}
-                <td>
-                    <input
-                        type="checkbox"
-                        // checked={!!indirectPresent[ben.trackInstanceId]}
-                        checked={Boolean(fetchedDates[ben.trackInstanceId]?.eventId)} // derive check status from backend
-                        onChange={e =>
-                            handleIndirectPresentChange(
-                                ben.trackInstanceId,
-                                e.target.checked
-                            )
-                        }
-                    />
-                </td>
+        return (
+            <>
+                {indirectBeneficiaries.map(ben => {
+                    const benTrackInstanceId = ben.trackInstanceId; // Or however you get the current row's ID
+                    const currentRowData = editInputValues[benTrackInstanceId];
+                    const isNew = isNewEntry[ben.trackInstanceId] || false;
+                    const isPresent = editInputValues[ben.trackInstanceId]?.[dataValueMapping['Present']] === true ||
+                        editInputValues[ben.trackInstanceId]?.[dataValueMapping['Present']] === 'true';
+                    const rowClass = !(editInputValues[ben.trackInstanceId]?.dataValues?.['Present'] === true) ? 'unchecked-record' : '';
 
-                {/* 1 Original columns */}
-                {columnsVis
-                    .filter(c => c.visible)
-                    .map(c => (
-                        <td key={c.accessor}>{(ben as any)[c.accessor]}</td>
-                    ))}
-
-                {/* 2 Additional columns (read‑only, inherited) */}
-
-                {inheritedCols.map(col => {
-                    const isAction = col.accessor === 'addEditEvent';
-                    const isCheckbox = col.accessor.includes('checkBox');
-                    const isMuacColumn = col.accessor === 'muac_num' || col.accessor === 'oedema_checkBox';
-                    const cellClass = isAction
-                        ? 'actions-cell'
-                        : col.className
-                            ? col.className
-                            : isCheckbox
-                                ? 'numeric-cell'
-                                : '';
-                    const style: React.CSSProperties = col.minWidth
-                        ? { minWidth: col.minWidth }
-                        : {};
-
-                    // Only allow editing for MUAC columns
-                    const inEdit = editableRows[ben.trackInstanceId] && isMuacColumn;
+                    const muacValue = editInputValues[benTrackInstanceId]?.[dataValueMapping['muac_num']];
+                    const oedemaValue = editInputValues[benTrackInstanceId]?.[dataValueMapping['oedema_checkBox']];
 
                     return (
-                        <td key={col.accessor} className={cellClass} style={style}>
-                            {isAction ? (
-                                <div className="button-container">
-                                    {editableRows[ben.trackInstanceId] ? (
-                                        <>
-                                            <button
-                                                className="save-button btn"
-                                                style={{ backgroundColor: 'green' }}
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    handleSave(
-                                                        ben.trackInstanceId,
-                                                        fetchedDates[ben.trackInstanceId]?.eventId
-                                                    );
-                                                }}
-                                            >
-                                                Save
-                                            </button>
-                                            <button
-                                                className="cancel-button btn"
-                                                style={{ backgroundColor: 'red' }}
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    handleCancel(ben.trackInstanceId);
-                                                }}
-                                            >
-                                                Cancel
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                className="add-button btn"
-                                                style={{ backgroundColor: 'grey' }}
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    handleAdd(ben.trackInstanceId);
-                                                }}
-                                            >
-                                                Add
-                                            </button>
-                                            <button
-                                                className="edit-button btn"
-                                                style={{ backgroundColor: 'orange' }}
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    handleEdit(ben.trackInstanceId);
-                                                }}
-                                            >
-                                                Edit
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            ) : inEdit ? (
-                                // Editing mode - only for MUAC columns
-                                col.accessor === 'muac_num' ? (
-                                    <input
-                                        type="text"
-                                        inputMode="numeric"
-                                        pattern="[0-9]*"
-                                        className="form-input"
-                                        value={String(fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] || '')}
-                                        onChange={(e) => {
-                                            const onlyDigits = e.target.value.replace(/\D/g, '');
-                                            const classification = computeMuacClassification(
-                                                onlyDigits,
-                                                ben.beneficiaryStage
-                                            );
-                                            handleMuacChange(
-                                                ben.trackInstanceId,
-                                                onlyDigits,
-                                                classification
-                                            );
-                                        }}
-                                        onKeyDown={(e) => {
-                                            if (
-                                                !/[0-9]/.test(e.key) &&
-                                                e.key !== 'Backspace' &&
-                                                e.key !== 'Delete' &&
-                                                e.key !== 'ArrowLeft' &&
-                                                e.key !== 'ArrowRight' &&
-                                                e.key !== 'Tab' &&
-                                                e.key !== 'Enter'
-                                            ) {
-                                                e.preventDefault();
-                                            }
+                        <tr
+                            key={ben.trackInstanceId}
+                            className={rowClass}
+                            // style={!isPresent ? { position: 'relative' } : {}}
+                            style={{
+                                ...(!isPresent ? { position: 'relative' } : {}),
+                                ...(isPresent && (!muacValue || !oedemaValue) ? {
+                                    boxShadow: '0 0 0 2px red inset',
+                                    animation: 'pulse 2s infinite'
+                                } : {})
+                            }}
+                        >
+                            {/* Present/Absent checkbox */}
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    checked={editInputValues[ben.trackInstanceId]?.dataValues?.['Present'] === true}
+                                    onChange={e =>
+                                        handleIndirectPresentChange(
+                                            ben.trackInstanceId,
+                                            e.target.checked
+                                        )
+                                    }
+                                />
+                            </td>
 
-                                            if (e.key === 'Enter') {
-                                                const training = col.training || selectedTrainings[0];
-                                                sendDataValueUpdate(
-                                                    ben.trackInstanceId,
-                                                    dataValueMapping[col.accessor],
-                                                    fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]],
-                                                    training
-                                                );
-                                                sendDataValueUpdate(
-                                                    ben.trackInstanceId,
-                                                    dataValueMapping['muacClassification'],
-                                                    fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping['muacClassification']],
-                                                    training
-                                                );
-                                            }
-                                        }}
-                                        placeholder="Enter MUAC"
-                                    />
-                                ) : col.accessor === 'oedema_checkBox' ? (
-                                    <input
-                                        type="checkbox"
-                                        checked={
-                                            fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] === true ||
-                                            fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] === 'true'
-                                        }
-                                        onChange={e =>
-                                            handleDataValueChange(
-                                                ben.trackInstanceId,
-                                                dataValueMapping[col.accessor],
-                                                e.target.checked
-                                            )
-                                        }
-                                    />
-                                ) : null
-                            ) :
-                                // Static display when NOT editing
-                                (
+                            {/* 1 Original columns */}
 
-                                    (() => {
-                                        if (col.accessor === 'reportDate') {
-                                            return parentData.reportDate?.split('T')[0] || '—';
-                                        } else if (col.accessor === 'dueDate') {
-                                            return parentData.dueDate?.split('T')[0] || '—';
-                                        } else if (col.accessor in dataValueMapping) {
-                                            if (col.accessor === 'muac_num') {
-                                                return (
-                                                    <input
-                                                        type="text"
-                                                        inputMode="numeric"
-                                                        pattern="[0-9]*"
-                                                        className="form-input"
-                                                        value={String(fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] || '')}
-                                                        onChange={(e) => {
-                                                            const onlyDigits = e.target.value.replace(/\D/g, '');
-                                                            const classification = computeMuacClassification(
-                                                                onlyDigits,
-                                                                ben.beneficiaryStage
-                                                            );
-                                                            handleMuacChange(
-                                                                ben.trackInstanceId,
-                                                                onlyDigits,
-                                                                classification
-                                                            );
-                                                        }}
-                                                        onKeyDown={(e) => {
-                                                            if (
-                                                                !/[0-9]/.test(e.key) &&
-                                                                e.key !== 'Backspace' &&
-                                                                e.key !== 'Delete' &&
-                                                                e.key !== 'ArrowLeft' &&
-                                                                e.key !== 'ArrowRight' &&
-                                                                e.key !== 'Tab' &&
-                                                                e.key !== 'Enter'
-                                                            ) {
-                                                                e.preventDefault();
-                                                            }
+                            {columnsVis.filter(c => c.visible).map(c => {
+                                const value = (ben as any)[c.accessor];
+                                // Format date columns
+                                if (c.accessor === 'recordDate' || c.accessor === 'dob') {
+                                    return <td key={c.accessor}>{formatDateToDDMMYY(value)}</td>;
+                                }
+                                return <td key={c.accessor}>{value}</td>;
+                            })}
 
-                                                            if (e.key === 'Enter') {
-                                                                const training = col.training || selectedTrainings[0];
-                                                                sendDataValueUpdate(
-                                                                    ben.trackInstanceId,
-                                                                    dataValueMapping[col.accessor],
-                                                                    fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]],
-                                                                    training
-                                                                );
-                                                                sendDataValueUpdate(
-                                                                    ben.trackInstanceId,
-                                                                    dataValueMapping['muacClassification'],
-                                                                    fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping['muacClassification']],
-                                                                    training
-                                                                );
-                                                            }
-                                                        }}
-                                                        placeholder="Enter MUAC"
-                                                    />
-                                                );
-                                            } else if (col.accessor === 'oedema_checkBox') {
-                                                return (
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={
-                                                            fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] === true ||
-                                                            fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]] === 'true'
+                            {/* 2 Additional columns (read‑only, inherited) */}
+
+                            {inheritedCols.map(col => {
+                                const isMuacColumn = col.accessor === 'muac_num' || col.accessor === 'oedema_checkBox';
+                                // Safely get values using both possible paths
+                                // const muacValue = editInputValues[benTrackInstanceId]?.dataValues?.['Muac'];                             
+                                // const oedemaValue = editInputValues[benTrackInstanceId]?.dataValues?.['Oedema'];
+                                const isMuacIncomplete = isPresent && (
+                                    muacValue === undefined ||
+                                    muacValue === null ||
+                                    String(muacValue).trim() === '' ||
+                                    oedemaValue === undefined ||
+                                    oedemaValue === null
+                                );
+                                const cellClass = isMuacColumn && isMuacIncomplete
+                                    ? 'muac-column-incomplete'
+                                    : '';
+                                const style: React.CSSProperties = col.minWidth ? { minWidth: col.minWidth } : {};
+
+                                // Only allow editing for MUAC columns
+                                const inEdit = editableRows[ben.trackInstanceId] && isMuacColumn;
+                                return (
+                                    <td
+                                        key={col.accessor}
+                                        className={cellClass}
+                                        style={style}
+                                        title={isMuacColumn && isPresent && !isMuacIncomplete ?
+                                            "Please fill both Oedema and Muac fields" : undefined}
+                                    >
+                                        {inEdit ? (
+                                            // Editing mode - only for MUAC columns
+                                            col.accessor === 'muac_num' ? (
+                                                <input
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    pattern="[0-9]*"
+                                                    className="form-input"
+                                                    value={String(editInputValues[ben.trackInstanceId]?.[dataValueMapping['muac_num']] || '')}
+                                                    onChange={(e) => {
+                                                        // strip out anything that isn’t a digit
+                                                        const onlyDigits = e.target.value.replace(/\D/g, '');
+                                                        const classification = computeMuacClassification(
+                                                            onlyDigits,
+                                                            ben.beneficiaryStage
+                                                        );
+                                                        // Update both muac_num and muacClassification in memory
+                                                        handleEditMuacChange(
+                                                            ben.trackInstanceId,
+                                                            onlyDigits,
+                                                            classification
+                                                        );
+                                                        // setMuacClass(classification);
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        // allow only digits, Backspace, Delete, arrows, Tab
+                                                        if (
+                                                            !/[0-9]/.test(e.key) &&
+                                                            e.key !== 'Backspace' &&
+                                                            e.key !== 'Delete' &&
+                                                            e.key !== 'ArrowLeft' &&
+                                                            e.key !== 'ArrowRight' &&
+                                                            e.key !== 'Tab' &&
+                                                            e.key !== 'Enter'
+                                                        ) {
+                                                            e.preventDefault();
                                                         }
-                                                        onChange={e =>
-                                                            handleDataValueChange(
+
+                                                        if (e.key === 'Enter') {
+                                                            const training = col.training || selectedTrainings[0];
+                                                            sendDataValueUpdate(
                                                                 ben.trackInstanceId,
                                                                 dataValueMapping[col.accessor],
-                                                                e.target.checked
-                                                            )
+                                                                // fetchedData.dataValues[dataValueMapping[col.accessor]],
+                                                                editInputValues[ben.trackInstanceId]?.[dataValueMapping['muac_num']],
+                                                                training
+                                                            );
+                                                            // Save Classification
+                                                            sendDataValueUpdate(
+                                                                ben.trackInstanceId,
+                                                                dataValueMapping['muacClassification'],
+                                                                editInputValues[ben.trackInstanceId]?.[dataValueMapping['muac_num']],
+                                                                training
+                                                            );
+
                                                         }
-                                                    />
-                                                );
-                                            } else {
-                                                // For other fields, just show a checkmark ✔️ or blank
-                                                const raw = fetchedDates[ben.trackInstanceId]?.dataValues[dataValueMapping[col.accessor]];
-                                                return renderCheckCell(raw === true || raw === 'true');
-                                            }
+                                                    }}
+                                                    placeholder="Enter MUAC"
+
+                                                />
+                                            ) : col.accessor === 'oedema_checkBox' ? (
+                                                // Replace the oedema checkbox rendering with:
+                                                <input
+                                                    type="checkbox"
+                                                    // className="form-input"
+                                                    checked={!!editInputValues[ben.trackInstanceId]?.[dataValueMapping[col.accessor]]}
+                                                    onChange={e => {
+                                                        const hasDate = editInputValues[parentId]?.reportDate
+                                                        console.log(`hasDate: ${hasDate}`);
+                                                        handleEditInputChange(
+                                                            ben.trackInstanceId,
+                                                            'Oedema',
+                                                            e.target.checked
+                                                        );
+
+                                                        sendDataValueUpdate(
+                                                            ben.trackInstanceId,
+                                                            'Oedema',
+                                                            e.target.checked,
+                                                            'Muac Assessment'
+                                                        );
+                                                    }}
+
+
+                                                />
+                                            ) : null
+                                        ) :
+                                            // Static display when NOT editing
+                                            (
+                                                (() => {
+                                                    const parentId = selectedBeneficiary?.trackInstanceId!;
+                                                    if (col.accessor === 'reportDate') {
+                                                        return parentData.reportDate || '';
+                                                        //fetchedDates[parentId]?.reportDate?.split('T')[0] || '';
+                                                    } else if (col.accessor in dataValueMapping) {
+                                                        if (col.accessor === 'muac_num') {
+                                                            return (
+                                                                <input
+                                                                    type="text"
+                                                                    inputMode="numeric"
+                                                                    pattern="[0-9]*"
+                                                                    className="form-input"
+                                                                    // value={String(fetchedData.dataValues[dataValueMapping[col.accessor]] || '')}
+                                                                    // value={String(editInputValues[activity.trackInstanceId]?.[col.accessor] || '')}
+                                                                    value={String(editInputValues[ben.trackInstanceId]?.[dataValueMapping['muac_num']] || '')}
+                                                                    onChange={(e) => {
+                                                                        // strip out anything that isn’t a digit
+                                                                        const onlyDigits = e.target.value.replace(/\D/g, '');
+                                                                        const classification = computeMuacClassification(
+                                                                            onlyDigits,
+                                                                            ben.beneficiaryStage
+                                                                        );
+                                                                        // Update both muac_num and muacClassification in memory
+                                                                        handleEditMuacChange(
+                                                                            ben.trackInstanceId,
+                                                                            onlyDigits,
+                                                                            classification
+                                                                        );
+                                                                        // setMuacClass(classification);
+                                                                    }}
+                                                                    onKeyDown={(e) => {
+                                                                        // allow only digits, Backspace, Delete, arrows, Tab
+                                                                        if (
+                                                                            !/[0-9]/.test(e.key) &&
+                                                                            e.key !== 'Backspace' &&
+                                                                            e.key !== 'Delete' &&
+                                                                            e.key !== 'ArrowLeft' &&
+                                                                            e.key !== 'ArrowRight' &&
+                                                                            e.key !== 'Tab' &&
+                                                                            e.key !== 'Enter'
+                                                                        ) {
+                                                                            e.preventDefault();
+                                                                        }
+
+                                                                        if (e.key === 'Enter') {
+                                                                            const training = col.training || selectedTrainings[0];
+                                                                            sendDataValueUpdate(
+                                                                                ben.trackInstanceId,
+                                                                                dataValueMapping[col.accessor],
+                                                                                // fetchedData.dataValues[dataValueMapping[col.accessor]],
+                                                                                editInputValues[ben.trackInstanceId]?.[dataValueMapping['muac_num']],
+                                                                                training
+                                                                            );
+                                                                            // Save Classification
+                                                                            sendDataValueUpdate(
+                                                                                ben.trackInstanceId,
+                                                                                dataValueMapping['muacClassification'],
+                                                                                editInputValues[ben.trackInstanceId]?.[dataValueMapping['muac_num']],
+                                                                                training
+                                                                            );
+
+                                                                        }
+
+                                                                    }}
+                                                                    placeholder="Enter MUAC"
+                                                                    style={{
+                                                                        ...style,
+                                                                        opacity: !(editInputValues[ben.trackInstanceId]?.dataValues?.['Present'] === true) ? 0.5 : 1,
+                                                                        pointerEvents: !(editInputValues[ben.trackInstanceId]?.dataValues?.['Present'] === true) ? 'none' : 'auto'
+                                                                    }}
+                                                                    title="Press Enter to save the MUAC value"
+
+                                                                />
+                                                            );
+                                                        } else if (col.accessor === 'oedema_checkBox') {
+                                                            return (
+                                                                <input
+                                                                    type="checkbox"
+                                                                    // className="form-input"
+                                                                    checked={!!editInputValues[ben.trackInstanceId]?.[dataValueMapping[col.accessor]]}
+                                                                    onChange={e => {
+                                                                        handleEditInputChange(
+                                                                            ben.trackInstanceId,
+                                                                            dataValueMapping[col.accessor],
+                                                                            e.target.checked
+                                                                        );
+                                                                    }}
+
+                                                                    style={{
+                                                                        // ...style,
+                                                                        opacity: !(editInputValues[ben.trackInstanceId]?.dataValues?.['Present'] === true) ? 0.5 : 1,
+                                                                        pointerEvents: !(editInputValues[ben.trackInstanceId]?.dataValues?.['Present'] === true) ? 'none' : 'auto'
+                                                                    }}
+
+                                                                />
+                                                            );
+                                                        } else {
+                                                            // First check if present
+                                                            const isPresent = editInputValues[ben.trackInstanceId]?.dataValues?.['Present'] === true ||
+                                                                editInputValues[ben.trackInstanceId]?.dataValues?.['Present'] === 'true';
+
+                                                            if (!isPresent) {
+                                                                return '—'; // Show dash if not present
+                                                            }
+
+                                                            // Check if this indirect beneficiary has their own value
+                                                            const ownValue = editInputValues[ben.trackInstanceId]?.dataValues?.[dataValueMapping[col.accessor]];
+
+                                                            // If no own value, inherit from parent (but only for non-MUAC columns)
+                                                            const valueToDisplay = ownValue !== undefined ? ownValue :
+                                                                (!['Oedema', 'Muac', 'Muac Classification'].includes(dataValueMapping[col.accessor]))
+                                                                    ? parentData.dataValues?.[dataValueMapping[col.accessor]]
+                                                                    : undefined;
+
+                                                            // Render appropriately
+                                                            if (valueToDisplay === undefined) {
+                                                                return '—';
+                                                            }
+                                                            if (typeof valueToDisplay === 'boolean') {
+                                                                return renderCheckCell(valueToDisplay);
+                                                            }
+                                                            return valueToDisplay || '—';
+                                                        }
+                                                    }
+                                                    return '—';
+                                                })()
+
+                                            )
                                         }
-                                        return '—';
-                                    })()
+                                    </td>
+                                );
+                            })}
 
-                                )
+                        </tr>)
 
-                            }
-                        </td>
-                    );
                 })}
-
-            </tr>
-        ));
+            </>
+        )
     };
 
     const handleColumnToggle = (topic) => {
@@ -3250,62 +2980,8 @@ export function OrgUnitTable(props: Props) {
         }));
     };
 
-    const handleProgramStageChange = async (newFilter: ProgramStage) => {
-        setSelectedProgramStage(newFilter);
-        setTrainingFilter(newFilter);
-
-        if (!newFilter) {
-            setFilteredData(props.orgUnitDetails);
-            return;
-        }
-
-        try {
-            // Fetch data for the selected program stage
-            const programStageId = PROGRAM_STAGE_MAPPING[newFilter];
-            const fetchedData = await fetchProgramStageData(programStageId);
-
-            // Update columns based on the selected program stage
-            setAdditionalColumns(getAdditionalColumns(newFilter));
-
-            // Filter and merge data
-            const mergedData = mergeProgramStageData(props.orgUnitDetails, fetchedData);
-            setFilteredData(mergedData);
-
-        } catch (error) {
-            console.error('Error fetching program stage data:', error);
-        }
-    };
-
-    // New function to fetch program stage specific data
-    const fetchProgramStageData = async (programStageId: string) => {
-        try {
-            const response = await fetch(
-                `${process.env.REACT_APP_DHIS2_BASE_URL}api/trackedEntityInstances/pending?programStage=${programStageId}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // 'Authorization': `Basic ${credentials}`,
-                    },
-                }
-            );
-            const data = await response.json();
-            return data.events || [];
-        } catch (error) {
-            console.error('Error fetching program stage data:', error);
-            return [];
-        }
-    };
-
-    // New function to merge program stage data with org unit details
-    const mergeProgramStageData = (orgUnitDetails: any[], programStageData: any[]) => {
-        return orgUnitDetails.filter(detail => {
-            return programStageData.some(event =>
-                event.trackedEntityInstance === detail.trackInstanceId
-            );
-        });
-    };
-
     const handleShowAllRecords = () => {
+        setLockSelection(false);
         setSelectedRecordOnly(false); // Stop filtering to one record
         setSelectedBeneficiary(null); // Clear the selected beneficiary
         setEditableRows({});          // Ensure no rows are in edit mode
@@ -3314,71 +2990,40 @@ export function OrgUnitTable(props: Props) {
         // setIndirectBeneficiaries([]);
     };
 
-    // Function to handle clicking a record row
     const handleRecordClick = async (activity: OrgUnitDetails) => {
-        // REQUIREMENT 1: Check if track filter is selected
-        if (!trackFilter) {
-            setMessage('Please select a tracker (Farmer or Fisher) before selecting beneficiary.');
-            setIsError(true);
-            return; // Stop execution if no track is selected
-        }
-
+        // Lock selection to prevent interference
+        setLockSelection(true);
 
         const trackInstId = activity.trackInstanceId;
         const isCurrentlySelected = selectedBeneficiary?.trackInstanceId === trackInstId;
-        const isCurrentlyEditable = editableRows[trackInstId];
+
+        // Track filter logic
+        if (activity.track === 'Fisher' || activity.track === 'Farmer') {
+            setTrackFilter(activity.track);
+            setNewRowData((prevData) => ({ ...prevData, track: activity.track }));
+            setNewIndirectData((prevData) => ({ ...prevData, track: activity.track }));
+        }
 
         if (!isCurrentlySelected) {
-            // --- Scenario 1: Clicking a NEW row ---
-            // Select it, show only this row, make sure it's NOT editable yet.
+            setIsNewEntry(prev => ({ ...prev, [trackInstId]: true }));
+
+            setEditInputValues(prev => ({
+                ...prev,
+                [trackInstId]: {} // Initialize as empty object for this row
+            }));
+
             setSelectedBeneficiary(activity);
             setSelectedRecordOnly(true);
-            setEditableRows({}); // Clear any previously editable row
-            setBeneficiarySearch(activity.patientID); // Highlight/filter
+            setFilteredData([activity]);
+            setEditableRows({ [trackInstId]: true });
+            setBeneficiarySearch(activity.patientID);
 
-            // Fetch data now, as we need it whether it becomes editable or just for display
-            setMessage('Fetching data...');
-            setIsError(false);
-            try {
-                const currentTrainingsString = selectedTrainings.join(',');
-                const additionalData = await fetchAdditionalData(
-                    trackInstId,
-                    currentTrainingsString,
-                    trackFilter
-                );
-                setFetchedDates((prev) => ({
-                    ...prev,
-                    [trackInstId]: additionalData
-                }));
-                setHasValidDate(prev => ({ ...prev, [trackInstId]: !!additionalData.reportDate }));
-                setMessage(null);
-            } catch (error) {
-                console.error("Error fetching data on first click:", error);
-                setMessage('Error fetching data.');
-                setIsError(true);
-                // If fetch fails on first click, maybe deselect?
-                setSelectedBeneficiary(null);
-                setSelectedRecordOnly(false);
-            }
-
-            // Update indirect beneficiaries
             const indirect = activity.patientID
                 ? props.orgUnitDetails.filter(b => b.directPatientID === activity.patientID)
                 : [];
             setIndirectBeneficiaries(indirect);
-
-        } else if (isCurrentlySelected && !isCurrentlyEditable) {
-            // --- Scenario 2: Clicking the SELECTED row AGAIN (the "make editable" click) ---
-            // Make it editable. Data should have been fetched on the first click.
-            setEditableRows({ [trackInstId]: true });
-            // No need to fetch data again unless you want to refresh it
-
-        } else if (isCurrentlySelected && isCurrentlyEditable) {
-            // --- Scenario 3: Clicking the row that is ALREADY selected AND editable ---
-            // Do nothing. This allows clicks inside input fields.
-            // console.log("Click inside editable row ignored for toggling state.");
-            return; // Explicitly do nothing
         }
+        // Removed deselect logic completely
     };
 
     return (
@@ -3388,8 +3033,25 @@ export function OrgUnitTable(props: Props) {
             // onDownloadCSV={() => handleDownloadCSV('')}
             /> */}
 
-            {/* Training Filters */}
-            <h5 style={{ padding: '10px' }}>Training</h5>
+            <div className="" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                {/* Training Filters */}
+                <h5 style={{ padding: '10px' }}>Training</h5>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="border border-gray-300 rounded-md p-2"
+                    style={{
+                        borderRadius: '5px',
+                        width: '160px',
+                        height: '40px',
+                        padding: '5px',
+                        marginLeft: '5px'
+                    }}
+                // title="Refresh page"
+                >
+                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>New Beneficiary</span>
+                </button>
+            </div>
+
 
             {/* First div block - Search, New Beneficiary, Track and Program Stage filters */}
             <div className="flex space-x-4" style={{
@@ -3398,6 +3060,7 @@ export function OrgUnitTable(props: Props) {
                 alignItems: 'center',
                 gap: '20px'
             }}>
+
                 {/* Track Filter */}
                 <select
                     value={trackFilter}
@@ -3424,12 +3087,20 @@ export function OrgUnitTable(props: Props) {
                     <option value="Farmer">Farmer</option>
                 </select>
 
+                {/* Search Beneficiary */}
                 <input
                     type="text"
                     placeholder="Search Beneficiary"
                     value={beneficiarySearch}
                     // onChange={(e) => setBeneficiarySearch(e.target.value)}
-                    onChange={handleBeneficiarySearch1}
+                    onChange={(e) => {
+                        if (!trackFilter) {
+                            setMessage('Please select a tracker (Farmer or Fisher) before searching for beneficiary.');
+                            setIsError(true);
+                            return; // Stop if no track selected
+                        }
+                        handleBeneficiarySearch1(e);
+                    }}
                     className="border border-gray-300 rounded-md"
                     style={{
                         borderRadius: '5px',
@@ -3451,7 +3122,10 @@ export function OrgUnitTable(props: Props) {
                             value="Livelihood"
                             // checked={trainingFilter === 'Livelihood'}
                             checked={selectedTrainings.length === 1 && selectedTrainings[0] === 'Livelihood'}
-                            onChange={() => handleFilterChange('Livelihood')}
+                            onChange={(e) => {
+                                handleFilterChange('Livelihood')
+
+                            }}
                         />
                         Livelihood
                     </label>
@@ -3478,45 +3152,6 @@ export function OrgUnitTable(props: Props) {
                 </div>
 
                 {/* Column Selector */}
-                {/* <div ref={dropdownRef} style={{ position: 'relative' }} className="relative column-filter-dropdown">
-                    <button
-                        className="btn btn-secondary"
-                        onClick={() => setShowColumns(v => !v)}
-                        style={{ zIndex: 1000 }}
-                    >
-                        Columns ▼
-                    </button>
-                    {showColumns && (
-                        <div
-                            className="absolute mt-1 p-2 bg-white border rounded shadow-lg z-10"
-                            style={{ minWidth: '180px', zIndex: 999 }}
-                        >
-                            {columnsVis.map(col => (
-                                <label
-                                    key={col.accessor}
-                                    className="flex items-start py-1"
-
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={col.visible}
-                                        onChange={() =>
-                                            setColumnsVis(cols =>
-                                                cols.map(c =>
-                                                    c.accessor === col.accessor
-                                                        ? { ...c, visible: !c.visible }
-                                                        : c
-                                                )
-                                            )
-                                        }
-                                    />
-                                    <span
-                                    >{col.Header}</span>
-                                </label>
-                            ))}
-                        </div>
-                    )}
-                </div> */}
 
                 {/* Topics Selector */}
                 <div className="relative column-filter-dropdown" ref={dropdownRef} style={{ position: 'relative' }}>
@@ -3634,76 +3269,34 @@ export function OrgUnitTable(props: Props) {
                 </div>
 
                 {/*  Revert to all table rows */}
-                {
-                    selectedRecordOnly && (
-                        <button
-                            onClick={handleShowAllRecords}
-                            className="border border-gray-300 rounded-md"
-                            style={{
-                                borderRadius: '5px',
-                                height: '40px',
-                                padding: '5px 10px',
-                                backgroundColor: '#f8f9fa',
-                                cursor: 'pointer',
-                                marginLeft: '10px'
-                            }}
-                        >
-                            Show All Records
-                        </button>
-                    )
-                }
-
-            </div>
-
-            {/* Second div block - Add Beneficiary */}
-            <div style={{
-                padding: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '15px',
-                marginTop: '-5px'
-            }}>
-
-
-                {/* {selectedProgramStage && (
+                {selectedRecordOnly && (
                     <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleNewBeneficiaryClick()
-                        }}
+                        onClick={handleShowAllRecords}
                         className="border border-gray-300 rounded-md"
                         style={{
                             borderRadius: '5px',
                             height: '40px',
                             padding: '5px 10px',
                             backgroundColor: '#f8f9fa',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            marginLeft: '10px'
                         }}
                     >
-                        + Beneficiary
+                        Show All Records
                     </button>
-                )} */}
+                )}
 
-                {/* <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px'
-                }}>
-                    <label>Select Date:</label>
-                    <input
-                        type="date"
-                        id="dateFilter"
-                        value={dateFilter}
-                        onChange={(e) => setDateFilter(e.target.value)}
-                        className="border border-gray-300 rounded-md"
-                        style={{
-                            borderRadius: '5px',
-                            height: '35px',
-                            padding: '5px 10px'
-                        }}
-                    />
-                </div> */}
+            </div>
+
+            {/* Second div block - Add Beneficiary */}
+            {/* Message Display Area */}
+            <div style={{ minHeight: '3em', padding: '0 10px', position: 'relative' }}> {/* Added div for messages */}
+                {message && (
+                    <div className={isError ? 'error-message' : 'success-message'}>
+                        {/* {message} */}
+                        {typeof message === 'string' ? message : message}
+                    </div>
+                )}
             </div>
 
             {/* Modal for Search Results */}
@@ -3793,251 +3386,13 @@ export function OrgUnitTable(props: Props) {
                 </Modal>
             )}
 
-            {loading && <div className="mt-4">
-                <div className="loader-container">
-                    <div className="spinner"></div>
-                    <p>Saving Entry...</p>
-                </div>
-            </div>}
-
-            {message && (
-                <div className={isError ? 'error-message' : 'success-message'}>
-                    {message}
-                </div>
-            )}
-
-            {/* Add record Section */}
-
-            {formVisible && (
-                <div className="form-container">
-                    <form onSubmit={handleFormSubmit} className="form">
-                        {/*loader for getting code*/}
-                        {/* {isLoading ? (
-                            <div className="mt-4">
-                                <div className="loader-container"> */}
-                        {/* <div className="spinner"></div> */}
-                        {/* <p>Loading code, please wait...</p>
-                                </div>
-                            </div>
-                        ) : ( */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Registration Date</label>
-                            <input
-                                type="date"
-                                name="recordDate"
-                                value={formData.recordDate}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                required
-                            />
-                        </div>
-                        {/*  )} */}
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700">Registering Unit</label>
-                            <input
-                                type="text"
-                                name="topicTrainedOn"
-                                value={formData.topicTrainedOn}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            />
-                        </div> */}
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700">Inactive</label>
-                            <input
-                                type="text"
-                                name="inactive"
-                                value={formData.inactive}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                required
-                            />
-                        </div> */}
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Is Beneficiary an Adult or Child</label>
-                            <select
-                                name="beneficiaryStage"
-                                value={formData.beneficiaryStage}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                required
-                            >
-                                <option value=""></option>
-                                <option value="Adult">Adult</option>
-                                <option value="Child">Child</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Name of Care Giver</label>
-                            <input
-                                type="text"
-                                name="careGiver"
-                                value={formData.careGiver}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Age of Care Giver</label>
-                            <input
-                                type="text"
-                                name="careGiverAge"
-                                value={formData.careGiverAge}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            />
-                        </div>
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700">Gender of Care Giver</label>
-                            <select
-                                name="sex"
-                                value={formData.sex}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                required
-                            >
-                                <option value="">Sex</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div> */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Patient ID</label>
-                            <input
-                                type="text"
-                                name="patientID"
-                                value={formData.patientID}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">First Name and Middle Name</label>
-                            <input
-                                type="text"
-                                name="firstMiddleName"
-                                value={formData.firstMiddleName}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Surname</label>
-                            <input
-                                type="text"
-                                name="surname"
-                                value={formData.surname}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">SSD_Select Training</label>
-                            <select
-                                name="topicTrainedOn"
-                                value={formData.topicTrainedOn}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                required
-                            >
-                                <option value=""></option>
-                                <option value="Livelihood">Livelihood</option>
-                                <option value="Water Sanitation and Hygiene Promotion ">Water Sanitation and Hygiene Promotion</option>
-                                <option value="Nutrition Centric Training">Nutrition Centric Training</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Name (Beneficiary)</label>
-                            <input
-                                type="text"
-                                name="beneficiaryName"
-                                value={formData.beneficiaryName}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                readOnly
-                            />
-                        </div>
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700">Name (Non Beneficiary)</label>
-                            <input
-                                type="text"
-                                name="nonBeneficiaryName"
-                                value={formData.nonBeneficiaryName}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            />
-                        </div> */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Sex</label>
-                            <select
-                                name="sex"
-                                value={formData.sex}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                required
-                            >
-                                <option value=""></option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Age</label>
-                            <input
-                                type="number"
-                                name="age"
-                                value={formData.age}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Track</label>
-                            <select
-                                name="track"
-                                value={formData.track}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                required
-                            >
-                                <option value=""></option>
-                                <option value="Farmer">Farmer</option>
-                                <option value="Fisher">Fisher</option>
-                            </select>
-                        </div><br></br>
-
-                        <div className="button-container">
-                            <button
-                                type="submit"
-                                className="submit-button"
-                                style={{ marginLeft: '5px' }}
-                            >
-                                Save & Continue
-                            </button>
-                            <button
-                                type="button"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    resetForm()
-                                }}
-                                className="cancel-button"
-                                style={{ marginRight: '200px' }}
-                            >
-                                Close
-                            </button>
-                        </div><br></br>
-                    </form>
-                </div>
-            )}
-
-            {!formVisible && (
+            {/* Beneficiaries Table */}
+            {(!formVisible && (beneficiarySearch || trackFilter)) && (
                 <>
                     <div className="table-responsive">
-                        <table className="table table-striped table-bordered table-hover table-dark-header">
+                        <table
+                            key={`table-${resetTrigger}`}
+                            className="table table-striped table-bordered table-hover table-dark-header">
                             <thead>
                                 <tr>
                                     {columnsVis
@@ -4092,255 +3447,17 @@ export function OrgUnitTable(props: Props) {
                             <tbody>
                                 {renderTableRows()}
                                 {/* New row form as part of the table */}
-                                {isAddingNewRow && (
-                                    <tr>
-                                        {/* <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input"
-                                                name="id"
-                                                value={newRowData.id}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, id: e.target.value })}
-                                                placeholder="Row No."
-                                            />
-                                        </td> */}
-                                        {/* <td>NEW</td> */}
-
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="date"
-                                                name="recordDate"
-                                                value={newRowData.recordDate}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, recordDate: e.target.value })}
-                                                className="w-full p-2 mb-2"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <select
-                                                className="table-select w-full p-2 mb-2"
-                                                name="beneficiaryStage"
-                                                value={newRowData.beneficiaryStage}
-                                                // onChange={(e) => setNewRowData({ ...newRowData, beneficiaryStage: e.target.value })}
-
-                                                onChange={(e) => {
-                                                    const newStage = e.target.value;
-                                                    const classification = computeMuacClassification(newRowData.initialMuac, newStage);
-
-                                                    setNewRowData((prev) => ({
-                                                        ...prev,
-                                                        beneficiaryStage: newStage,
-                                                        muacClassification: classification,
-                                                    }));
-                                                }}
-                                            >
-                                                <option value="">Select Beneficiary Stage</option>
-                                                <option value="Adult">Adult</option>
-                                                <option value="Child">Child</option>
-                                            </select>
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <select
-                                                className="table-select w-full p-2 mb-2"
-                                                name="beneficiaryType"
-                                                value={newRowData.beneficiaryType}
-                                                onChange={(e) =>
-                                                    setNewRowData({ ...newRowData, beneficiaryType: e.target.value })
-                                                }
-                                            >
-                                                <option value="">Select Beneficiary Type</option>
-                                                <option value="Direct Beneficiary">Direct Beneficiary</option>
-                                                <option value="Indirect Beneficiary">Indirect Beneficiary</option>
-                                            </select>
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="patientID"
-                                                value={newRowData.patientID}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, patientID: e.target.value })}
-                                                placeholder="Patient ID"
-                                                readOnly
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="first_middleName"
-                                                value={newRowData.first_middleName}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, first_middleName: e.target.value })}
-                                                placeholder="First Name and Middle Name"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="surname"
-                                                value={newRowData.surname}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, surname: e.target.value })}
-                                                placeholder="Surname"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]" style={{ minWidth: '120px' }}>
-                                            <select
-                                                className="table-select w-full p-2 mb-2"
-                                                name="sex"
-                                                value={newRowData.sex}
-                                                onChange={(e) => setNewRowData({ ...newRowData, sex: e.target.value })}
-                                            >
-                                                <option value="">Select Gender</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                            </select>
-                                        </td>
-                                        <td className="min-w-[120px]" style={{ minWidth: '120px' }}>
-                                            <input
-                                                type="text"
-                                                inputMode="numeric"
-                                                pattern="[0-9]*"
-                                                name="age"
-                                                value={newRowData.age}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={e => {
-                                                    // strip out anything that isn’t a digit
-                                                    const onlyDigits = e.target.value.replace(/\D/g, '')
-                                                    setNewRowData({ ...newRowData, age: onlyDigits })
-                                                }}
-                                                onKeyDown={e => {
-                                                    // allow only digits, Backspace, Delete, arrows, Tab
-                                                    if (
-                                                        !/[0-9]/.test(e.key) &&
-                                                        e.key !== 'Backspace' &&
-                                                        e.key !== 'Delete' &&
-                                                        e.key !== 'ArrowLeft' &&
-                                                        e.key !== 'ArrowRight' &&
-                                                        e.key !== 'Tab'
-                                                    ) {
-                                                        e.preventDefault()
-                                                    }
-                                                }}
-                                                // style={{ width: '100%' /* keep full‐width even if table cols shrink */ }}
-                                                placeholder="Age"
-                                                className="w-full p-2 mb-2"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="date"
-                                                name="dob"
-                                                value={newRowData.dob}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, dob: e.target.value })}
-                                                className="w-full p-2 mb-2"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="initialMuac"
-                                                value={newRowData.initialMuac}
-                                                // onChange={handleNewRowInputChange}
-                                                // onChange={(e) => {
-                                                //     setNewRowData({ ...newRowData, initialMuac: e.target.value })}
-                                                // }
-                                                onChange={(e) => {
-                                                    const newMuac = e.target.value;
-                                                    const classification = computeMuacClassification(newMuac, newRowData.beneficiaryStage);
-
-                                                    setNewRowData((prev) => ({
-                                                        ...prev,
-                                                        initialMuac: newMuac,
-                                                        muacClassification: classification,
-                                                    }));
-                                                }}
-                                                placeholder="Initial Muac"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="muacClassification"
-                                                value={newRowData.muacClassification}
-
-                                                placeholder="Muac Classification"
-                                                readOnly
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="ben_facility_RegNo"
-                                                value={newRowData.ben_facility_RegNo}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, ben_facility_RegNo: e.target.value })}
-                                                placeholder="Beneficiary Facility Registration Number"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="directPatientID"
-                                                value={newRowData.directPatientID}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, directPatientID: e.target.value })}
-                                                placeholder="Direct Patient ID"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="track"
-                                                value={newRowData.track}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewRowData({ ...newRowData, track: e.target.value })}
-                                                readOnly
-                                                placeholder="Beneficiary Track"
-                                            />
-                                        </td>
-
-                                        {/* Add more input fields for other data as needed */}
-                                        <td>
-                                            <button onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleFormSubmit(e);
-                                            }}
-                                                className="submit-button"
-                                            >Save</button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setIsAddingNewRow(false)
-                                                }}
-                                                style={{ marginLeft: '5px' }}
-                                                className="cancel-button"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </td>
-                                    </tr>
-                                )}
                             </tbody>
                         </table>
                     </div>
                 </>
             )}
 
+            {/* Indirect Beneficiaries Table */}
             {selectedBeneficiary && (
                 <div className="mt-8">
                     <div className="flex justify-between items-center mb-4">
-                        <h5 style={{ padding: '10px' }} >Indirect Beneficiaries for Patient: {selectedBeneficiary.patientID}</h5>
+                        <h5 style={{ padding: '10px' }} >Direct Patient ID: {selectedBeneficiary.patientID}</h5>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -4358,6 +3475,18 @@ export function OrgUnitTable(props: Props) {
                         >
                             + Indirect Beneficiary
                         </button>
+                        <div style={{
+                            fontSize: '0.8rem',
+                            color: '#666',
+                            maxWidth: '300px',
+                            marginTop: '5px',
+                            marginLeft: '10px',
+                            padding: '5px',
+                            backgroundColor: '#f8f8f8',
+                            borderRadius: '4px'
+                        }}>
+                            <strong>Note:</strong> Records with blinking red border need attendance marked.
+                        </div>
                     </div>
 
                     <div className="table-responsive">
@@ -4365,7 +3494,7 @@ export function OrgUnitTable(props: Props) {
                             <thead>
                                 <tr>
                                     {/* 3 New Present / Absent header */}
-                                    <th>Present / Absent</th>
+                                    <th>Present</th>
 
                                     {/* 1 Original columns – exactly the same visibile set you chose in part 1 */}
                                     {columnsVis
@@ -4418,6 +3547,7 @@ export function OrgUnitTable(props: Props) {
 
                             <tbody>
                                 {indirectBeneficiaries.length === 0 ? (
+
                                     <tr>
                                         <td colSpan={14} className="text-center">
                                             No indirect beneficiaries found for this record
@@ -4432,13 +3562,23 @@ export function OrgUnitTable(props: Props) {
                                 {/* Editable row for new indirect beneficiary */}
                                 {isAddingIndirect && (
                                     <tr>
-                                        <td>NEW</td>
+                                        <td> {/* This is the 'Present' column */}
+                                            <input
+                                                type="checkbox"
+                                                checked={isNewIndirectPresent}
+                                                onChange={(e) => setIsNewIndirectPresent(e.target.checked)}
+                                                disabled
+                                                className="disabled-checkbox"
+                                                title="Save beneficiary first before marking attendance"
+                                            // Optionally disable if no training is selected? Or allow marking present even without training?
+                                            // For now, let's allow checking even without training selected, though saving won't create training events.
+                                            />
+                                        </td>
                                         <td className="min-w-[120px]">
                                             <input
                                                 type="date"
                                                 value={newIndirectData.recordDate}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, recordDate: e.target.value })}
-
                                                 className="w-full p-2 mb-2"
                                             />
                                         </td>
@@ -4471,17 +3611,10 @@ export function OrgUnitTable(props: Props) {
                                                 name="beneficiaryType"
                                                 value='Indirect Beneficiary'
                                                 readOnly
+                                                disabled={!newIndirectData.beneficiaryStage}
                                             />
                                         </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                value={newIndirectData.patientID}
-                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, patientID: e.target.value })}
-                                                readOnly
-                                            />
-                                        </td>
+
                                         <td className="min-w-[120px]">
                                             <input
                                                 type="text"
@@ -4489,6 +3622,7 @@ export function OrgUnitTable(props: Props) {
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, first_middleName: e.target.value })}
                                                 className="w-full p-2 mb-2"
                                                 placeholder="First Name and Middle Name"
+                                                disabled={!newIndirectData.beneficiaryStage}
                                             />
                                         </td>
                                         <td className="min-w-[120px]">
@@ -4498,6 +3632,7 @@ export function OrgUnitTable(props: Props) {
                                                 value={newIndirectData.surname}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, surname: e.target.value })}
                                                 placeholder="Surname"
+                                                disabled={!newIndirectData.beneficiaryStage}
                                             />
                                         </td>
                                         <td className="min-w-[120px]" style={{ minWidth: '120px' }}>
@@ -4505,6 +3640,7 @@ export function OrgUnitTable(props: Props) {
                                                 className="table-select w-full p-2 mb-2"
                                                 value={newIndirectData.sex}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, sex: e.target.value })}
+                                                disabled={!newIndirectData.beneficiaryStage}
                                             >
                                                 <option value="">Select Gender</option>
                                                 <option value="Male">Male</option>
@@ -4540,6 +3676,7 @@ export function OrgUnitTable(props: Props) {
                                                 style={{ width: '100%' /* keep full‐width even if table cols shrink */ }}
                                                 placeholder="Age"
                                                 className="w-full p-2 mb-2"
+                                                disabled={!newIndirectData.beneficiaryStage}
                                             />
                                         </td>
                                         <td className="min-w-[120px]">
@@ -4550,74 +3687,21 @@ export function OrgUnitTable(props: Props) {
                                                 // onChange={handleNewRowInputChange}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, dob: e.target.value })}
                                                 className="w-full p-2 mb-2"
+                                                disabled={!newIndirectData.beneficiaryStage}
                                             />
                                         </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="initialMuac"
-                                                value={newIndirectData.initialMuac}
-                                                // onChange={handleNewRowInputChange}
-                                                // onChange={(e) => setNewIndirectData({ ...newIndirectData, initialMuac: e.target.value })}
-                                                onChange={(e) => {
-                                                    const newMuac = e.target.value;
-                                                    const classification = computeMuacClassification(newMuac, newIndirectData.beneficiaryStage);
 
-                                                    setNewIndirectData((prev) => ({
-                                                        ...prev,
-                                                        initialMuac: newMuac,
-                                                        muacClassification: classification,
-                                                    }));
-                                                }}
-
-                                                placeholder="Initial Muac"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="muacClassification"
-                                                value={newIndirectData.muacClassification}
-
-                                                placeholder="Muac Classification"
-                                                readOnly
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="ben_facility_RegNo"
-                                                value={newIndirectData.ben_facility_RegNo}
-                                                // onChange={handleNewRowInputChange}
-                                                onChange={(e) => setNewIndirectData({ ...newIndirectData, ben_facility_RegNo: e.target.value })}
-                                                placeholder="Beneficiary Facility Registration Number"
-                                            />
-                                        </td>
-                                        <td className="min-w-[120px]">
-                                            <input
-                                                type="text"
-                                                className="table-input w-full p-2 mb-2"
-                                                name="directPatientID"
-                                                value={newIndirectData.directPatientID}
-                                                // onChange={handleNewRowInputChange}
-                                                // onChange={(e) => setNewIndirectData({ ...newIndirectData, directPatientID: e.target.value })}
-                                                placeholder="Direct Patient ID"
-                                                readOnly
-                                            />
-                                        </td>
                                         <td className="min-w-[120px]">
                                             <input
                                                 type="text"
                                                 className="table-input w-full p-2 mb-2"
                                                 name="track"
-                                                value={newIndirectData.track}
+                                                value={newRowData.track}
                                                 // onChange={handleNewRowInputChange}
                                                 onChange={(e) => setNewIndirectData({ ...newIndirectData, track: e.target.value })}
                                                 readOnly
                                                 placeholder="Beneficiary Track"
+                                                disabled={!newIndirectData.beneficiaryStage}
                                             />
                                         </td>
                                         <td>
@@ -4628,6 +3712,7 @@ export function OrgUnitTable(props: Props) {
                                                 }
                                                 }
                                                 className="submit-button"
+                                                disabled={!newIndirectData.beneficiaryStage}
                                             >
                                                 Save
                                             </button>
@@ -4638,6 +3723,7 @@ export function OrgUnitTable(props: Props) {
                                                 }}
                                                 style={{ marginLeft: '5px' }}
                                                 className="cancel-button"
+
                                             >
                                                 Cancel
                                             </button>
@@ -4654,7 +3740,5 @@ export function OrgUnitTable(props: Props) {
         </main>
 
     );
-
-
 
 }
